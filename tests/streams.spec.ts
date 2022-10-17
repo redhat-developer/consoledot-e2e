@@ -37,7 +37,7 @@ test('can create and delete instances', async ({ page }) => {
   await marketingOverlaysGoAway();
 
   // check we landed on the right page
-  await expect(page).toHaveTitle(/Streams for Apache Kafka/);
+  await expect(page).toHaveTitle(/Streams for Apache Kafka.*/, { timeout: 10000 });
 
   // create a Kafka instance
   await page.getByText('Create Kafka instance').click();
