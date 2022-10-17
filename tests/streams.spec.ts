@@ -47,21 +47,20 @@ test('can create and delete instances', async ({ page }) => {
   await page.getByTestId('modalCreateKafka-buttonSubmit').click();
 
   // wait for the table to appear
-  await page.waitForSelector('[data-ouia-component-id=table-kafka-instances]', {timeout: 2 * 60 * 1000});
+  const table = await page.locator('[data-ouia-component-id=table-kafka-instances]');
 
   // check for the instance to have been created
-  await expect(page.getByText('Time created')).toBeTruthy();
-  await expect(page.getByText('test-instance')).toBeTruthy();
-  // await expect.soft(page.getByText('Creation in progress')).toBeTruthy();
+  await expect(table.getByText('test-instance')).toBeTruthy();
+  await expect.soft(table.getByText('Creation in progress')).toBeTruthy();
 
   // delete the created instance
-  await page.getByText('Delete').click();
+  await table.locator('[aria-label="Actions"]').last().click();
+  await table.getByText('Delete').click();
   await page.locator('#confirm__button').click();
 
   // wait for deletion
   await page.waitForSelector('test-instance', { state: 'detached'});
 
   // check to be in the initial empty state
-  await page.waitForSelector('Create Kafka instance');
-
+  await page.locator('No Kafka instances');
 });
