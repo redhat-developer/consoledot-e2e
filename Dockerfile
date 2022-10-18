@@ -3,6 +3,8 @@
 FROM mcr.microsoft.com/playwright:v1.20.0-focal
 # FROM mcr.microsoft.com/playwright:v1.27.0-focal
 
+RUN curl -sL https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64 -o /usr/local/bin/jq && chmod a+x /usr/local/bin/jq
+
 ENV CI=true
 RUN useradd --no-log-init -rm -d /opt/playwright -s /bin/bash -g root -u 1001 playwright
 

@@ -37,5 +37,5 @@ spec:
             command:
               - "/bin/sh"
               - "-c"
-              - "npx playwright test --reporter=dot | xargs -0 -I {} curl -si $GOOGLE_CHAT_WEBHOOK -X POST -H 'Content-Type: application/json' --data '{\"text\": \"{}\"}'"
+              - "npx playwright test --reporter=json | jq -Rsa . | xargs -0 -I {} curl -si $GOOGLE_CHAT_WEBHOOK -X POST -H 'Content-Type: application/json' --data '{\"text\": \"{}\"}'"
           restartPolicy: Never
