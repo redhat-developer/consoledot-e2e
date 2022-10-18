@@ -35,7 +35,7 @@ spec:
                     name: consoledot-e2e-gchat
                     key: webhook
             command:
-              - "/bin/sh"
-              - "-c"
-              - "npx playwright test --reporter=dot | jq -Rsa . | xargs -0 -I {} curl -si $GOOGLE_CHAT_WEBHOOK -X POST -H 'Content-Type: application/json' --data '{\"text\": {}}'"
+              - "/bin/bash"
+              - "-xc"
+              - "npx playwright test --reporter=dot | jq -Rsa . | awk '{print substr($0,1,4000)}' | xargs --verbose -0 -I {} curl -si $GOOGLE_CHAT_WEBHOOK -X POST -H 'Content-Type: application/json' --data '{\"text\": {}}'"
           restartPolicy: Never
