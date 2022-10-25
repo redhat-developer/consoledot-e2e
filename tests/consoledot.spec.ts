@@ -23,9 +23,9 @@ test('can see the homepage', async ({ page }) => {
   await expect(page).toHaveTitle(/Log In | Red Hat IDP/);
 
   // do login
-  await page.locator('#username-verification').fill(process.env.RH_USERNAME!);
+  await page.locator('#username-verification').fill(process.env.TEST_USERNAME!);
   await page.getByText('Next').click();
-  await page.locator('#password').fill(process.env.RH_PASSWORD!);
+  await page.locator('#password').fill(process.env.TEST_PASSWORD!);
   await page.locator('#rh-password-verification-submit-button').click();
 
   // check we landed on the right page
