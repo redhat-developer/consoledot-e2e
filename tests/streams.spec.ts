@@ -29,9 +29,9 @@ test('can create and delete instances', async ({ page }) => {
   }
 
   // do login
-  await page.locator('#username-verification').fill(process.env.RH_USERNAME!);
+  await page.locator('#username-verification').fill(process.env.TEST_USERNAME!);
   await page.getByText('Next').click();
-  await page.locator('#password').fill(process.env.RH_PASSWORD!);
+  await page.locator('#password').fill(process.env.TEST_PASSWORD!);
   await page.locator('#rh-password-verification-submit-button').click();
 
   await marketingOverlaysGoAway();
