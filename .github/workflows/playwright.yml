@@ -5,6 +5,7 @@ on:
   schedule:
     - cron: "*/30 * * * *"
 
+# TODO: use a fast and full approach to CI
 jobs:
   playwright:
     uses: andreaTP/apicurio-gh-workflows/.github/workflows/playwright.yaml@playwright
