@@ -17,9 +17,7 @@ test('perform login', async ({ page }) => {
 
   await expect(page).toHaveTitle(/Overview | Streams for Apache Kafka | Red Hat OpenShift Application Services/);
   await expect(
-    page.getByRole('heading', {
-      name: 'Get started with Red Hat OpenShift Application and Data Services'
-    })
+    page.getByRole('heading', { name: /Get started with Red Hat OpenShift/ })
   ).toBeVisible();
 });
 
