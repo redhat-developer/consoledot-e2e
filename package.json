@@ -3,12 +3,18 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-  "scripts": {},
+  "scripts": {
+    "prettier-format": "prettier --config .prettierrc 'tests/**/*.ts' --write"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
     "@playwright/test": "^1.27.1",
-    "dotenv": "^16.0.3"
+    "dotenv": "^16.0.3",
+    "prettier": "^2.7.1"
+  },
+  "dependencies": {
+    "uuid": "^9.0.0"
   }
 }
