@@ -23,10 +23,9 @@ const createKafkaInstance = async function (page, name) {
   // check for the instance to have been created
   const table = await page.locator('[data-ouia-component-id=table-kafka-instances]');
   await expect(table.getByText(name)).toBeTruthy();
-  await expect.soft(page.getByText('Creating')).toHaveCount(1);
 };
 
-const deleteKafkaInstance = async function (page, name) {
+const deleteKafkaInstance = async function (page, name, awaitDeletion = true) {
   const instanceLinkSelector = page.getByText(name);
   const row = page.locator('tr', { has: instanceLinkSelector });
 
@@ -46,9 +45,11 @@ const deleteKafkaInstance = async function (page, name) {
   await page.getByTestId('modalDeleteKafka-buttonDelete').click();
 
   // await for the instance to be deleted
-  await expect(page.getByText(`${name}`, { exact: true })).toHaveCount(0, {
-    timeout: config.kafkaInstanceDeletionTimeout
-  });
+  if (awaitDeletion) {
+    await expect(page.getByText(`${name}`, { exact: true })).toHaveCount(0, {
+      timeout: config.kafkaInstanceDeletionTimeout
+    });
+  }
 };
 
 const waitForKafkaReady = async function (page, name) {
@@ -90,9 +91,7 @@ test('create, wait for ready and delete a Kafka instance', async ({ page }) => {
   const testInstanceName = `test-instance-${config.sessionID}`;
 
   await createKafkaInstance(page, testInstanceName);
-
   await waitForKafkaReady(page, testInstanceName);
-
   await deleteKafkaInstance(page, testInstanceName);
 });
 
@@ -109,12 +108,46 @@ test('test Kafka creation units slider', async ({ page }) => {
   await expect(slider.locator('.pf-c-slider__step-label').last()).toHaveText(config.maxKafkaStreamingUnits.toString());
 });
 
-// TODO: next
-// // test_3kas.py test_kas_kafka_filter_by_status
-// test('test Kafka list filtered by status', async ({ page }) => {
-//   const testInstanceName = `test-instance-${config.sessionID}`;
+const filterByStatus = async function (page, status) {
+  if ((await page.getByRole('button', { name: 'Clear all filters' }).count()) > 0) {
+    await page.getByRole('button', { name: 'Clear all filters' }).click();
+  }
+  await page.getByTestId('large-viewport-toolbar').locator('[aria-label="Options menu"]').click();
 
-//   await createKafkaInstance(page, testInstanceName);
+  // TODO: Riccardo do you have a better selector here?
+  await page.locator('button[role="option"]:has-text("Status")').click();
+  await page.getByTestId('large-viewport-toolbar').getByText('Filter by status').click();
 
-//   await waitForKafkaReady(page, testInstanceName);
-// });
+  await page.getByLabel(status).check(true);
+
+  await page.getByTestId('large-viewport-toolbar').getByText('Filter by status').click();
+}
+
+// test_3kas.py test_kas_kafka_filter_by_status
+test('test Kafka list filtered by status', async ({ page }) => {
+  const testInstanceName = `test-instance-${config.sessionID}`;
+
+  await createKafkaInstance(page, testInstanceName);
+  await expect(page.getByText(testInstanceName)).toBeVisible();
+
+  await filterByStatus(page, 'Suspended');
+  await expect(page.getByText('No results found')).toHaveCount(1);
+
+  await filterByStatus(page, 'Creating');
+  await expect(page.getByText(testInstanceName)).toBeTruthy();
+
+  await waitForKafkaReady(page, testInstanceName);
+
+  await filterByStatus(page, 'Ready');
+  await expect(page.getByText(testInstanceName)).toBeTruthy();
+
+  await deleteKafkaInstance(page, testInstanceName, false);
+
+  await filterByStatus(page, 'Deleting');
+  await expect(page.getByText(testInstanceName)).toBeTruthy();
+
+  // await for the kafka instance to be deleted
+  await expect(page.getByText(`${testInstanceName}`, { exact: true })).toHaveCount(0, {
+    timeout: config.kafkaInstanceDeletionTimeout
+  });
+});
