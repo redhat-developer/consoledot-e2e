@@ -4,10 +4,6 @@ import { config } from '@lib/config';
 import { navigateToKafkaList, deleteKafkaInstance, createKafkaInstance, waitForKafkaReady } from '@lib/kafka';
 
 const testInstanceName = `test-instance-${config.sessionID}`;
-// DEBUG MODE:
-// let testInstanceName = `test-instance-${config.sessionID}`;
-
-let kafkaCreated = false;
 
 test.beforeEach(async ({ page }, testInfo) => {
   await login(page);
@@ -21,21 +17,14 @@ test.beforeEach(async ({ page }, testInfo) => {
 
     if (name !== testInstanceName) {
       await deleteKafkaInstance(page, name);
-      // DEBUG MODE:
-      // testInstanceName = name;
-      // kafkaCreated = true;
     }
   }
 
-  if (!kafkaCreated) {
+  if (!((await page.getByText(testInstanceName).count()) > 0)) {
     await createKafkaInstance(page, testInstanceName);
     await expect(page.getByText(testInstanceName)).toBeVisible();
 
     await waitForKafkaReady(page, testInstanceName);
-
-    await page.waitForSelector('[role=progressbar]', { state: 'detached' });
-
-    kafkaCreated = true;
   }
 });
 
@@ -70,16 +59,16 @@ const filterByName = async function (page, name, skipClick = false) {
 }
 
 // test_3kas.py test_kas_kafka_filter_by_name
-// test('test instances can be filtered by name', async ({ page }) => {
-//   await filterByName(page, 'test');
-//   await expect(page.getByText(testInstanceName)).toBeTruthy();
+test('test instances can be filtered by name', async ({ page }) => {
+  await filterByName(page, 'test');
+  await expect(page.getByText(testInstanceName)).toBeTruthy();
 
-//   await filterByName(page, 'wrong');
-//   await expect(page.getByText('No results found')).toHaveCount(1);
+  await filterByName(page, 'wrong');
+  await expect(page.getByText('No results found')).toHaveCount(1);
 
-//   await filterByName(page, 'INVALID-SYNTAX#$', true);
-//   await expect(page.getByText('Valid characters include lowercase letters from a to z, numbers from 0 to 9, and')).toHaveCount(1);
-// });
+  await filterByName(page, 'INVALID-SYNTAX#$', true);
+  await expect(page.getByText('Valid characters include lowercase letters from a to z, numbers from 0 to 9, and')).toHaveCount(1);
+});
 
 const filterByOwner = async function (page, name, skipClick = false) {
   if ((await page.getByRole('button', { name: 'Clear all filters' }).count()) > 0) {
