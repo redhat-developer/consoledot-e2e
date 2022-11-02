@@ -8,7 +8,7 @@ test.beforeEach(async ({ page }, testInfo) => {
 
   await navigateToKafkaList(page);
 
-  await page.waitForSelector('[role=progressbar]', { state: 'detached' });
+  await page.waitForSelector('[role=progressbar]', { state: 'detached', timeout: config.kafkaInstanceCreationTimeout });
 
   for (const el of await page.locator(`tr >> a`).elementHandles()) {
     const name = await el.textContent();

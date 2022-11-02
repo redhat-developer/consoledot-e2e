@@ -10,21 +10,25 @@ test.beforeEach(async ({ page }, testInfo) => {
 
   await navigateToKafkaList(page);
 
-  await page.waitForSelector('[role=progressbar]', { state: 'detached' });
+  await expect(page.getByRole('button', { name: 'Create Kafka instance' })).toBeVisible();
 
-  for (const el of await page.locator(`tr >> a`).elementHandles()) {
-    const name = await el.textContent();
+  if (((await page.getByText(testInstanceName).count()) > 0) &&
+      ((await page.locator('tr').count()) === 2)) {
+    // Test instance present, nothing to do!
+  } else {
+    await page.waitForSelector('[role=progressbar]', { state: 'detached', timeout: config.kafkaInstanceCreationTimeout });
 
-    if (name !== testInstanceName) {
-      await deleteKafkaInstance(page, name);
+    for (const el of await page.locator(`tr >> a`).elementHandles()) {
+      const name = await el.textContent();
+
+      if (name !== testInstanceName) {
+        await deleteKafkaInstance(page, name);
+      }
     }
-  }
 
-  if (!((await page.getByText(testInstanceName).count()) > 0)) {
-    await createKafkaInstance(page, testInstanceName);
-    await expect(page.getByText(testInstanceName)).toBeVisible();
-
-    await waitForKafkaReady(page, testInstanceName);
+    if (((await page.getByText(testInstanceName).count()) === 0)) {
+      await createKafkaInstance(page, testInstanceName);
+    }
   }
 });
 
