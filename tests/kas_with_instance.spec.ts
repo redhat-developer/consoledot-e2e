@@ -12,11 +12,13 @@ test.beforeEach(async ({ page }, testInfo) => {
 
   await expect(page.getByRole('button', { name: 'Create Kafka instance' })).toBeVisible();
 
-  if (((await page.getByText(testInstanceName).count()) > 0) &&
-      ((await page.locator('tr').count()) === 2)) {
+  if ((await page.getByText(testInstanceName).count()) > 0 && (await page.locator('tr').count()) === 2) {
     // Test instance present, nothing to do!
   } else {
-    await page.waitForSelector('[role=progressbar]', { state: 'detached', timeout: config.kafkaInstanceCreationTimeout });
+    await page.waitForSelector('[role=progressbar]', {
+      state: 'detached',
+      timeout: config.kafkaInstanceCreationTimeout
+    });
 
     for (const el of await page.locator(`tr >> a`).elementHandles()) {
       const name = await el.textContent();
@@ -26,7 +28,7 @@ test.beforeEach(async ({ page }, testInfo) => {
       }
     }
 
-    if (((await page.getByText(testInstanceName).count()) === 0)) {
+    if ((await page.getByText(testInstanceName).count()) === 0) {
       await createKafkaInstance(page, testInstanceName);
     }
   }
@@ -60,7 +62,7 @@ const filterByName = async function (page, name, skipClick = false) {
   if (!skipClick) {
     await page.getByRole('button', { name: 'Search' }).click();
   }
-}
+};
 
 // test_3kas.py test_kas_kafka_filter_by_name
 test('test instances can be filtered by name', async ({ page }) => {
@@ -71,7 +73,9 @@ test('test instances can be filtered by name', async ({ page }) => {
   await expect(page.getByText('No results found')).toHaveCount(1);
 
   await filterByName(page, 'INVALID-SYNTAX#$', true);
-  await expect(page.getByText('Valid characters include lowercase letters from a to z, numbers from 0 to 9, and')).toHaveCount(1);
+  await expect(
+    page.getByText('Valid characters include lowercase letters from a to z, numbers from 0 to 9, and')
+  ).toHaveCount(1);
 });
 
 const filterByOwner = async function (page, name, skipClick = false) {
@@ -88,7 +92,7 @@ const filterByOwner = async function (page, name, skipClick = false) {
   if (!skipClick) {
     await page.getByRole('button', { name: 'Search' }).click();
   }
-}
+};
 
 // test_3kas.py test_kas_kafka_filter_by_owner
 test('test instances can be filtered by owner', async ({ page }) => {
@@ -99,7 +103,9 @@ test('test instances can be filtered by owner', async ({ page }) => {
   await expect(page.getByText('No results found')).toHaveCount(1);
 
   await filterByOwner(page, 'INVALID-SYNTAX#$', true);
-  await expect(page.getByText('Valid characters include lowercase letters from a to z, numbers from 0 to 9, and')).toHaveCount(1);
+  await expect(
+    page.getByText('Valid characters include lowercase letters from a to z, numbers from 0 to 9, and')
+  ).toHaveCount(1);
 });
 
 // test_3kas.py test_kas_kafka_filter_by_region
@@ -119,7 +125,7 @@ test('test instances can be filtered by cloud provider', async ({ page }) => {
 // test_3kas.py test_kas_kafka_view_details_by_row_click_panel_opened
 test('test instance details on row click', async ({ page }) => {
   await page.getByRole('gridcell', { name: `${config.username}` }).click();
-  
+
   await expect(page.getByRole('heading', { name: `${testInstanceName}` })).toHaveCount(1);
 });
 
@@ -158,4 +164,3 @@ test('test instance quick options', async ({ page }) => {
 
   await page.getByRole('button', { name: 'Cancel' }).click();
 });
-

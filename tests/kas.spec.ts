@@ -63,7 +63,7 @@ const filterByStatus = async function (page, status) {
   await page.getByLabel(status).check(true);
 
   await page.getByTestId('large-viewport-toolbar').getByText('Filter by status').click();
-}
+};
 
 // test_3kas.py test_kas_kafka_filter_by_status
 test('test Kafka list filtered by status', async ({ page }) => {
@@ -99,7 +99,7 @@ test('test Kafka list filtered by status', async ({ page }) => {
 test('test fail to create Kafka instance with the same name', async ({ page }) => {
   const testInstanceName = `test-instance-${config.sessionID}`;
   await createKafkaInstance(page, testInstanceName, false);
-  
+
   await page.getByText('Create Kafka instance').click();
 
   await expect(page.getByText('Create a Kafka instance')).toHaveCount(1);

@@ -16,9 +16,7 @@ test('perform login', async ({ page }) => {
   await page.getByRole('region', { name: 'Streams for Apache Kafka' }).getByRole('link', { name: 'Overview' }).click();
 
   await expect(page).toHaveTitle(/Overview | Streams for Apache Kafka | Red Hat OpenShift Application Services/);
-  await expect(
-    page.getByRole('heading', { name: /Get started with Red Hat OpenShift/ })
-  ).toBeVisible();
+  await expect(page.getByRole('heading', { name: /Get started with Red Hat OpenShift/ })).toBeVisible();
 });
 
 // test_1auth.py test_auth_log_out
