@@ -5,7 +5,11 @@ on:
   schedule:
     - cron: "*/30 * * * *"
 
-# TODO: use a fast and full approach to CI
+concurrency:
+  # Only run once this workflow
+  group: ${{ github.workflow }}
+  cancel-in-progress: true
+
 jobs:
   playwright:
     uses: andreaTP/apicurio-gh-workflows/.github/workflows/playwright.yaml@playwright
