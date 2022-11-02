@@ -18,8 +18,8 @@ class Config {
     this.startingPage = process.env.STARTING_PAGE || "https://console.redhat.com";
     this.sessionID = uuid().substring(0, 16);
 
-    this.kafkaInstanceCreationTimeout = 10 * 60 * 1000; // 5 minutes
-    this.kafkaInstanceDeletionTimeout = 5 * 60 * 1000; // 5 minutes
+    this.kafkaInstanceCreationTimeout = 20 * 60 * 1000; // 20 minutes
+    this.kafkaInstanceDeletionTimeout = 10 * 60 * 1000; // 10 minutes
 
     this.minKafkaStreamingUnits = 1;
     this.maxKafkaStreamingUnits = 2;
