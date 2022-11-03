@@ -4,8 +4,8 @@ on:
     branches: [ main ]
   pull_request:
     branches: [ main ]
-  # schedule:
-  #   - cron: "*/30 * * * *"
+  schedule:
+    - cron: "*/30 * * * *"
 
 concurrency:
   # Only run once this workflow
