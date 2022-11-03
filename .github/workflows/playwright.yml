@@ -2,8 +2,10 @@ name: Playwright Tests
 on:
   push:
     branches: [ main ]
-  schedule:
-    - cron: "*/30 * * * *"
+  pull_request:
+    branches: [ main ]
+  # schedule:
+  #   - cron: "*/30 * * * *"
 
 concurrency:
   # Only run once this workflow
@@ -16,6 +18,7 @@ jobs:
     with:
       os: ubuntu-latest
       notify-on-failure: false
+    environment: test
     secrets:
       username: ${{ secrets.RH_USERNAME }}
       password: ${{ secrets.RH_PASSWORD }}
