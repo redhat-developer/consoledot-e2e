@@ -55,9 +55,12 @@ export const deleteKafkaInstance = async function (page: Page, name: string, awa
 };
 
 export const waitForKafkaReady = async function (page: Page, name: string) {
+  // no loading in progress
+  await page.waitForSelector('[role=progressbar]', { state: 'detached', timeout: config.kafkaInstanceCreationTimeout });
+
   const instanceLinkSelector = page.getByText(name);
   const row = page.locator('tr', { has: instanceLinkSelector });
-  await expect(row.getByText('Ready')).toHaveCount(1, {
+  await expect(row.getByText('Ready', { exact: true })).toHaveCount(1, {
     timeout: config.kafkaInstanceCreationTimeout
   });
 };
