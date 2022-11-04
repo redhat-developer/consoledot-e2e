@@ -51,10 +51,14 @@ test('test Kafka creation units slider', async ({ page }) => {
   await expect(slider.locator('.pf-c-slider__step-label').last()).toHaveText(config.maxKafkaStreamingUnits.toString());
 });
 
-const filterByStatus = async function (page, status) {
-  if ((await page.getByRole('button', { name: 'Clear all filters' }).count()) > 0) {
-    await page.getByRole('button', { name: 'Clear all filters' }).click();
+const resetFilter = async function (page) {
+  if ((await (page.getByText('Clear all filters')).count()) > 1) {
+    await page.getByText('Clear all filters').nth(1).click();
   }
+}
+
+const filterByStatus = async function (page, status) {
+  await resetFilter(page);
   await page.getByTestId('large-viewport-toolbar').locator('[aria-label="Options menu"]').click();
 
   await page.locator('button[role="option"]:has-text("Status")').click();
@@ -78,6 +82,8 @@ test('test Kafka list filtered by status', async ({ page }) => {
   await filterByStatus(page, 'Creating');
   await expect(page.getByText(testInstanceName)).toBeTruthy();
 
+  // Reset the filter
+  await resetFilter(page);
   await waitForKafkaReady(page, testInstanceName);
 
   await filterByStatus(page, 'Ready');
