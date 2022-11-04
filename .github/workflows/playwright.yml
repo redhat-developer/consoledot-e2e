@@ -3,7 +3,7 @@ on:
   push:
     branches: [ main ]
   schedule:
-    - cron: "*/30 * * * *"
+    - cron: "0 */1 * * *"
 
 concurrency:
   # Only run once this workflow
