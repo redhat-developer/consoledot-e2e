@@ -13,9 +13,10 @@ export const createKafkaInstance = async function (page: Page, name: string, che
   await page.getByText('Create Kafka instance').click();
 
   await expect(page.getByText('Create a Kafka instance')).toHaveCount(1);
-  await page.getByLabel('Name *').fill(name);
 
   await page.waitForSelector('[role=progressbar]', { state: 'detached' });
+
+  await page.getByLabel('Name *').fill(name);
 
   await page.getByTestId('modalCreateKafka-buttonSubmit').click();
 
