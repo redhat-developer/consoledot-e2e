@@ -52,10 +52,10 @@ test('test Kafka creation units slider', async ({ page }) => {
 });
 
 const resetFilter = async function (page) {
-  if ((await (page.getByText('Clear all filters')).count()) > 1) {
+  if ((await page.getByText('Clear all filters').count()) > 1) {
     await page.getByText('Clear all filters').nth(1).click();
   }
-}
+};
 
 const filterByStatus = async function (page, status) {
   await resetFilter(page);
