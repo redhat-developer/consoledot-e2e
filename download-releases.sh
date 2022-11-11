@@ -1,13 +1,29 @@
 #! /bin/bash
-# set -x
+set -euxo pipefail
+
+GH_TOKEN=$1
+if [ -z "$GH_TOKEN" ]; then
+    echo "Please provide a GH TOKEN as first argument."
+    exit 1
+fi
 
 INITIAL_TAG=${INITIAL_TAG:-'1'}
-REPO='andreaTP/consoledot-e2e'
-LATEST_TAG=$(curl -sL "https://api.github.com/repos/${REPO}/releases/latest" | jq -r '.tag_name')
+REPO='redhat-developer/consoledot-e2e'
 
-echo "Latest release is ${LATEST_TAG}"
+curl -sL https://api.github.com/repos/${REPO}/releases | jq -rc '.[].name' | \
+  while IFS='' read tag; do
+    echo "Downloading test results for ID ${tag}"
+    curl -f -sL https://github.com/${REPO}/releases/download/${tag}/results.xml -o test-results/results-${tag}.xml
 
-for (( i = ${INITIAL_TAG}; i <= ${LATEST_TAG}; i++ )) do
-  # echo "Downloading test results for ID $i"
-  curl -f -sL https://github.com/${REPO}/releases/download/${i}/results.xml -o test-results/results-${i}.xml &
-done
+    # do business with the downloaded file
+
+    curl \
+      -H "Accept: application/vnd.github+json" \
+      -H "Authorization: Bearer ${GH_TOKEN}" \
+      -X DELETE "https://api.github.com/repos/${REPO}/git/refs/${tag}"
+
+    curl \
+      -H "Accept: application/vnd.github+json" \
+      -H "Authorization: Bearer ${GH_TOKEN}" \
+      -X DELETE "https://api.github.com/${REPO}/releases/${tag}"
+  done
