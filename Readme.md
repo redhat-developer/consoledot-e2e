@@ -17,7 +17,7 @@ Local requirements:
 - `npm`: `8.X`
 - `node`: `16.X`
 
-Before running the tests you would need to provide a valide username and password to be used in the form of environment variables.
+Before running the tests you would need to provide a valid username and password to be used in the form of environment variables.
 
 ```bash
 export TEST_USERNAME=...
