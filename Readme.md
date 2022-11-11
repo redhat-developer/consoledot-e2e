@@ -17,6 +17,22 @@ Local requirements:
 - `npm`: `8.X`
 - `node`: `16.X`
 
+Before running the tests you would need to provide a valid username and password to be used in the form of environment variables.
+
+```bash
+export TEST_USERNAME=...
+export TEST_PASSWORD=...
+```
+
+or drop a `.env` file in the root folder with a similar content:
+
+```
+TEST_USERNAME=...
+TEST_PASSWORD=...
+```
+
+now you can run the tests:
+
 ```bash
 npm install # Install all the needed Node dependencies
 npx playwright install # Install all the Playwright dependencies and needed browsers
