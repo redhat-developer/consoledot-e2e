@@ -1,5 +1,5 @@
-import { expect, Page } from "@playwright/test";
-import { config } from "./config";
+import { expect, Page } from '@playwright/test';
+import { config } from './config';
 
 export const navigateToKafkaList = async function (page: Page) {
   await page.getByRole('link', { name: 'Application and Data Services' }).click();
@@ -22,8 +22,8 @@ export const createKafkaInstance = async function (page: Page, name: string, che
 
   if (check) {
     // check for the instance to have been created
-    const table = await page.locator('[data-ouia-component-id=table-kafka-instances]');
-    await expect(table.getByText(name)).toBeTruthy();
+    const table = page.locator('[data-ouia-component-id=table-kafka-instances]');
+    expect(table.getByText(name)).toBeTruthy();
   }
 };
 
