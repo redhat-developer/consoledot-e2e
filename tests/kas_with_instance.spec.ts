@@ -1,9 +1,43 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, Page } from '@playwright/test';
 import login from '@lib/auth';
 import { config } from '@lib/config';
 import { navigateToKafkaList, deleteKafkaInstance, createKafkaInstance, waitForKafkaReady } from '@lib/kafka';
 
 const testInstanceName = `test-instance-${config.sessionID}`;
+const testTopicName = `test-topic-${config.sessionID}`;
+
+export const navigateToKafkaTopicsList = async function (page: Page, kafkaName: string) {
+  await expect(page.getByText(kafkaName)).toHaveCount(1);
+  await waitForKafkaReady(page, kafkaName);
+  await page.getByText(kafkaName).click();
+  await page.getByText('Topics').click();
+};
+
+export const createKafkaTopic = async function (page: Page, name: string) {
+  await page.getByText('Create topic').click();
+  await expect(page.getByText('Create topic')).toHaveCount(2);
+  // Default Topic creation
+  await page.getByPlaceholder('Enter topic name').fill(name);
+  for (let i = 0; i < 3; i++) {
+    await page.getByText('Next').click();
+  }
+  await page.getByText('Finish').click();
+
+  expect(page.getByText(name)).toHaveCount(1);
+};
+
+export const deleteKafkaTopic = async function (page: Page, name: string) {
+  const instanceLinkSelector = page.getByText(name);
+  const row = page.locator('tr', { has: instanceLinkSelector });
+
+  await row.locator('[aria-label="Actions"]').click();
+  await page.getByText('Delete').click();
+  await page.getByLabel('Type DELETE to confirm:').click();
+  await page.getByLabel('Type DELETE to confirm:').fill('DELETE');
+  await page.getByTestId('modalDeleteTopic-buttonDelete').click();
+
+  await expect(page.getByText(name)).toHaveCount(0);
+};
 
 test.beforeEach(async ({ page }, testInfo) => {
   await login(page);
@@ -163,4 +197,11 @@ test('test instance quick options', async ({ page }) => {
   await expect(page.getByRole('dialog', { name: 'Change owner' }).getByText(config.username)).toHaveCount(1);
 
   await page.getByRole('button', { name: 'Cancel' }).click();
+});
+
+// test_4kafka.py test_kafka_topic_create
+test('create and delete a Kafka Topic', async ({ page }) => {
+  await navigateToKafkaTopicsList(page, testInstanceName);
+  await createKafkaTopic(page, testTopicName);
+  await deleteKafkaTopic(page, testTopicName);
 });
