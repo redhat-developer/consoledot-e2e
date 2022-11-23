@@ -14,7 +14,6 @@ export const createKafkaTopic = async function (page: Page, name: string) {
   await expect(page.getByText('Create topic')).toHaveCount(2);
   // This is default Topic creation
   await page.getByPlaceholder('Enter topic name').fill(name);
-
   for (let i = 0; i < 3; i++) {
     await page.getByText('Next').click();
   }
