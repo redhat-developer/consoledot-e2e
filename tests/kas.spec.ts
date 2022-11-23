@@ -80,19 +80,19 @@ test('test Kafka list filtered by status', async ({ page }) => {
   await expect(page.getByText('No results found')).toHaveCount(1);
 
   await filterByStatus(page, 'Creating');
-  expect(page.getByText(testInstanceName)).toBeTruthy();
+  await expect(page.getByText(testInstanceName)).toBeTruthy();
 
   // Reset the filter
   await resetFilter(page);
   await waitForKafkaReady(page, testInstanceName);
 
   await filterByStatus(page, 'Ready');
-  expect(page.getByText(testInstanceName)).toBeTruthy();
+  await expect(page.getByText(testInstanceName)).toBeTruthy();
 
   await deleteKafkaInstance(page, testInstanceName, false);
 
   await filterByStatus(page, 'Deleting');
-  expect(page.getByText(testInstanceName)).toBeTruthy();
+  await expect(page.getByText(testInstanceName)).toBeTruthy();
 
   // await for the kafka instance to be deleted
   await expect(page.getByText(`${testInstanceName}`, { exact: true })).toHaveCount(0, {
