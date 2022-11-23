@@ -1,5 +1,6 @@
 import { expect, Page } from '@playwright/test';
 import { waitForKafkaReady } from './kafka';
+import { config } from './config';
 
 export const navigateToKafkaTopicsList = async function (page: Page, kafkaName: string) {
   await expect(page.getByText(kafkaName)).toHaveCount(1);
@@ -30,5 +31,5 @@ export const deleteKafkaTopic = async function (page: Page, name: string) {
   await page.getByLabel('Type DELETE to confirm:').fill('DELETE');
   await page.getByTestId('modalDeleteTopic-buttonDelete').click();
   await page.getByTestId('mk--instance__drawer').getByText('Kafka Instances').click();
-  await page.waitForURL('https://console.redhat.com/application-services/streams/kafkas');
+  await page.waitForURL(config.startingPage + '/application-services/streams/kafkas');
 };
