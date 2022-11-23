@@ -6,20 +6,20 @@ FROM mcr.microsoft.com/playwright:v1.20.0-focal
 RUN curl -sL https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64 -o /usr/local/bin/jq && chmod a+x /usr/local/bin/jq
 
 ENV CI=true
-RUN useradd --no-log-init -rm -d /opt/playwright -s /bin/bash -g root -o -u 1000 playwright
+RUN useradd --no-log-init -rm -d /tmp/playwright -s /bin/bash -g root -o -u 1000 playwright
 
-COPY . /opt/playwright
+COPY . /tmp/playwright
 
-RUN chown -R playwright:root /opt/playwright && \
-    chgrp -R 0 /opt/playwright && \
-    chmod -R 775 /opt/playwright && \
+RUN chown -R playwright:root /tmp/playwright && \
+    chgrp -R 0 /tmp/playwright && \
+    chmod -R 775 /tmp/playwright && \
     chown -R playwright:root /ms-playwright && \
     chgrp -R 0 /ms-playwright && \
     chmod -R 775 /ms-playwright
 
 USER 1000
-WORKDIR /opt/playwright
-ENV HOME=/opt/playwright
+WORKDIR /tmp/playwright
+ENV HOME=/tmp/playwright
 
 RUN npx playwright install
 
