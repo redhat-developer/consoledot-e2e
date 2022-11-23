@@ -8,7 +8,7 @@ export const navigateToKafkaTopicsList = async function (page: Page, kafkaName: 
   await page.getByText('Topics').click();
 };
 
-export const createKafkaTopic = async function (page: Page, name: string, check = true) {
+export const createKafkaTopic = async function (page: Page, name: string) {
   await page.getByText('Create topic').click();
   await expect(page.getByText('Create topic')).toHaveCount(2);
   // This is default Topic creation
@@ -18,11 +18,6 @@ export const createKafkaTopic = async function (page: Page, name: string, check 
   await page.getByText('Next').click();
   await page.getByText('Finish').click();
 
-  if (check) {
-    // check that the instance has been created
-    const table = page.locator('[data-ouia-component-id=card-table]');
-    expect(table.getByText(name)).toBeTruthy();
-  }
 };
 
 export const deleteKafkaTopic = async function (page: Page, name: string) {
