@@ -21,6 +21,7 @@ USER 1000
 WORKDIR /tmp/playwright
 ENV HOME=/tmp/playwright
 
+RUN npm ci
 RUN npx playwright install
 
 ENTRYPOINT [ "npx", "playwright", "test", "--reporter=line" ]
