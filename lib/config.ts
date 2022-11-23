@@ -9,21 +9,17 @@ class Config {
   readonly kafkaInstanceCreationTimeout: number;
   readonly kafkaInstanceDeletionTimeout: number;
 
-  readonly kafkaTopicDeletionTimeout: number;
-
   readonly minKafkaStreamingUnits: number;
   readonly maxKafkaStreamingUnits: number;
 
   constructor() {
     this.username = process.env.TEST_USERNAME!;
     this.password = process.env.TEST_PASSWORD!;
-    this.startingPage = process.env.STARTING_PAGE || "https://console.redhat.com";
+    this.startingPage = process.env.STARTING_PAGE || 'https://console.redhat.com';
     this.sessionID = uuid().substring(0, 16);
 
     this.kafkaInstanceCreationTimeout = 20 * 60 * 1000; // 20 minutes
     this.kafkaInstanceDeletionTimeout = 10 * 60 * 1000; // 10 minutes
-    
-    this.kafkaTopicDeletionTimeout = 10 * 1000; // 10 seconds
 
     this.minKafkaStreamingUnits = 1;
     this.maxKafkaStreamingUnits = 2;

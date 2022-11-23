@@ -14,11 +14,11 @@ export const createKafkaTopic = async function (page: Page, name: string) {
   await expect(page.getByText('Create topic')).toHaveCount(2);
   // This is default Topic creation
   await page.getByPlaceholder('Enter topic name').fill(name);
-  await page.getByText('Next').click();
-  await page.getByText('Next').click();
-  await page.getByText('Next').click();
+  for (let i = 0; i < 3; i++) {
+    await page.getByText('Next').click();
+  }
   await page.getByText('Finish').click();
-
+  await expect(page.getByText(name)).toHaveCount(1);
 };
 
 export const deleteKafkaTopic = async function (page: Page, name: string) {
