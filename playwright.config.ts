@@ -40,7 +40,9 @@ const config: PlaywrightTestConfig = {
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'retain-on-failure',
-    screenshot: 'on'
+    screenshot: 'on',
+    /* ignore https certificate authority if STARTING_PAGE is defined */
+    ignoreHTTPSErrors: process.env.STARTING_PAGE ? true : false,
   },
 
   /* Configure projects for major browsers */
