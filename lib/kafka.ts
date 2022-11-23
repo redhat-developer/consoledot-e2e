@@ -40,8 +40,8 @@ export const createKafkaInstance = async function (page: Page, name: string, che
 
   if (check) {
     // check for the instance to have been created
-    const table = page.locator('[data-ouia-component-id=table-kafka-instances]');
-    expect(table.getByText(name)).toBeTruthy();
+    const table = await page.locator('[data-ouia-component-id=table-kafka-instances]');
+    await expect(table.getByText(name)).toBeTruthy();
   }
 };
 
