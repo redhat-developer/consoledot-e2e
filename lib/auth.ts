@@ -18,6 +18,6 @@ export default async function login(page: Page) {
   await page.locator('#rh-password-verification-submit-button').click();
 
   // check we landed on the right page
-  await expect(page).toHaveTitle(/Home | console.redhat.com/, { timeout: 10000 });
+  await expect(page).toHaveTitle(/Home/, { timeout: 10000 });
   await expect(page.getByText("Gain increased visibility into your hybrid cloud")).toBeTruthy();
 }
