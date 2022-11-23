@@ -70,7 +70,7 @@ const filterByName = async function (page, name, skipClick = false) {
 // test_3kas.py test_kas_kafka_filter_by_name
 test('test instances can be filtered by name', async ({ page }) => {
   await filterByName(page, 'test');
-  expect(page.getByText(testInstanceName)).toBeTruthy();
+  await expect(page.getByText(testInstanceName)).toBeTruthy();
 
   await filterByName(page, 'wrong');
   await expect(page.getByText('No results found')).toHaveCount(1);
@@ -100,7 +100,7 @@ const filterByOwner = async function (page, name, skipClick = false) {
 // test_3kas.py test_kas_kafka_filter_by_owner
 test('test instances can be filtered by owner', async ({ page }) => {
   await filterByOwner(page, config.username.substring(0, 5));
-  expect(page.getByText(testInstanceName)).toBeTruthy();
+  await expect(page.getByText(testInstanceName)).toBeTruthy();
 
   await filterByOwner(page, 'wrong');
   await expect(page.getByText('No results found')).toHaveCount(1);
@@ -115,14 +115,14 @@ test('test instances can be filtered by owner', async ({ page }) => {
 // TODO: region can only be ordered, not filtered ???
 test('test instances can be filtered by region', async ({ page }) => {
   await page.getByRole('button', { name: 'Region' }).click();
-  expect(page.getByText(testInstanceName)).toBeTruthy();
+  await expect(page.getByText(testInstanceName)).toBeTruthy();
 });
 
 // test_3kas.py test_kas_kafka_filter_by_cloud_provider
 // TODO: cloud provider can only be ordered, not filtered ???
 test('test instances can be filtered by cloud provider', async ({ page }) => {
   await page.getByRole('button', { name: 'Cloud provider' }).click();
-  expect(page.getByText(testInstanceName)).toBeTruthy();
+  await expect(page.getByText(testInstanceName)).toBeTruthy();
 });
 
 // test_3kas.py test_kas_kafka_view_details_by_row_click_panel_opened
