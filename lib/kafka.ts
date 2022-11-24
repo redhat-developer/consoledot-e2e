@@ -1,5 +1,5 @@
-import { expect, Page } from "@playwright/test";
-import { config } from "./config";
+import { expect, Page } from '@playwright/test';
+import { config } from './config';
 
 export const navigateToKafkaList = async function (page: Page) {
   await page.getByRole('link', { name: 'Application and Data Services' }).click();

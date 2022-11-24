@@ -15,7 +15,7 @@ class Config {
   constructor() {
     this.username = process.env.TEST_USERNAME!;
     this.password = process.env.TEST_PASSWORD!;
-    this.startingPage = process.env.STARTING_PAGE || "https://console.redhat.com";
+    this.startingPage = process.env.STARTING_PAGE || 'https://console.redhat.com';
     this.sessionID = uuid().substring(0, 16);
 
     this.kafkaInstanceCreationTimeout = 20 * 60 * 1000; // 20 minutes
