@@ -2,8 +2,10 @@ import { test, expect } from '@playwright/test';
 import login from '@lib/auth';
 import { config } from '@lib/config';
 import { navigateToKafkaList, deleteKafkaInstance, createKafkaInstance } from '@lib/kafka';
+import { navigateToKafkaTopicsList, createKafkaTopic, deleteKafkaTopic } from '@lib/topic';
 
 const testInstanceName = `test-instance-${config.sessionID}`;
+const testTopicName = `test-topic-${config.sessionID}`;
 
 test.beforeEach(async ({ page }, testInfo) => {
   await login(page);
@@ -163,4 +165,11 @@ test('test instance quick options', async ({ page }) => {
   await expect(page.getByRole('dialog', { name: 'Change owner' }).getByText(config.username)).toHaveCount(1);
 
   await page.getByRole('button', { name: 'Cancel' }).click();
+});
+
+// test_4kafka.py test_kafka_topic_create
+test('create and delete a Kafka Topic', async ({ page }) => {
+  await navigateToKafkaTopicsList(page, testInstanceName);
+  await createKafkaTopic(page, testTopicName);
+  await deleteKafkaTopic(page, testTopicName);
 });

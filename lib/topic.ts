@@ -14,11 +14,12 @@ export const createKafkaTopic = async function (page: Page, name: string) {
   await expect(page.getByText('Create topic')).toHaveCount(2);
   // This is default Topic creation
   await page.getByPlaceholder('Enter topic name').fill(name);
-  await page.getByText('Next').click();
-  await page.getByText('Next').click();
-  await page.getByText('Next').click();
-  await page.getByText('Finish').click();
 
+  for (let i = 0; i < 3; i++) {
+    await page.getByText('Next').click();
+  }
+  await page.getByText('Finish').click();
+  await expect(page.getByText(name)).toHaveCount(1);
 };
 
 export const deleteKafkaTopic = async function (page: Page, name: string) {
@@ -30,6 +31,5 @@ export const deleteKafkaTopic = async function (page: Page, name: string) {
   await page.getByLabel('Type DELETE to confirm:').click();
   await page.getByLabel('Type DELETE to confirm:').fill('DELETE');
   await page.getByTestId('modalDeleteTopic-buttonDelete').click();
-  await page.getByTestId('mk--instance__drawer').getByText('Kafka Instances').click();
-  await page.waitForURL(config.startingPage + '/application-services/streams/kafkas');
+  await expect(page.getByText(name)).toHaveCount(0);
 };
