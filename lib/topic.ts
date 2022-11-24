@@ -30,6 +30,5 @@ export const deleteKafkaTopic = async function (page: Page, name: string) {
   await page.getByLabel('Type DELETE to confirm:').click();
   await page.getByLabel('Type DELETE to confirm:').fill('DELETE');
   await page.getByTestId('modalDeleteTopic-buttonDelete').click();
-  await page.getByTestId('mk--instance__drawer').getByText('Kafka Instances').click();
-  await page.waitForURL(config.startingPage + '/application-services/streams/kafkas');
+  await expect(page.getByText(name)).toHaveCount(0);
 };
