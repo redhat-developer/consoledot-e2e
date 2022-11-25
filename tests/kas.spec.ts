@@ -120,9 +120,3 @@ test('test fail to create Kafka instance with the same name', async ({ page }) =
 
   await deleteKafkaInstance(page, testInstanceName);
 });
-
-// test_4kafka.py test_kafka_404_not_found_kasui
-test('404 not found Kas UI', async ({ page }) => {
-  await page.goto(config.startingPage + '/application-services/streams/kafkas/' + Math.random());
-  await expect(page.getByRole('heading', { name: '404: That page doesn’t exist' })).toHaveCount(1);
-});
