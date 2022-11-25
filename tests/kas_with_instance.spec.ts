@@ -7,7 +7,7 @@ import { navigateToKafkaTopicsList, createKafkaTopic, deleteKafkaTopic } from '@
 const testInstanceName = `test-instance-${config.sessionID}`;
 const testTopicName = `test-topic-${config.sessionID}`;
 
-test.beforeEach(async ({ page }, testInfo) => {
+test.beforeEach(async ({ page }) => {
   await login(page);
 
   await navigateToKafkaList(page);

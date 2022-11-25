@@ -3,7 +3,7 @@ import login from '@lib/auth';
 import { config } from '@lib/config';
 import { navigateToKafkaList, deleteKafkaInstance, createKafkaInstance, waitForKafkaReady } from '@lib/kafka';
 
-test.beforeEach(async ({ page }, testInfo) => {
+test.beforeEach(async ({ page }) => {
   await login(page);
 
   await navigateToKafkaList(page);

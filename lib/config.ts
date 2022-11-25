@@ -13,8 +13,8 @@ class Config {
   readonly maxKafkaStreamingUnits: number;
 
   constructor() {
-    this.username = process.env.TEST_USERNAME!;
-    this.password = process.env.TEST_PASSWORD!;
+    this.username = process.env.TEST_USERNAME;
+    this.password = process.env.TEST_PASSWORD;
     this.startingPage = process.env.STARTING_PAGE || 'https://console.redhat.com';
     this.sessionID = uuid().substring(0, 16);
 
