@@ -12,7 +12,7 @@ concurrency:
 
 jobs:
   playwright:
-    uses: andreaTP/apicurio-gh-workflows/.github/workflows/playwright.yaml@playwright-test-reports
+    uses: apicurio/apicurio-gh-workflows/.github/workflows/playwright.yaml@main
     with:
       os: ubuntu-latest
       notify-on-failure: true
