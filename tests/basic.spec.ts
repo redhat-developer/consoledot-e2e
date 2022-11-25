@@ -37,3 +37,10 @@ test('404 not found Global', async ({ page }) => {
   await page.goto(config.startingPage + '/application-services/streams/kafka');
   await expect(page.getByRole('heading', { name: '404 Page not found' })).toHaveCount(1);
 });
+
+// test_4kafka.py test_kafka_404_not_found_kasui
+test('404 not found Kas UI', async ({ page }) => {
+  await login(page);
+  await page.goto(config.startingPage + '/application-services/streams/kafkas/' + Math.random());
+  await expect(page.getByRole('heading', { name: '404: That page doesn’t exist' })).toHaveCount(1);
+});
