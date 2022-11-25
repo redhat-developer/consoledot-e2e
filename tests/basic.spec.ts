@@ -30,10 +30,6 @@ test('perform login and logout', async ({ page }) => {
   await expect(page).toHaveTitle(/Log In | Red Hat IDP/);
 });
 
-test('quick start tour', async ({ page }) => {
-  await login(page);
-});
-
 // test_4kafka.py test_kafka_404_not_found_global
 test('404 not found Global', async ({ page }) => {
   await page.goto(config.startingPage + '/application-services/streams/kafka');
