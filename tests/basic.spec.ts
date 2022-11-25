@@ -32,6 +32,8 @@ test('perform login and logout', async ({ page }) => {
 
 // test_4kafka.py test_kafka_404_not_found_global
 test('404 not found Global', async ({ page }) => {
+  await login(page);
+
   await page.goto(config.startingPage + '/application-services/streams/kafka');
   await expect(page.getByRole('heading', { name: '404 Page not found' })).toHaveCount(1);
 });
