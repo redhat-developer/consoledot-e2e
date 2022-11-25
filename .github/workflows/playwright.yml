@@ -12,10 +12,11 @@ concurrency:
 
 jobs:
   playwright:
-    uses: andreaTP/apicurio-gh-workflows/.github/workflows/playwright.yaml@playwright-test-reports
+    uses: apicurio/apicurio-gh-workflows/.github/workflows/playwright.yaml@main
     with:
       os: ubuntu-latest
-      notify-on-failure: false
+      notify-on-failure: true
     secrets:
       username: ${{ secrets.RH_USERNAME }}
       password: ${{ secrets.RH_PASSWORD }}
+      chat-webhook: ${{ secrets.GOOGLE_CHAT_WEBHOOK }}
