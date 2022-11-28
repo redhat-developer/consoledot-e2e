@@ -5,11 +5,11 @@ export const navigateToKafkaTopicsList = async function (page: Page, kafkaName: 
   await expect(page.getByText(kafkaName)).toHaveCount(1);
   await waitForKafkaReady(page, kafkaName);
   await page.getByText(kafkaName).click();
-  await page.getByText('Topics').click();
+  await page.getByText('Topics', { exact: true }).click();
 };
 
 export const createKafkaTopic = async function (page: Page, name: string) {
-  await page.getByText('Create topic').click();
+  await page.getByText('Create topic', { exact: true }).click();
   await expect(page.getByText('Create topic')).toHaveCount(2);
   // This is default Topic creation
   await page.getByPlaceholder('Enter topic name').fill(name);
@@ -25,7 +25,7 @@ export const deleteKafkaTopic = async function (page: Page, name: string) {
   const row = page.locator('tr', { has: instanceLinkSelector });
 
   await row.locator('[aria-label="Actions"]').click();
-  await page.getByText('Delete').click();
+  await page.getByText('Delete', { exact: true }).click();
   await page.getByLabel('Type DELETE to confirm:').click();
   await page.getByLabel('Type DELETE to confirm:').fill('DELETE');
   await page.getByTestId('modalDeleteTopic-buttonDelete').click();
