@@ -8,7 +8,7 @@ export const navigateToSAList = async function (page: Page) {
     await expect(page.getByRole('heading', { name: 'Service Accounts' })).toHaveCount(1);
 };
 
-export const createServiceAccount = async function (page: Page, name: string, exists = true) {
+export const createServiceAccount = async function (page: Page, name: string) {
     await page.getByTestId('emptyStateStreams-buttonCreateServiceAccount').click();
 
     await expect(page.getByText('Create a service account', {exact: true})).toHaveCount(1);
@@ -30,34 +30,22 @@ export const createServiceAccount = async function (page: Page, name: string, ex
 
     await page.getByTestId('modalCredentials-buttonClose').click()
 
-    if (exists) {
-        // check for the service account to have been created
-        const table = await page.locator('[aria-label="Service account list"]');
-        await expect(table.getByText(name)).toBeTruthy();
-    }
+    // check for the service account to have been created
+    const table = await page.locator('[aria-label="Service account list"]');
+    await expect(table.getByText(name)).toHaveCount(1);
 
     return {clientID: clientID, clientSecret: clientSecret}
-
-
 };
 
-export const deleteServiceAccount = async function (page: Page, name: string, awaitDeletion = true) {
-
+export const deleteServiceAccount = async function (page: Page, name: string) {
+    console.log("Deleting service account " + name);
     const instanceLinkSelector = page.getByText(name, { exact: true });
-    const row = page.locator('tr', { has: instanceLinkSelector });
 
-    // await expect(
-    //     row.locator('td[data-label="Owner"]', { hasText: config.username })
-    // ).toHaveText(config.username)
+    let count = await instanceLinkSelector.count();
+    while (count > 0) {
+        const row = page.locator('tr', { has: instanceLinkSelector.nth(0) });
 
-    // await page.pause()
-
-    const id = await row.innerText();
-    console.log("Name: " + name + "\tid: " + id);
-
-    await row.locator('[aria-label="Actions"]').click();
-
-    if (await page.getByText('Delete service account').isEnabled()) {
+        await row.locator('[aria-label="Actions"]').nth(0).click();
 
         await expect(page.getByText('Delete service account')).toBeEnabled();
 
@@ -65,18 +53,15 @@ export const deleteServiceAccount = async function (page: Page, name: string, aw
 
         await page.locator('#confirm__button').click();
 
-        // await for the account to be deleted
-        if (awaitDeletion) {
-            await expect(page.getByText(`${name}`, { exact: true })).toHaveCount(0, {
-                timeout: config.serviceAccountDeletionTimeout
-            });
-        }
-    }
-    else {
-        await row.locator('[aria-label="Actions"]').click();
+        await expect(instanceLinkSelector).toHaveCount(count - 1);
+
+        count--;
     }
 
-
+    // await for all the accounts with the same name to be deleted
+    await expect(page.getByText(`${name}`, { exact: true })).toHaveCount(0, {
+        timeout: config.serviceAccountDeletionTimeout
+    });
 };
 
 export const resetServiceAccount = async function (page: Page, name: string) {

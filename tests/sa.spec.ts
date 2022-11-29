@@ -3,7 +3,7 @@ import login from '@lib/auth';
 import { config } from '@lib/config';
 import { navigateToSAList, createServiceAccount, deleteServiceAccount, resetServiceAccount } from '@lib/sa';
 
-test.beforeEach(async ({ page }, testInfo) => {
+test.beforeEach(async ({ page }) => {
   await login(page);
 
   await navigateToSAList(page);
@@ -13,13 +13,17 @@ test.beforeEach(async ({ page }, testInfo) => {
     timeout: config.serviceAccountCreationTimeout
   });
 
-  const elements = await page.locator(`tr >> td[data-label="Description"]`).elementHandles()
+  const elements = async () => {
+    return await (
+      await page.locator(`tr >> td[data-label="Description"]`).elementHandles()
+    ).length;
+  };
 
-  // for loop jumps over one element every time
-  for (const el of elements) {
-    console.log("element from beforeEach: " + el);
+  while ((await elements()) > 0) {
+    const el = await page.locator(`tr >> td[data-label="Description"]`).nth(0);
+    console.log('element from beforeEach: ' + el);
     const accountID = await el.textContent();
-    console.log("Account to be deleted: " + accountID)
+    console.log('Account to be deleted: ' + accountID);
     await deleteServiceAccount(page, accountID);
   }
 });
@@ -39,8 +43,8 @@ test('test service account credentials reset', async ({ page }) => {
   const credentials = await createServiceAccount(page, testServiceAccountName);
   const credentials_reset = await resetServiceAccount(page, testServiceAccountName);
 
-  expect(credentials.clientID === credentials_reset.clientID);
-  expect(credentials.clientSecret != credentials_reset.clientSecret);
+  await expect(credentials.clientID).toBe(credentials_reset.clientID);
+  await expect(credentials.clientSecret).not.toBe(credentials_reset.clientSecret);
 
   await deleteServiceAccount(page, testServiceAccountName);
 });
