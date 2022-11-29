@@ -34,8 +34,8 @@ const config: PlaywrightTestConfig = {
   reporter: process.env.CI ? [['line'], ['github'], ['junit', { outputFile: 'results.xml' }]] : 'html',
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
-    /* Maximum time each action such as `click()` can take. Defaults to 0 (no limit). */
-    actionTimeout: 0,
+    /* Maximum time each action such as `click()` can take. Defaults to 10000 (0 means no limit). */
+    actionTimeout: 60000,
     /* Base URL to use in actions like `await page.goto('/')`. */
     // baseURL: 'http://localhost:3000',
 
