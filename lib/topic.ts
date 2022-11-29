@@ -27,7 +27,7 @@ export const deleteKafkaTopic = async function (page: Page, name: string) {
 
   await row.locator('[aria-label="Actions"]').click();
   // data-testid=tableTopics-actionDelete
-  await page.locator('button >> text=Delete').click();
+  await page.locator('button', { hasText: 'Delete'}).click()
   await page.getByLabel('Type DELETE to confirm:').click();
   await page.getByLabel('Type DELETE to confirm:').fill('DELETE');
   // data-testid=modalDeleteTopic-buttonDelete
