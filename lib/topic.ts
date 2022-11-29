@@ -1,7 +1,5 @@
 import { expect, Page } from '@playwright/test';
 import { waitForKafkaReady } from './kafka';
-import { config } from './config';
-import { text } from 'stream/consumers';
 
 export const navigateToKafkaTopicsList = async function (page: Page, kafkaName: string) {
   await expect(page.getByText(kafkaName)).toHaveCount(1);
