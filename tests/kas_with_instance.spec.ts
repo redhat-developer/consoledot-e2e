@@ -1,8 +1,18 @@
 import { test, expect } from '@playwright/test';
 import login from '@lib/auth';
 import { config } from '@lib/config';
-import { navigateToKafkaList, deleteKafkaInstance, createKafkaInstance, waitForKafkaReady } from '@lib/kafka';
+import {
+  navigateToKafkaList,
+  deleteKafkaInstance,
+  createKafkaInstance,
+  waitForKafkaReady,
+  navigateToAccess,
+  manageAccess,
+  navigateToConsumerGroups
+} from '@lib/kafka';
 import { navigateToKafkaTopicsList, createKafkaTopic, deleteKafkaTopic } from '@lib/topic';
+import { navigateToSAList, createServiceAccount, deleteServiceAccount } from '@lib/sa';
+import { produceAndConsumeMessage } from '@lib/client';
 
 const testInstanceName = config.instanceName;
 const testTopicPrefix = 'test-topic-';
@@ -176,4 +186,36 @@ test('create and delete a Kafka Topic', async ({ page }) => {
   await navigateToKafkaTopicsList(page, testInstanceName);
   await createKafkaTopic(page, testTopicName);
   await deleteKafkaTopic(page, testTopicName);
+});
+
+// test_6acl.py test_kafka_create_consumer_group_and_check_dashboard
+test('create consumer group and check dashboard', async ({ page }) => {
+  const instanceLinkSelector = page.getByText(testInstanceName);
+  const row = page.locator('tr', { has: instanceLinkSelector });
+
+  await row.locator('[aria-label="Actions"]').click();
+  await page.getByText('Connection').click();
+
+  const broker = await page.locator('[aria-label="Bootstrap server"]').getAttribute('value');
+  console.log('broker: ' + broker);
+  await page.locator('.pf-c-drawer__close > .pf-c-button').click();
+
+  await navigateToKafkaTopicsList(page, testInstanceName);
+  await createKafkaTopic(page, testTopicName);
+  await navigateToSAList(page);
+  const credentials = await createServiceAccount(page, saName);
+
+  await navigateToAccess(page, testInstanceName);
+  await manageAccess(page, credentials.clientID, saName);
+
+  // kafka client
+  await produceAndConsumeMessage(broker, credentials, testTopicName);
+
+  // Open Consumer Groups Tab to check dashboard
+  await navigateToConsumerGroups(page);
+  await expect(page.getByText('test-group')).toHaveCount(1);
+
+  await navigateToSAList(page);
+
+  await deleteServiceAccount(page, saName);
 });
