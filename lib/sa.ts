@@ -9,7 +9,7 @@ export const navigateToSAList = async function (page: Page) {
 };
 
 export const createServiceAccount = async function (page: Page, name: string) {
-    await page.getByTestId('emptyStateStreams-buttonCreateServiceAccount').click();
+    await page.locator('button', { hasText: 'Create service account' }).click();
 
     await expect(page.getByText('Create a service account', {exact: true})).toHaveCount(1);
 
@@ -26,9 +26,11 @@ export const createServiceAccount = async function (page: Page, name: string) {
 
     await page.getByLabel('I have copied the client ID and secret').check();
 
-    await expect(page.getByTestId('modalCredentials-buttonClose')).toBeEnabled();
+    // data-testid=modalCredentials-buttonClose
+    await expect(page.locator('button', { hasText: 'Close' })).toBeEnabled();
 
-    await page.getByTestId('modalCredentials-buttonClose').click()
+    // data-testid=modalCredentials-buttonClose
+    await page.locator('button', { hasText: 'Close' }).click()
 
     // check for the service account to have been created
     const table = await page.locator('[aria-label="Service account list"]');
@@ -48,10 +50,10 @@ export const deleteServiceAccount = async function (page: Page, name: string) {
         await row.locator('[aria-label="Actions"]').nth(0).click();
 
         await expect(page.getByText('Delete service account')).toBeEnabled();
+        await page.locator('button', { hasText: 'Delete service account'}).click();
 
-        await page.getByText('Delete service account').click();
-
-        await page.locator('#confirm__button').click();
+        // #confirm__button
+        await page.locator('button', { hasText: 'Delete' }).click();
 
         await expect(instanceLinkSelector).toHaveCount(count - 1);
 
@@ -70,9 +72,9 @@ export const resetServiceAccount = async function (page: Page, name: string) {
 
     await row.locator('[aria-label="Actions"]').click();
 
-    await page.getByText('Reset credentials').click();
+    await page.locator('button', {hasText: 'Reset credentials'}).click();
 
-    await page.locator('button:has-text("Reset")').click();
+    await page.locator('button', {hasText: 'Reset'}).click();
 
     await expect(page.getByText('Credentials successfully generated')).toHaveCount(1);
 
@@ -81,9 +83,11 @@ export const resetServiceAccount = async function (page: Page, name: string) {
 
     await page.getByLabel('I have copied the client ID and secret').check();
 
-    await expect(page.getByTestId('modalCredentials-buttonClose')).toBeEnabled();
+    // data-testid=modalCredentials-buttonClose
+    await expect(page.locator('button', { hasText: 'Close' })).toBeEnabled();
 
-    await page.getByTestId('modalCredentials-buttonClose').click()
+    // data-testid=modalCredentials-buttonClose
+    await page.locator('button', { hasText: 'Close' }).click()
 
     return {clientID: clientID, clientSecret: clientSecret}
 };
