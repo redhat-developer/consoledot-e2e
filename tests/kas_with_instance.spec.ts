@@ -3,8 +3,11 @@ import login from '@lib/auth';
 import { config } from '@lib/config';
 import { navigateToKafkaList, deleteKafkaInstance, createKafkaInstance, waitForKafkaReady } from '@lib/kafka';
 import { navigateToKafkaTopicsList, createKafkaTopic, deleteKafkaTopic } from '@lib/topic';
+import { KafkaConsumer, KafkaProducer } from '../lib/clients'
+import { strict as assert } from 'assert';
 
-const testInstanceName = `test-instance-${config.sessionID}`;
+// const testInstanceName = `test-instance-${config.sessionID}`;
+const testInstanceName = `jakub-test`;
 const testTopicName = `test-topic-${config.sessionID}`;
 
 test.beforeEach(async ({ page }) => {
@@ -176,3 +179,22 @@ test('create and delete a Kafka Topic', async ({ page }) => {
   await createKafkaTopic(page, testTopicName);
   await deleteKafkaTopic(page, testTopicName);
 });
+
+test('producer-sasl-plain-ssl', async() => {
+
+  let bootstrap: string = "jakub-test-ce-ko-nhuq-sola--qcg.bf2.kafka-stage.rhcloud.com:443"
+
+  const producer = new KafkaProducer("test", bootstrap)
+  let producerResponse = await producer.produceMessages("test", 100, "test")
+  console.log(producerResponse)
+
+  assert(producerResponse === true)
+
+  const consumer = new KafkaConsumer("test", bootstrap, "test")
+  let consumerResponse = await consumer.consumeMessages("test", "test", 100)
+  console.log(consumerResponse)
+
+  assert(consumerResponse === true)
+})
+
+
