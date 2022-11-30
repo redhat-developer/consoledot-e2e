@@ -3,6 +3,8 @@ import login from '@lib/auth';
 import { config } from '@lib/config';
 import { navigateToSAList, createServiceAccount, deleteServiceAccount, resetServiceAccount } from '@lib/sa';
 
+const testServiceAccountName = `test-service-account-${config.sessionID}`;
+
 test.beforeEach(async ({ page }) => {
   await login(page);
 
@@ -21,25 +23,19 @@ test.beforeEach(async ({ page }) => {
 
   while ((await elements()) > 0) {
     const el = await page.locator(`tr >> td[data-label="Description"]`).nth(0);
-    console.log('element from beforeEach: ' + el);
     const accountID = await el.textContent();
-    console.log('Account to be deleted: ' + accountID);
     await deleteServiceAccount(page, accountID);
   }
 });
 
 // test_5sa.py test_sa_create
 test('test service account creation', async ({ page }) => {
-  const testServiceAccountName = `test-service-account-${config.sessionID}`;
-
   await createServiceAccount(page, testServiceAccountName);
   await deleteServiceAccount(page, testServiceAccountName);
 });
 
 // test_5sa.py test_sa_create
 test('test service account credentials reset', async ({ page }) => {
-  const testServiceAccountName = `test-service-account-${config.sessionID}`;
-
   const credentials = await createServiceAccount(page, testServiceAccountName);
   const credentials_reset = await resetServiceAccount(page, testServiceAccountName);
 

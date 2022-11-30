@@ -17,7 +17,7 @@ export const createServiceAccount = async function (page: Page, name: string) {
 
     await page.getByLabel('Short description *').fill(name);
 
-    await page.getByTestId('modalCreateServiceAccount-buttonSubmit').click();
+    await page.locator('button:text-is("Create")').click();
 
     await expect(page.getByText('Credentials successfully generated')).toHaveCount(1);
 
@@ -40,7 +40,6 @@ export const createServiceAccount = async function (page: Page, name: string) {
 };
 
 export const deleteServiceAccount = async function (page: Page, name: string) {
-    console.log("Deleting service account " + name);
     const instanceLinkSelector = page.getByText(name, { exact: true });
 
     let count = await instanceLinkSelector.count();
