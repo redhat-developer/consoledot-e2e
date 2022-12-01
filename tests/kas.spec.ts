@@ -3,7 +3,7 @@ import login from '@lib/auth';
 import { config } from '@lib/config';
 import { navigateToKafkaList, deleteKafkaInstance, createKafkaInstance, waitForKafkaReady } from '@lib/kafka';
 
-test.beforeEach(async ({ page }, testInfo) => {
+test.beforeEach(async ({ page }) => {
   await login(page);
 
   await navigateToKafkaList(page);
@@ -91,6 +91,8 @@ test('test Kafka list filtered by status', async ({ page }) => {
 
   await deleteKafkaInstance(page, testInstanceName, false);
 
+  // TODO: Probably race condition when deleting is finished too quickly
+  // Currently it just make the test flaky so we should discuss what we will do with it
   await filterByStatus(page, 'Deleting');
   await expect(page.getByText(testInstanceName)).toBeTruthy();
 

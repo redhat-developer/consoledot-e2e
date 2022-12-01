@@ -3,22 +3,18 @@ import { config } from './config';
 
 export const navigateToKafkaList = async function (page: Page) {
   await page.getByRole('link', { name: 'Application and Data Services' }).click();
-  // }
   await page.getByRole('button', { name: 'Streams for Apache Kafka' }).click();
   await page.getByRole('link', { name: 'Kafka Instances' }).click();
   await expect(page.getByRole('heading', { name: 'Kafka Instances' })).toHaveCount(1);
 };
 
 export const createKafkaInstance = async function (page: Page, name: string, check = true) {
-  await page.getByText('Create Kafka instance').click();
-
+  await page.locator('button', { hasText: 'Create Kafka instance' }).click();
   await expect(page.getByText('Create a Kafka instance')).toHaveCount(1);
-
   await page.waitForSelector('[role=progressbar]', { state: 'detached' });
-
   await page.getByLabel('Name *').fill(name);
-
-  await page.getByTestId('modalCreateKafka-buttonSubmit').click();
+  // data-testid=modalCreateKafka-buttonSubmit
+  await page.locator('button', { hasText: 'Create instance'}).click()
 
   if (check) {
     // check for the instance to have been created
@@ -32,9 +28,7 @@ export const deleteKafkaInstance = async function (page: Page, name: string, awa
   const row = page.locator('tr', { has: instanceLinkSelector });
 
   await row.locator('[aria-label="Actions"]').click();
-
-  await page.getByText('Delete instance').click();
-
+  await page.locator('button', { hasText: 'Delete instance' }).click();
   try {
     await expect(page.locator('input[name="mas-name-input"]')).toHaveCount(1, {
       timeout: 1000
@@ -44,8 +38,8 @@ export const deleteKafkaInstance = async function (page: Page, name: string, awa
     // Removal without confirmation
     // ignore
   }
-  await page.getByTestId('modalDeleteKafka-buttonDelete').click();
-
+  // data-testid=modalDeleteKafka-buttonDelete
+  await page.locator('button', { hasText: 'Delete' }).click();
   // await for the instance to be deleted
   if (awaitDeletion) {
     await expect(page.getByText(`${name}`, { exact: true })).toHaveCount(0, {

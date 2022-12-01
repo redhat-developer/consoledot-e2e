@@ -12,9 +12,12 @@ class Config {
   readonly minKafkaStreamingUnits: number;
   readonly maxKafkaStreamingUnits: number;
 
+  readonly serviceAccountCreationTimeout: number;
+  readonly serviceAccountDeletionTimeout: number;
+
   constructor() {
-    this.username = process.env.TEST_USERNAME!;
-    this.password = process.env.TEST_PASSWORD!;
+    this.username = process.env.TEST_USERNAME;
+    this.password = process.env.TEST_PASSWORD;
     this.startingPage = process.env.STARTING_PAGE || 'https://console.redhat.com';
     this.sessionID = uuid().substring(0, 16);
 
@@ -23,6 +26,9 @@ class Config {
 
     this.minKafkaStreamingUnits = 1;
     this.maxKafkaStreamingUnits = 2;
+
+    this.serviceAccountCreationTimeout = 30 * 1000; // 30 seconds
+    this.serviceAccountDeletionTimeout = 30 * 1000; // 30 seconds
   }
 }
 
