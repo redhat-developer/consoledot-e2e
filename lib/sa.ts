@@ -16,10 +16,10 @@ export const navigateToSAList = async function (page: Page) {
   await expect(page.locator('h1', { hasText: 'Service Accounts' })).toHaveCount(1);
 };
 
-/* export const navigateToServiceAccounts = async function (page: Page) {
+export const navigateToServiceAccounts = async function (page: Page) {
   await page.getByText('Service Accounts').click();
   await expect(page.locator('h1:has-text("Service Accounts")')).toHaveCount(1);
-}; */
+};
 
 export const createServiceAccount = async function (page: Page, name: string) {
   await page.locator('button', { hasText: 'Create service account' }).click();
@@ -52,27 +52,6 @@ export const createServiceAccount = async function (page: Page, name: string) {
   return { clientID: clientID, clientSecret: clientSecret };
 };
 
-/* export const createServiceAccount = async function (page: Page, desc: string) {
-  await page.getByTestId('emptyStateStreams-buttonCreateServiceAccount').click();
-  await page.getByLabel('Short description *').fill(desc);
-  await page.getByTestId('modalCreateServiceAccount-buttonSubmit').click();
-
-  class saCredentials {
-    id: string;
-    secret: string;
-  }
-  const credentials = new saCredentials();
-
-  credentials.id = await page.locator('[aria-label="Client ID"]').getAttribute('value');
-  console.log('credentials.id=' + credentials.id);
-  credentials.secret = await page.locator('[aria-label="Client secret"]').getAttribute('value');
-  console.log('credentials.secret=' + credentials.secret);
-  await page.getByLabel('I have copied the client ID and secret').check();
-  await page.getByTestId('modalCredentials-buttonClose').click();
-
-  await expect(page.getByText(desc)).toHaveCount(1);
-  return credentials;
-}; */
 
 export const deleteServiceAccount = async function (page: Page, name: string) {
   const instanceLinkSelector = page.getByText(name, { exact: true });
@@ -100,14 +79,6 @@ export const deleteServiceAccount = async function (page: Page, name: string) {
   });
 };
 
-/* export const deleteServiceAccount = async function (page: Page, desc: string) {
-  const instanceLinkSelector = page.getByText(desc);
-  const row = page.locator('tr', { has: instanceLinkSelector });
-
-  await row.locator('[aria-label="Actions"]').click();
-  await page.getByTestId('tableServiceAccounts-actionDeleteAccount').click();
-  await page.locator('button:has-text("Delete")').click();
-}; */
 
 export const resetServiceAccount = async function (page: Page, name: string) {
   const instanceLinkSelector = page.getByText(name);

@@ -8,7 +8,7 @@ const testServiceAccountName = `${testServiceAccountPrefix}${config.sessionID}`;
 
 test.beforeEach(async ({ page }) => {
   await login(page);
-
+  await page.getByRole('link', { name: 'Application and Data Services' }).click();
   await navigateToSAList(page);
 
   await page.waitForSelector('[role=progressbar]', {
