@@ -7,11 +7,9 @@ export const produceAndConsumeMessage = async function (
 ) {
   const kafka = new Kafka({
     brokers: [broker],
-    // authenticationTimeout: 10000,
-    // reauthenticationThreshold: 10000,
     ssl: true,
     sasl: {
-      mechanism: 'plain', // scram-sha-256 or scram-sha-512
+      mechanism: 'plain',
       username: credentials.clientID,
       password: credentials.clientSecret
     }
