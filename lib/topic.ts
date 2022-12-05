@@ -5,7 +5,7 @@ export const navigateToKafkaTopicsList = async function (page: Page, kafkaName: 
   await expect(page.getByText(kafkaName)).toHaveCount(1);
   await waitForKafkaReady(page, kafkaName);
   await page.locator('a', { hasText: kafkaName }).click();
-  expect(await page.locator('button', { hasText: 'Topics' }).count() == 1);
+  expect((await page.locator('button', { hasText: 'Topics' }).count()) == 1);
   // data-testid=pageKafka-tabTopics
   await page.locator('button', { hasText: 'Topics' }).click();
 };

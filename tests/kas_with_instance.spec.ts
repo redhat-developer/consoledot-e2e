@@ -3,7 +3,7 @@ import login from '@lib/auth';
 import { config } from '@lib/config';
 import { navigateToKafkaList, deleteKafkaInstance, createKafkaInstance, waitForKafkaReady } from '@lib/kafka';
 import { navigateToKafkaTopicsList, createKafkaTopic, deleteKafkaTopic } from '@lib/topic';
-import { KafkaConsumer, KafkaProducer } from '../lib/clients'
+import { KafkaConsumer, KafkaProducer } from '../lib/clients';
 import { strict as assert } from 'assert';
 
 const testInstanceName = `test-instance-${config.sessionID}`;
@@ -178,6 +178,3 @@ test('create and delete a Kafka Topic', async ({ page }) => {
   await createKafkaTopic(page, testTopicName);
   await deleteKafkaTopic(page, testTopicName);
 });
-
-
-

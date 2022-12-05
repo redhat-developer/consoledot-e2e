@@ -3,17 +3,17 @@ import { config } from './config';
 import { closePopUp } from './popup';
 
 export const navigateToKafkaList = async function (page: Page) {
-  if (await page.locator('button', { hasText: 'Streams for Apache Kafka' }).count() === 0) {
+  if ((await page.locator('button', { hasText: 'Streams for Apache Kafka' }).count()) === 0) {
     await page.getByRole('link', { name: 'Application and Data Services' }).click();
   }
 
   await page.locator('button', { hasText: 'Streams for Apache Kafka' }).click();
 
-  await closePopUp(page, '[aria-label=close-notification]')
+  await closePopUp(page, '[aria-label=close-notification]');
 
   // await expect(await page.getByRole('link', { name: 'Kafka Instances' })).toHaveCount(1);
   await page.locator('a', { hasText: 'Kafka Instances' }).click();
-  expect(await page.locator('heading', { hasText: 'Kafka Instances' }).count() === 1);
+  expect((await page.locator('heading', { hasText: 'Kafka Instances' }).count()) === 1);
 };
 
 export const createKafkaInstance = async function (page: Page, name: string, check = true) {
@@ -78,7 +78,7 @@ export const waitForKafkaReady = async function (page: Page, name: string) {
 };
 
 export const getBootstrapUrl = async function (page: Page, name: string) {
-  await navigateToKafkaList(page)
+  await navigateToKafkaList(page);
   const instanceLinkSelector = page.getByText(name);
   const row = page.locator('tr', { has: instanceLinkSelector });
   await row.locator('[aria-label="Actions"]').click();
@@ -90,14 +90,14 @@ export const getBootstrapUrl = async function (page: Page, name: string) {
   await page.locator('[aria-label="Close drawer panel"]').click();
 
   return bootstrap;
-}
-  
+};
+
 // TODO - we shouldn't use just prefix for topic/group but also complete name
 // TODO - we should click on topic name/prefix when it popups when filling the prefix/name
 export const grantProducerAccess = async function (page: Page, saId: string, topicName: string) {
   await page.getByTestId('actionManagePermissions').click();
   await page.getByRole('button', { name: 'Options menu' }).click();
-  await page.getByRole('option').filter({hasText: saId}).click();
+  await page.getByRole('option').filter({ hasText: saId }).click();
   await page.getByRole('button', { name: 'Next' }).click();
   await page.getByTestId('permissions-dropdown-toggle').click();
   // TODO - This is another option which should be tested
@@ -110,27 +110,26 @@ export const grantProducerAccess = async function (page: Page, saId: string, top
   // TODO - This is just a workaround - create issue for `save` button which is disabled even if the prefix is written
   await page.getByPlaceholder('Enter prefix').click();
 
-
-  await page.getByRole('button').filter({hasText: 'Save'}).click();
-}
+  await page.getByRole('button').filter({ hasText: 'Save' }).click();
+};
 
 // TODO - we shouldn't use just prefix for topic/group but also complete name
 // TODO - we should click on topic name/prefix when it popups when filling the prefix/name
 export const grantConsumerAccess = async function (page: Page, saId: string, topicName: string, consumerGroup: string) {
   await page.getByTestId('actionManagePermissions').click();
   await page.getByRole('button', { name: 'Options menu' }).click();
-  await page.getByRole('option').filter({hasText: saId}).click();
+  await page.getByRole('option').filter({ hasText: saId }).click();
   await page.getByRole('button', { name: 'Next' }).click();
   await page.getByTestId('permissions-dropdown-toggle').click();
 
   await page.locator('button', { hasText: 'Consume from a topic' }).click();
 
   await page
-  .getByRole('row', {
-    name: 'T Topic Options menu permission.manage_permissions_dialog.assign_permissions.resource_name_aria Options menu Label group category'
-  })
-  .getByPlaceholder('Enter prefix')
-  .click();
+    .getByRole('row', {
+      name: 'T Topic Options menu permission.manage_permissions_dialog.assign_permissions.resource_name_aria Options menu Label group category'
+    })
+    .getByPlaceholder('Enter prefix')
+    .click();
 
   await page
     .getByRole('row', {
@@ -153,14 +152,14 @@ export const grantConsumerAccess = async function (page: Page, saId: string, top
     .getByPlaceholder('Enter prefix')
     .fill(consumerGroup);
 
-    await page.getByRole('button').filter({hasText: 'Save'}).click();
-  }
+  await page.getByRole('button').filter({ hasText: 'Save' }).click();
+};
 
 export const navigateToAccess = async function (page: Page, kafkaName: string) {
-  if (await page.locator('a', { hasText: "Kafka Instances" }).count() !== 1) {
-    await page.locator('button', { hasText: "Streams for Apache Kafka" }).click();
+  if ((await page.locator('a', { hasText: 'Kafka Instances' }).count()) !== 1) {
+    await page.locator('button', { hasText: 'Streams for Apache Kafka' }).click();
   }
-  await page.locator('a', { hasText: "Kafka Instances" }).click();
+  await page.locator('a', { hasText: 'Kafka Instances' }).click();
   await expect(page.getByText(kafkaName)).toHaveCount(1);
   await page.getByText(kafkaName).click();
   await page.getByTestId('pageKafka-tabPermissions').click();
@@ -169,4 +168,3 @@ export const navigateToAccess = async function (page: Page, kafkaName: string) {
 export const navigateToConsumerGroups = async function (page: Page) {
   await page.getByTestId('pageKafka-tabConsumers').click();
 };
-
