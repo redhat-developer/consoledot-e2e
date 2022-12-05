@@ -1,4 +1,7 @@
+import { expect } from '@playwright/test';
 import { Kafka } from 'kafkajs';
+
+const messageContent = 'first_message';
 
 export const produceAndConsumeMessage = async function (
   broker: string,
@@ -20,7 +23,7 @@ export const produceAndConsumeMessage = async function (
   await producer.connect();
   await producer.send({
     topic: topic,
-    messages: [{ value: 'first_message' }]
+    messages: [{ value: messageContent }]
   });
 
   await producer.disconnect();
@@ -32,6 +35,7 @@ export const produceAndConsumeMessage = async function (
 
   await consumer.run({
     eachMessage: async ({ message }) => {
+      await expect(message.value.toString()).toContain(messageContent);
       console.log({
         value: message.value.toString()
       });
