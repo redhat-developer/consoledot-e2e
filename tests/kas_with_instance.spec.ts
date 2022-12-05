@@ -196,7 +196,7 @@ test('create consumer group and check dashboard', async ({ page }) => {
   await row.locator('[aria-label="Actions"]').click();
   await page.getByText('Connection').click();
 
-  const broker = await page.locator('[aria-label="Bootstrap server"]').getAttribute('value');
+  const broker = await page.locator('[aria-label="Bootstrap server"]').inputValue();
   console.log('broker: ' + broker);
   await page.locator('.pf-c-drawer__close > .pf-c-button').click();
 
