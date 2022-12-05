@@ -14,7 +14,7 @@ export const createKafkaInstance = async function (page: Page, name: string, che
   await page.waitForSelector('[role=progressbar]', { state: 'detached' });
   await page.getByLabel('Name *').fill(name);
   // data-testid=modalCreateKafka-buttonSubmit
-  await page.locator('button', { hasText: 'Create instance'}).click()
+  await page.locator('button', { hasText: 'Create instance' }).click();
 
   if (check) {
     // check for the instance to have been created
