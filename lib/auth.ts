@@ -1,6 +1,6 @@
-import { expect, Page } from "@playwright/test";
-import blockAnalyticsDomains from "./blocker";
-import { config } from "./config";
+import { expect, Page } from '@playwright/test';
+import blockAnalyticsDomains from './blocker';
+import { config } from './config';
 
 export default async function login(page: Page) {
   await blockAnalyticsDomains(page);
@@ -19,5 +19,5 @@ export default async function login(page: Page) {
 
   // check we landed on the right page
   await expect(page).toHaveTitle(/Home/, { timeout: 10000 });
-  await expect(page.getByText("Gain increased visibility into your hybrid cloud")).toBeTruthy();
+  await expect(page.getByText('Gain increased visibility into your hybrid cloud')).toBeTruthy();
 }

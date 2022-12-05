@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "prettier-format": "prettier --config .prettierrc 'tests/**/*.ts' --write",
-    "prettier-check": "prettier --config .prettierrc 'tests/**/*.ts' --check"
+    "prettier-format": "prettier --config .prettierrc 'tests/**/*.ts' 'lib/**/*.ts' --write",
+    "prettier-check": "prettier --config .prettierrc 'tests/**/*.ts' 'lib/**/*.ts' --check"
   },
   "keywords": [],
   "author": "",

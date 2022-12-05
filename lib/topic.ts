@@ -10,14 +10,14 @@ export const navigateToKafkaTopicsList = async function (page: Page, kafkaName: 
 };
 
 export const createKafkaTopic = async function (page: Page, name: string) {
-  await page.locator('button', { hasText: 'Create topic'}).click()
+  await page.locator('button', { hasText: 'Create topic' }).click();
   await expect(page.getByText('Create topic')).toHaveCount(2);
   // This is default Topic creation
   await page.getByPlaceholder('Enter topic name').fill(name);
   for (let i = 0; i < 3; i++) {
-    await page.locator('button', { hasText: 'Next'}).click()
+    await page.locator('button', { hasText: 'Next' }).click();
   }
-  await page.locator('button', { hasText: 'Finish'}).click()
+  await page.locator('button', { hasText: 'Finish' }).click();
   await expect(page.getByText(name)).toHaveCount(1);
 };
 
@@ -27,10 +27,10 @@ export const deleteKafkaTopic = async function (page: Page, name: string) {
 
   await row.locator('[aria-label="Actions"]').click();
   // data-testid=tableTopics-actionDelete
-  await page.locator('button', { hasText: 'Delete'}).click()
+  await page.locator('button', { hasText: 'Delete' }).click();
   await page.getByLabel('Type DELETE to confirm:').click();
   await page.getByLabel('Type DELETE to confirm:').fill('DELETE');
   // data-testid=modalDeleteTopic-buttonDelete
-  await page.locator('button', { hasText: 'Delete'}).click()
+  await page.locator('button', { hasText: 'Delete' }).click();
   await expect(page.getByText(name)).toHaveCount(0);
 };
