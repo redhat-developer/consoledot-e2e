@@ -52,7 +52,6 @@ export const createServiceAccount = async function (page: Page, name: string) {
   return { clientID: clientID, clientSecret: clientSecret };
 };
 
-
 export const deleteServiceAccount = async function (page: Page, name: string) {
   const instanceLinkSelector = page.getByText(name, { exact: true });
 
@@ -78,7 +77,6 @@ export const deleteServiceAccount = async function (page: Page, name: string) {
     timeout: config.serviceAccountDeletionTimeout
   });
 };
-
 
 export const resetServiceAccount = async function (page: Page, name: string) {
   const instanceLinkSelector = page.getByText(name);
