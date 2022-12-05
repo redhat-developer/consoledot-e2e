@@ -1,21 +1,23 @@
 import { Consumer, Producer, Kafka, EachMessagePayload, logLevel } from 'kafkajs';
 
 class KafkaClient {
-    clientId: string;
     bootstrapServer: string;
+    username: string;
+    password: string;
     kafka: Kafka;
 
-    constructor(clientId: string, bootstrapServer: string) {
-        this.clientId = clientId
+    constructor(bootstrapServer: string, username: string, password: string) {
         this.bootstrapServer = bootstrapServer
+        this.username = username
+        this.password = password
         this.kafka = new Kafka({
             brokers: [bootstrapServer],
-            clientId: clientId,
             ssl: true,
             sasl: {
+                // TODO add oauth
                 mechanism: 'plain',
-                username: '48b75664-b3d6-4e13-a5ef-0d10d0e1a536',
-                password: '0tG5Nb0ku8IzEduh1yKZ3SuyZ2iQrsfW',
+                username: username,
+                password: password,
             },
             logLevel: logLevel.INFO
           })
@@ -26,8 +28,8 @@ export class KafkaProducer extends KafkaClient {
     
     private producer: Producer
 
-    constructor(clientId: string, bootstrapServer: string) {
-        super(clientId, bootstrapServer)
+    constructor(bootstrapServer: string, username: string, password: string) {
+        super(bootstrapServer, username, password)
         this.producer = this.kafka.producer()
     }
 
@@ -50,7 +52,7 @@ export class KafkaProducer extends KafkaClient {
             })
             .catch(e => {
                 this.kafka.logger().error(`[${KafkaProducer.name}] ${e.message}`, { stack: e.stack })
-                return false
+                return e;
             })
     }
 
@@ -71,15 +73,13 @@ export class KafkaConsumer extends KafkaClient {
 
     private kafkaConsumer: Consumer
 
-    constructor(clientId: string, bootstrapServer: string, consumerGroup: string) {
-        super(clientId, bootstrapServer)
+    constructor(bootstrapServer: string, consumerGroup: string, username: string, password: string) {
+        super(bootstrapServer, username, password)
         this.kafkaConsumer = this.kafka.consumer({ groupId: consumerGroup })
     }
 
-
-    public async consumeMessages(topic: string, consumerGroup: string, messageCount: number, fromBeginning: boolean = true) {   
-    let msgCount = 1;
-    let test
+    public async consumeMessages(topic: string, expectedMsgCount: number, fromBeginning: boolean = true): Promise<boolean> {   
+        let msgCount = 0;
 
         try {
             await this.kafkaConsumer.connect()
@@ -91,39 +91,23 @@ export class KafkaConsumer extends KafkaClient {
                     const prefix = `${topic}[${partition} | ${message.offset}] / ${message.timestamp}`
                     console.log(`- ${prefix} ${message.key}#${message.value} -> ${msgCount}`)
                     msgCount++
-                    if (msgCount >= messageCount) {
-                        test = Promise.resolve(msgCount) 
-                    }
                 }
             })
         } catch (error) {
             console.log('Error: ', error)
-            return false
+            return error
         }
 
-        const timeout = new Promise<never>((_, reject) => {
+        return await new Promise((resolve, reject) => {
             setTimeout(() => {
-              reject(false);
-            }, 40000);
-          });
-
-        const succeeded = new Promise((resolve, _) => {
-            if (msgCount >= messageCount) {
-                console.log(msgCount)
-                resolve(true)
-            }
-        })
-
-        return Promise.race([test, timeout])
-
-        // return await new Promise((resolve, _) => {
-        //     setTimeout(() => {
-        //         if (msgCount <= messageCount) {
-        //             console.log(msgCount)
-        //             resolve(true)
-        //         } 
-        //     }, 20000)
-        // }) 
+                if (msgCount <= expectedMsgCount) {
+                    console.log("Received: " + msgCount)
+                    resolve(true)
+                } else {
+                    reject(false)
+                }
+            }, 20000)
+        }) 
     }
     
     public async shutdown(): Promise<void> {

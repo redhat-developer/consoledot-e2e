@@ -70,7 +70,7 @@ const filterByStatus = async function (page, status) {
 };
 
 // test_3kas.py test_kas_kafka_filter_by_status
-test('test Kafka list filtered by status', async ({ page }) => {
+test.skip('test Kafka list filtered by status', async ({ page }) => {
   const testInstanceName = `test-instance-${config.sessionID}`;
 
   await createKafkaInstance(page, testInstanceName);
@@ -104,7 +104,7 @@ test('test Kafka list filtered by status', async ({ page }) => {
 
 // test_3kas.py test_try_to_create_kafka_instance_with_same_name
 // NOTE: this test is expected to be pretty fragile as it needs that the current instance is in "early" `Creating` status
-test('test fail to create Kafka instance with the same name', async ({ page }) => {
+test.skip('test fail to create Kafka instance with the same name', async ({ page }) => {
   const testInstanceName = `test-instance-${config.sessionID}`;
   await createKafkaInstance(page, testInstanceName, false);
 
