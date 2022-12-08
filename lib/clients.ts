@@ -55,7 +55,7 @@ export class KafkaProducer extends KafkaClient {
       });
   }
 
-  private generateMessage(key: String) {
+  private generateMessage(key: string) {
     return {
       key: `key-${key}`,
       value: `value-${key}-${new Date().toISOString()}`
@@ -78,7 +78,7 @@ export class KafkaConsumer extends KafkaClient {
   public async consumeMessages(
     topic: string,
     expectedMsgCount: number,
-    fromBeginning: boolean = true
+    fromBeginning = true
   ): Promise<boolean> {
     let msgCount = 0;
 

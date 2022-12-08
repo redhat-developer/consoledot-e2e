@@ -73,7 +73,7 @@ test.beforeEach(async ({ page }) => {
 
   // Producer 100 messages
   const producer = new KafkaProducer(bootstrap, credentials.clientID, credentials.clientSecret);
-  let producerResponse = await producer.produceMessages(testTopicName, expectedMessageCount, testMessageKey);
+  const producerResponse = await producer.produceMessages(testTopicName, expectedMessageCount, testMessageKey);
   assert(producerResponse === true);
 });
 
@@ -84,7 +84,7 @@ test('Consume messages from topic', async ({ page }) => {
 
   // Consume 100 messages
   const consumer = new KafkaConsumer(bootstrap, consumerGroupId, credentials.clientID, credentials.clientSecret);
-  let consumerResponse = await consumer.consumeMessages(testTopicName, expectedMessageCount);
+  const consumerResponse = await consumer.consumeMessages(testTopicName, expectedMessageCount);
   assert(consumerResponse === true);
 
   // Open Consumer Groups Tab to check dashboard

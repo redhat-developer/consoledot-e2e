@@ -13,7 +13,7 @@ export const navigateToKafkaList = async function (page: Page) {
   await closePopUp(page, '[aria-label=close-notification]');
 
   await page.locator('[data-testid=router-link]', { hasText: 'Kafka Instances' }).click();
-  expect((await page.locator('heading', { hasText: 'Kafka Instances' }).count()) === 1);
+  await expect((await page.locator('heading', { hasText: 'Kafka Instances' }).count()) === 1).toBeTruthy();
 };
 
 export const createKafkaInstance = async function (page: Page, name: string, check = true) {
