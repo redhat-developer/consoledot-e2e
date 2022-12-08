@@ -1,4 +1,4 @@
-import { test, expect, Page } from '@playwright/test';
+import { test, expect } from '@playwright/test';
 import login from '@lib/auth';
 import { config } from '@lib/config';
 import {
@@ -11,7 +11,7 @@ import {
   grantProducerAccess,
   grantConsumerAccess
 } from '@lib/kafka';
-import { navigateToKafkaTopicsList, createKafkaTopic, deleteKafkaTopic, navigeToMessages } from '@lib/topic';
+import { navigateToKafkaTopicsList, createKafkaTopic, navigeToMessages } from '@lib/topic';
 import { KafkaConsumer, KafkaProducer } from '../lib/clients';
 import { strict as assert } from 'assert';
 import { createServiceAccount, deleteServiceAccount, navigateToSAList } from '@lib/sa';
@@ -89,7 +89,7 @@ test('Consume messages from topic', async ({ page }) => {
 
   // Open Consumer Groups Tab to check dashboard
   await navigateToConsumerGroups(page);
-  expect((await page.getByText(consumerGroupId).count()) >= 1);
+  await expect((await page.getByText(consumerGroupId).count()) >= 1).toBeTruthy();
   // Shutdown consumer
   await consumer.shutdown();
 });
@@ -106,8 +106,8 @@ test('Browse messages', async ({ page }) => {
   await expect(page.locator('table[aria-label="Messages table"]')).toContainText('key-' + testMessageKey);
   await page.locator('table[aria-label="Messages table"] >> tr').nth(1).click();
   const messageDetail = await page.locator('data-testid=message-details');
-  expect(messageDetail.locator('dt:has-text("Offset")')).toHaveCount(1);
-  expect(messageDetail.locator('dd:has-text("key-")')).toHaveCount(1);
+  await expect(messageDetail.locator('dt:has-text("Offset")')).toHaveCount(1);
+  await expect(messageDetail.locator('dd:has-text("key-")')).toHaveCount(1);
 });
 
 // test_6messages.py filter_messages
