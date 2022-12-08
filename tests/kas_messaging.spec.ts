@@ -105,4 +105,3 @@ test('Browse messages', async ({ page }) => {
   await expect(messageDetail.locator('dt:has-text("Offset")')).toHaveCount(1);
   await expect(messageDetail.locator('dd:has-text("key-")')).toHaveCount(1);
 });
-
