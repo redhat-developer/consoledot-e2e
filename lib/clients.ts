@@ -75,11 +75,7 @@ export class KafkaConsumer extends KafkaClient {
     this.kafkaConsumer = this.kafka.consumer({ groupId: consumerGroup });
   }
 
-  public async consumeMessages(
-    topic: string,
-    expectedMsgCount: number,
-    fromBeginning = true
-  ): Promise<boolean> {
+  public async consumeMessages(topic: string, expectedMsgCount: number, fromBeginning = true): Promise<boolean> {
     let msgCount = 0;
 
     try {
