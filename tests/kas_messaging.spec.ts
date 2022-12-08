@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, Page } from '@playwright/test';
 import login from '@lib/auth';
 import { config } from '@lib/config';
 import {
@@ -7,23 +7,23 @@ import {
   createKafkaInstance,
   getBootstrapUrl,
   navigateToAccess,
-  manageAccess,
   navigateToConsumerGroups,
   grantProducerAccess,
   grantConsumerAccess
 } from '@lib/kafka';
-import { navigateToKafkaTopicsList, createKafkaTopic, deleteKafkaTopic } from '@lib/topic';
+import { navigateToKafkaTopicsList, createKafkaTopic, deleteKafkaTopic, navigeToMessages } from '@lib/topic';
 import { KafkaConsumer, KafkaProducer } from '../lib/clients';
 import { strict as assert } from 'assert';
 import { createServiceAccount, deleteServiceAccount, navigateToSAList } from '@lib/sa';
 
-// const testInstanceName = `test-instance-${config.sessionID}`;
-// const testTopicName = `test-topic-${config.sessionID}`;
-
-const testInstanceName = `jakub-test`;
+const testInstanceName = config.instanceName;
 const testTopicName = `test-jstejska`;
 const testServiceAccountName = 'jstejska-test';
+const testMessageKey = 'key';
+const consumerGroupId = 'test';
+const expectedMessageCount = 100;
 let credentials;
+let bootstrap: string;
 
 test.beforeEach(async ({ page }) => {
   await login(page);
@@ -66,23 +66,21 @@ test.beforeEach(async ({ page }) => {
     await deleteServiceAccount(page, testServiceAccountName);
   }
   credentials = await createServiceAccount(page, testServiceAccountName);
-});
-
-// test_6messages.py generate_messages_to_topic
-test('Generate messages to topic', async ({ page }) => {
-  const consumerGroupId = 'test';
-  const expectedMessageCount = 100;
-
-  const bootstrap = await getBootstrapUrl(page, testInstanceName);
+  bootstrap = await getBootstrapUrl(page, testInstanceName);
 
   await navigateToAccess(page, testInstanceName);
   await grantProducerAccess(page, credentials.clientID, testTopicName);
-  await grantConsumerAccess(page, credentials.clientID, testTopicName, consumerGroupId);
 
   // Producer 100 messages
   const producer = new KafkaProducer(bootstrap, credentials.clientID, credentials.clientSecret);
-  let producerResponse = await producer.produceMessages(testTopicName, expectedMessageCount, 'key');
+  let producerResponse = await producer.produceMessages(testTopicName, expectedMessageCount, testMessageKey);
   assert(producerResponse === true);
+});
+
+// test_6messages.py generate_messages_to_topic
+test('Consume messages from topic', async ({ page }) => {
+  await navigateToAccess(page, testInstanceName);
+  await grantConsumerAccess(page, credentials.clientID, testTopicName, consumerGroupId);
 
   // Consume 100 messages
   const consumer = new KafkaConsumer(bootstrap, consumerGroupId, credentials.clientID, credentials.clientSecret);
@@ -92,16 +90,27 @@ test('Generate messages to topic', async ({ page }) => {
   // Open Consumer Groups Tab to check dashboard
   await navigateToConsumerGroups(page);
   expect((await page.getByText(consumerGroupId).count()) >= 1);
-  // Shutdown producer
+  // Shutdown consumer
   await consumer.shutdown();
 });
 
-// // test_6messages.py browse_messages
-// test('Browse messages', async({page}) => {
-//   await navigeToMessages(page, testTopicName)
-// })
+// test_6messages.py browse_messages
+test('Browse messages', async ({ page }) => {
+  await navigeToMessages(page, testInstanceName, testTopicName);
 
-// // test_6messages.py filter_messages
-// test('Filter messages', async({page}) => {
-//   await navigeToMessages(page, testTopicName)
-// })
+  if (await page.locator('button:has-text("Check for new data")').isVisible()) {
+    await page.locator('button:has-text("Check for new data")').click();
+  }
+
+  await expect(page.locator('table[aria-label="Messages table"]')).toContainText('value-' + testMessageKey);
+  await expect(page.locator('table[aria-label="Messages table"]')).toContainText('key-' + testMessageKey);
+  await page.locator('table[aria-label="Messages table"] >> tr').nth(1).click();
+  const messageDetail = await page.locator('data-testid=message-details');
+  expect(messageDetail.locator('dt:has-text("Offset")')).toHaveCount(1);
+  expect(messageDetail.locator('dd:has-text("key-")')).toHaveCount(1);
+});
+
+// test_6messages.py filter_messages
+test.skip('Filter messages', async ({ page }) => {
+  await navigeToMessages(page, testInstanceName, testTopicName);
+});

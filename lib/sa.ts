@@ -4,12 +4,15 @@ import { closePopUp } from './popup';
 
 export const navigateToSAList = async function (page: Page) {
   if ((await page.getByRole('link', { name: 'Application and Data Services' }).count()) === 1) {
+    // await page.locator('li >> a:has-text("Application and Data Services")').click();
     await page.getByRole('link', { name: 'Application and Data Services' }).click();
   }
   await closePopUp(page, '[aria-label=close-notification]');
 
-  await page.getByRole('link').filter({ hasText: 'Service Accounts' }).click();
-  await expect(page.getByRole('heading', { name: 'Service Accounts' })).toHaveCount(1);
+  await expect(page.locator('li >> a:text("Service Accounts")')).toHaveCount(1);
+  await page.locator('li >> a:text("Service Accounts")').click();
+  // expect(await page.locator('h1:has-text("Service Accounts")').count() === 1).toBeTruthy();
+  await expect(page.locator('h1', { hasText: 'Service Accounts' })).toHaveCount(1);
 };
 
 export const createServiceAccount = async function (page: Page, name: string) {

@@ -3,16 +3,16 @@ import { config } from './config';
 import { closePopUp } from './popup';
 
 export const navigateToKafkaList = async function (page: Page) {
-  if ((await page.locator('button', { hasText: 'Streams for Apache Kafka' }).count()) === 0) {
-    await page.getByRole('link', { name: 'Application and Data Services' }).click();
+  if (!(await page.locator('[data-testid=router-link]', { hasText: 'Kafka Instances' }).isVisible())) {
+    if (!(await page.locator('button', { hasText: 'Streams for Apache Kafka' }).isVisible())) {
+      await page.getByRole('link', { name: 'Application and Data Services' }).click();
+    }
+    await page.locator('button', { hasText: 'Streams for Apache Kafka' }).click();
   }
-
-  await page.locator('button', { hasText: 'Streams for Apache Kafka' }).click();
 
   await closePopUp(page, '[aria-label=close-notification]');
 
-  // await expect(await page.getByRole('link', { name: 'Kafka Instances' })).toHaveCount(1);
-  await page.locator('a', { hasText: 'Kafka Instances' }).click();
+  await page.locator('[data-testid=router-link]', { hasText: 'Kafka Instances' }).click();
   expect((await page.locator('heading', { hasText: 'Kafka Instances' }).count()) === 1);
 };
 
@@ -156,10 +156,11 @@ export const grantConsumerAccess = async function (page: Page, saId: string, top
 };
 
 export const navigateToAccess = async function (page: Page, kafkaName: string) {
-  if ((await page.locator('a', { hasText: 'Kafka Instances' }).count()) !== 1) {
-    await page.locator('button', { hasText: 'Streams for Apache Kafka' }).click();
-  }
-  await page.locator('a', { hasText: 'Kafka Instances' }).click();
+  // if ((await page.locator('a', { hasText: 'Kafka Instances' }).count()) !== 1) {
+  //   await page.locator('button', { hasText: 'Streams for Apache Kafka' }).click();
+  // }
+  // await page.locator('a', { hasText: 'Kafka Instances' }).click();
+  await navigateToKafkaList(page);
   await expect(page.getByText(kafkaName)).toHaveCount(1);
   await page.getByText(kafkaName).click();
   await page.getByTestId('pageKafka-tabPermissions').click();

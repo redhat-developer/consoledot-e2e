@@ -3,11 +3,10 @@ import login from '@lib/auth';
 import { config } from '@lib/config';
 import { navigateToKafkaList, deleteKafkaInstance, createKafkaInstance, waitForKafkaReady } from '@lib/kafka';
 import { navigateToKafkaTopicsList, createKafkaTopic, deleteKafkaTopic } from '@lib/topic';
-import { KafkaConsumer, KafkaProducer } from '../lib/clients';
-import { strict as assert } from 'assert';
 
-const testInstanceName = `test-instance-${config.sessionID}`;
-const testTopicName = `test-topic-${config.sessionID}`;
+const testInstanceName = config.instanceName;
+const testTopicPrefix = 'test-topic-';
+const testTopicName = `${testTopicPrefix}${config.sessionID}`;
 
 test.beforeEach(async ({ page }) => {
   await login(page);
@@ -34,6 +33,7 @@ test.beforeEach(async ({ page }) => {
 
     if ((await page.getByText(testInstanceName).count()) === 0) {
       await createKafkaInstance(page, testInstanceName);
+      await waitForKafkaReady(page, testInstanceName);
     }
   }
 });

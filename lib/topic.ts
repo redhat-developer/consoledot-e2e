@@ -1,5 +1,5 @@
 import { expect, Page } from '@playwright/test';
-import { waitForKafkaReady } from './kafka';
+import { navigateToKafkaList, waitForKafkaReady } from './kafka';
 
 export const navigateToKafkaTopicsList = async function (page: Page, kafkaName: string) {
   await expect(page.getByText(kafkaName)).toHaveCount(1);
@@ -34,4 +34,17 @@ export const deleteKafkaTopic = async function (page: Page, name: string) {
   // data-testid=modalDeleteTopic-buttonDelete
   await page.locator('button', { hasText: 'Delete' }).click();
   await expect(page.getByText(name)).toHaveCount(0);
+};
+
+export const navigeToMessages = async function (page: Page, kafkaName: string, topicName: string) {
+  await navigateToKafkaList(page);
+  await navigateToKafkaTopicsList(page, kafkaName);
+  expect((await page.locator('a', { hasText: topicName }).count()) !== 0);
+  await page.locator('a', { hasText: topicName }).click();
+
+  expect((await page.locator('button', { hasText: 'Messages' }).count()) !== 0);
+
+  await page.locator('button', { hasText: 'Messages' }).click();
+
+  await expect(page.locator('table', { hasText: 'Messages table' })).toBeTruthy();
 };
