@@ -47,4 +47,8 @@ export const navigeToMessages = async function (page: Page, kafkaName: string, t
   await page.locator('button', { hasText: 'Messages' }).click();
 
   await expect(page.locator('table', { hasText: 'Messages table' })).toBeTruthy();
+
+  if (await page.locator('button:has-text("Check for new data")').isVisible()) {
+    await page.locator('button:has-text("Check for new data")').click();
+  }
 };

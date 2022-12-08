@@ -98,10 +98,6 @@ test('Consume messages from topic', async ({ page }) => {
 test('Browse messages', async ({ page }) => {
   await navigeToMessages(page, testInstanceName, testTopicName);
 
-  if (await page.locator('button:has-text("Check for new data")').isVisible()) {
-    await page.locator('button:has-text("Check for new data")').click();
-  }
-
   await expect(page.locator('table[aria-label="Messages table"]')).toContainText('value-' + testMessageKey);
   await expect(page.locator('table[aria-label="Messages table"]')).toContainText('key-' + testMessageKey);
   await page.locator('table[aria-label="Messages table"] >> tr').nth(1).click();
@@ -110,7 +106,3 @@ test('Browse messages', async ({ page }) => {
   await expect(messageDetail.locator('dd:has-text("key-")')).toHaveCount(1);
 });
 
-// test_6messages.py filter_messages
-test.skip('Filter messages', async ({ page }) => {
-  await navigeToMessages(page, testInstanceName, testTopicName);
-});
