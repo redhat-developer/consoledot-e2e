@@ -161,6 +161,14 @@ test('test instance quick options', async ({ page }) => {
   await page.getByRole('button', { name: 'Cancel' }).click();
 });
 
+// test_4kas.py test_kafka_dashboard_opened
+test('test instance dashboard on instance name click', async ({ page }) => {
+  await page.locator('a', { hasText: `${testInstanceName}` }).click();
+
+  await expect(page.locator('h1', { hasText: `${testInstanceName}` })).toHaveCount(1);
+  await expect(page.getByTestId('pageKafka-tabDashboard')).toHaveCount(1);
+});
+
 // test_4kafka.py test_kafka_topic_create
 test('create and delete a Kafka Topic', async ({ page }) => {
   await navigateToKafkaTopicsList(page, testInstanceName);
