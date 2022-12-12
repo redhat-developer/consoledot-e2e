@@ -128,37 +128,31 @@ test('test instances can be filtered by cloud provider', async ({ page }) => {
 test('test instance details on row click', async ({ page }) => {
   await page.getByRole('gridcell', { name: `${config.username}` }).click();
 
-  await expect(page.getByRole('heading', { name: `${testInstanceName}` })).toHaveCount(1);
+  await expect(page.locator('h1', { hasText: `${testInstanceName}` })).toHaveCount(1);
 });
 
 // test_3kas.py test_kas_kafka_view_details_by_menu_click_panel_opened
-test('test instance details on instance name click', async ({ page }) => {
-  await page.getByRole('gridcell', { name: `${testInstanceName}` }).click();
+test('test instance details on menu click', async ({ page }) => {
+  await page.locator('main >> [aria-label="Actions"]').click();
+  await page.locator('button', { hasText: 'Details' }).click();
 
-  await expect(page.getByRole('heading', { name: `${testInstanceName}` })).toHaveCount(1);
-  await expect(page.getByTestId('pageKafka-tabDashboard')).toHaveCount(1);
+  await expect(page.locator('h1', { hasText: `${testInstanceName}` })).toHaveCount(1);
+  await expect(page.locator('button', { hasText: 'Details' })).toHaveCount(1);
+
+  await page.locator('button[aria-label="Close drawer panel"]').click();
 });
 
-// test_3kas.py test_kas_kafka_view_details_by_menu_click_panel_opened
 // test_3kas.py test_kas_kafka_view_details_by_connection_menu_click_panel_opened
 // ... and more ...
 test('test instance quick options', async ({ page }) => {
-  await page.getByRole('button', { name: 'Actions' }).click();
-  await page.getByRole('menuitem', { name: 'Details' }).click();
-
-  await expect(page.getByRole('heading', { name: `${testInstanceName}` })).toHaveCount(1);
-  await expect(page.getByRole('tab', { name: 'Details' })).toHaveCount(1);
-
-  await page.getByRole('button', { name: 'Close drawer panel' }).click();
-
-  await page.getByRole('button', { name: 'Actions' }).click();
-  await page.getByRole('menuitem', { name: 'Connection' }).click();
+  await page.locator('main >> [aria-label="Actions"]').click();
+  await page.locator('button', { hasText: 'Connection' }).click();
 
   await expect(page.getByRole('textbox', { name: 'Bootstrap server' })).toHaveCount(1);
 
-  await page.getByRole('button', { name: 'Close drawer panel' }).click();
+  await page.locator('button[aria-label="Close drawer panel"]').click();
 
-  await page.getByRole('button', { name: 'Actions' }).click();
+  await page.locator('main >> [aria-label="Actions"]').click();
   await page.getByRole('menuitem', { name: 'Change owner' }).click();
 
   await expect(page.getByText('Current owner')).toHaveCount(1);
