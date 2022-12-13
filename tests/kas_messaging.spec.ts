@@ -16,7 +16,7 @@ import { KafkaConsumer, KafkaProducer } from '../lib/clients';
 import { strict as assert } from 'assert';
 import { createServiceAccount, deleteServiceAccount, navigateToSAList } from '@lib/sa';
 
-const testInstanceName = "test-instance-messaging";
+const testInstanceName = 'test-instance-messaging';
 const testTopicName = `test-topic-name`;
 const testServiceAccountName = 'test-service-account';
 const testMessageKey = 'key';
@@ -32,7 +32,7 @@ test.beforeEach(async ({ page }) => {
 
   await expect(page.getByRole('button', { name: 'Create Kafka instance' })).toBeVisible();
 
-  if ((await page.  getByText(testInstanceName).count()) > 0 && (await page.locator('tr').count()) === 2) {
+  if ((await page.getByText(testInstanceName).count()) > 0 && (await page.locator('tr').count()) === 2) {
     // Test instance present, nothing to do!
   } else {
     await page.waitForSelector('[role=progressbar]', {
@@ -51,30 +51,30 @@ test.beforeEach(async ({ page }) => {
     if ((await page.getByText(testInstanceName).count()) === 0) {
       await createKafkaInstance(page, testInstanceName);
     }
+
+    await navigateToKafkaTopicsList(page, testInstanceName);
+    // Do not create topic if it already exists
+    await expect(page.getByText('Create topic')).toHaveCount(1);
+    if ((await page.locator('a', { hasText: testTopicName }).count()) === 0) {
+      await createKafkaTopic(page, testTopicName);
+    }
+
+    await navigateToSAList(page);
+    await expect(page.getByText('Create service account')).toHaveCount(1);
+    if ((await page.locator('tr', { hasText: testServiceAccountName }).count()) !== 0) {
+      await deleteServiceAccount(page, testServiceAccountName);
+    }
+    credentials = await createServiceAccount(page, testServiceAccountName);
+    bootstrap = await getBootstrapUrl(page, testInstanceName);
+
+    await navigateToAccess(page, testInstanceName);
+    await grantProducerAccess(page, credentials.clientID, testTopicName);
+
+    // Producer 100 messages
+    const producer = new KafkaProducer(bootstrap, credentials.clientID, credentials.clientSecret);
+    const producerResponse = await producer.produceMessages(testTopicName, expectedMessageCount, testMessageKey);
+    assert(producerResponse === true);
   }
-
-  await navigateToKafkaTopicsList(page, testInstanceName);
-  // Do not create topic if it already exists
-  await expect(page.getByText('Create topic')).toHaveCount(1);
-  if ((await page.locator('a', { hasText: testTopicName }).count()) === 0) {
-    await createKafkaTopic(page, testTopicName);
-  }
-
-  await navigateToSAList(page);
-  await expect(page.getByText('Create service account')).toHaveCount(1);
-  if ((await page.locator('tr', { hasText: testServiceAccountName }).count()) !== 0) {
-    await deleteServiceAccount(page, testServiceAccountName);
-  }
-  credentials = await createServiceAccount(page, testServiceAccountName);
-  bootstrap = await getBootstrapUrl(page, testInstanceName);
-
-  await navigateToAccess(page, testInstanceName);
-  await grantProducerAccess(page, credentials.clientID, testTopicName);
-
-  // Producer 100 messages
-  const producer = new KafkaProducer(bootstrap, credentials.clientID, credentials.clientSecret);
-  const producerResponse = await producer.produceMessages(testTopicName, expectedMessageCount, testMessageKey);
-  assert(producerResponse === true);
 });
 
 // test_6messages.py generate_messages_to_topic
