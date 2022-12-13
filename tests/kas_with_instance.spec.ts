@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import login from '@lib/auth';
 import { config } from '@lib/config';
-import { navigateToKafkaList, deleteKafkaInstance, createKafkaInstance } from '@lib/kafka';
+import { navigateToKafkaList, deleteKafkaInstance, createKafkaInstance, waitForKafkaReady } from '@lib/kafka';
 import { navigateToKafkaTopicsList, createKafkaTopic, deleteKafkaTopic } from '@lib/topic';
 
 const testInstanceName = `test-instance-${config.sessionID}`;
@@ -163,6 +163,7 @@ test('test instance quick options', async ({ page }) => {
 
 // test_4kas.py test_kafka_dashboard_opened
 test('test instance dashboard on instance name click', async ({ page }) => {
+  await waitForKafkaReady(page, testInstanceName);
   await page.locator('a', { hasText: `${testInstanceName}` }).click();
 
   await expect(page.locator('h1', { hasText: `${testInstanceName}` })).toHaveCount(1);
