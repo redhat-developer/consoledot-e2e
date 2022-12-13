@@ -163,6 +163,7 @@ test('test instance quick options', async ({ page }) => {
 
 // test_4kas.py test_kafka_dashboard_opened
 test('test instance dashboard on instance name click', async ({ page }) => {
+  await waitForKafkaReady(page, testInstanceName);
   await page.locator('a', { hasText: `${testInstanceName}` }).click();
 
   await expect(page.locator('h1', { hasText: `${testInstanceName}` })).toHaveCount(1);
