@@ -5,9 +5,9 @@ export const navigateToKafkaTopicsList = async function (page: Page, kafkaName: 
   await expect(page.getByText(kafkaName)).toHaveCount(1);
   await waitForKafkaReady(page, kafkaName);
   await page.locator('a', { hasText: kafkaName }).click();
-  await expect((await page.locator('button', { hasText: 'Topics' }).count()) == 1).toBeTruthy();
+  await expect(await page.locator('button[aria-label="Topics"]')).toHaveCount(1);
   // data-testid=pageKafka-tabTopics
-  await page.locator('button', { hasText: 'Topics' }).click();
+  await page.locator('button[aria-label="Topics"]').click();
 };
 
 export const createKafkaTopic = async function (page: Page, name: string) {
@@ -39,10 +39,12 @@ export const deleteKafkaTopic = async function (page: Page, name: string) {
 export const navigeToMessages = async function (page: Page, kafkaName: string, topicName: string) {
   await navigateToKafkaList(page);
   await navigateToKafkaTopicsList(page, kafkaName);
-  await expect((await page.locator('a', { hasText: topicName }).count()) !== 0).toBeTruthy();
+  // await expect((await page.locator('a', { hasText: topicName }).count()) !== 0).toBeTruthy();
+  await expect(await page.locator('a', { hasText: topicName })).toHaveCount(1);
+
   await page.locator('a', { hasText: topicName }).click();
 
-  await expect((await page.locator('button', { hasText: 'Messages' }).count()) !== 0).toBeTruthy();
+  await expect(await page.locator('button', { hasText: 'Messages' })).toHaveCount(1);
 
   await page.locator('button', { hasText: 'Messages' }).click();
 

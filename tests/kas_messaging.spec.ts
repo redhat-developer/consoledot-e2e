@@ -16,11 +16,11 @@ import { KafkaConsumer, KafkaProducer } from '../lib/clients';
 import { strict as assert } from 'assert';
 import { createServiceAccount, deleteServiceAccount, navigateToSAList } from '@lib/sa';
 
-const testInstanceName = config.instanceName;
-const testTopicName = `test-jstejska`;
-const testServiceAccountName = 'jstejska-test';
+const testInstanceName = "test-instance-messaging";
+const testTopicName = `test-topic-name`;
+const testServiceAccountName = 'test-service-account';
 const testMessageKey = 'key';
-const consumerGroupId = 'test';
+const consumerGroupId = 'test-consumer-group';
 const expectedMessageCount = 100;
 let credentials;
 let bootstrap: string;
@@ -32,7 +32,7 @@ test.beforeEach(async ({ page }) => {
 
   await expect(page.getByRole('button', { name: 'Create Kafka instance' })).toBeVisible();
 
-  if ((await page.getByText(testInstanceName).count()) > 0 && (await page.locator('tr').count()) === 2) {
+  if ((await page.  getByText(testInstanceName).count()) > 0 && (await page.locator('tr').count()) === 2) {
     // Test instance present, nothing to do!
   } else {
     await page.waitForSelector('[role=progressbar]', {
@@ -89,7 +89,7 @@ test('Consume messages from topic', async ({ page }) => {
 
   // Open Consumer Groups Tab to check dashboard
   await navigateToConsumerGroups(page);
-  await expect((await page.getByText(consumerGroupId).count()) >= 1).toBeTruthy();
+  await expect(await page.getByText(consumerGroupId)).toHaveCount(1);
   // Shutdown consumer
   await consumer.shutdown();
 });

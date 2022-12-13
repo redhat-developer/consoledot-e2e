@@ -97,7 +97,7 @@ export class KafkaConsumer extends KafkaClient {
 
     return await new Promise((resolve, reject) => {
       setTimeout(() => {
-        if (msgCount <= expectedMsgCount) {
+        if (msgCount >= expectedMsgCount) {
           console.log('Received: ' + msgCount);
           resolve(true);
         } else {
