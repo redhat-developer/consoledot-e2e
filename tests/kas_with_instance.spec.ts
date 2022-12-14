@@ -33,7 +33,6 @@ test.beforeEach(async ({ page }) => {
 
     if ((await page.getByText(testInstanceName).count()) === 0) {
       await createKafkaInstance(page, testInstanceName);
-      await waitForKafkaReady(page, testInstanceName);
     }
   }
 });
