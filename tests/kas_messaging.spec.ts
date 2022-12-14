@@ -50,30 +50,30 @@ test.beforeEach(async ({ page }) => {
     if ((await page.getByText(testInstanceName).count()) === 0) {
       await createKafkaInstance(page, testInstanceName);
     }
-
-    await navigateToKafkaTopicsList(page, testInstanceName);
-    // Do not create topic if it already exists
-    await expect(page.getByText('Create topic')).toHaveCount(1);
-    if ((await page.locator('a', { hasText: testTopicName }).count()) === 0) {
-      await createKafkaTopic(page, testTopicName);
-    }
-
-    await navigateToSAList(page);
-    await expect(page.getByText('Create service account')).toHaveCount(1);
-    if ((await page.locator('tr', { hasText: testServiceAccountName }).count()) !== 0) {
-      await deleteServiceAccount(page, testServiceAccountName);
-    }
-    credentials = await createServiceAccount(page, testServiceAccountName);
-    bootstrap = await getBootstrapUrl(page, testInstanceName);
-
-    await navigateToAccess(page, testInstanceName);
-    await grantProducerAccess(page, credentials.clientID, testTopicName);
-
-    // Producer 100 messages
-    const producer = new KafkaProducer(bootstrap, credentials.clientID, credentials.clientSecret);
-    const producerResponse = await producer.produceMessages(testTopicName, expectedMessageCount, testMessageKey);
-    expect(producerResponse === true);
   }
+
+  await navigateToKafkaTopicsList(page, testInstanceName);
+  // Do not create topic if it already exists
+  await expect(page.getByText('Create topic')).toHaveCount(1);
+  if ((await page.locator('a', { hasText: testTopicName }).count()) === 0) {
+    await createKafkaTopic(page, testTopicName);
+  }
+
+  await navigateToSAList(page);
+  await expect(page.getByText('Create service account')).toHaveCount(1);
+  if ((await page.locator('tr', { hasText: testServiceAccountName }).count()) !== 0) {
+    await deleteServiceAccount(page, testServiceAccountName);
+  }
+  credentials = await createServiceAccount(page, testServiceAccountName);
+  bootstrap = await getBootstrapUrl(page, testInstanceName);
+
+  await navigateToAccess(page, testInstanceName);
+  await grantProducerAccess(page, credentials.clientID, testTopicName);
+
+  // Producer 100 messages
+  const producer = new KafkaProducer(bootstrap, credentials.clientID, credentials.clientSecret);
+  const producerResponse = await producer.produceMessages(testTopicName, expectedMessageCount, testMessageKey);
+  expect(producerResponse === true).toBeTruthy();
 });
 
 // test_6messages.py generate_messages_to_topic
@@ -84,7 +84,7 @@ test('Consume messages from topic', async ({ page }) => {
   // Consume 100 messages
   const consumer = new KafkaConsumer(bootstrap, consumerGroupId, credentials.clientID, credentials.clientSecret);
   const consumerResponse = await consumer.consumeMessages(testTopicName, expectedMessageCount);
-  expect(consumerResponse >= expectedMessageCount);
+  expect(consumerResponse).toBeGreaterThanOrEqual(expectedMessageCount);
 
   // Open Consumer Groups Tab to check dashboard
   await navigateToConsumerGroups(page);
@@ -96,10 +96,6 @@ test('Consume messages from topic', async ({ page }) => {
 // test_6messages.py browse_messages
 test('Browse messages', async ({ page }) => {
   await navigeToMessages(page, testInstanceName, testTopicName);
-
-  if (await page.locator('button:has-text("Check for new data")').isVisible()) {
-    await page.locator('button:has-text("Check for new data")').click();
-  }
 
   await expect(page.locator('table[aria-label="Messages table"]')).toContainText('value-' + testMessageKey);
   await expect(page.locator('table[aria-label="Messages table"]')).toContainText('key-' + testMessageKey);

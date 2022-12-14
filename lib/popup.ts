@@ -1,7 +1,7 @@
 import { expect, Page } from '@playwright/test';
 
 export const closePopUp = async function (page: Page) {
-  let selector = '[aria-label=close-notification]';
+  const selector = '[aria-label=close-notification]';
   try {
     await expect(page.locator(selector)).toHaveCount(0);
   } catch (e) {

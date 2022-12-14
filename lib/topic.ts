@@ -52,4 +52,8 @@ export const navigeToMessages = async function (page: Page, kafkaName: string, t
   if (await page.locator('button:has-text("Check for new data")').isVisible()) {
     await page.locator('button:has-text("Check for new data")').click();
   }
+  // TODO deal with this, put it to some for or something
+  if (await page.locator('button:has-text("Check for new data")').isVisible()) {
+    await page.locator('button:has-text("Check for new data")').click();
+  }
 };
