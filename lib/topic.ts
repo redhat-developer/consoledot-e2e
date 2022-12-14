@@ -39,7 +39,6 @@ export const deleteKafkaTopic = async function (page: Page, name: string) {
 export const navigeToMessages = async function (page: Page, kafkaName: string, topicName: string) {
   await navigateToKafkaList(page);
   await navigateToKafkaTopicsList(page, kafkaName);
-  // await expect((await page.locator('a', { hasText: topicName }).count()) !== 0).toBeTruthy();
   await expect(await page.locator('a', { hasText: topicName })).toHaveCount(1);
 
   await page.locator('a', { hasText: topicName }).click();

@@ -10,7 +10,7 @@ export const navigateToKafkaList = async function (page: Page) {
     await page.locator('button', { hasText: 'Streams for Apache Kafka' }).click();
   }
 
-  await closePopUp(page, '[aria-label=close-notification]');
+  await closePopUp(page);
 
   await page.locator('[data-testid=router-link]', { hasText: 'Kafka Instances' }).click();
   await expect(await page.locator('h1', { hasText: 'Kafka Instances' })).toHaveCount(1);

@@ -7,11 +7,10 @@ export const navigateToSAList = async function (page: Page) {
     // await page.locator('li >> a:has-text("Application and Data Services")').click();
     await page.getByRole('link', { name: 'Application and Data Services' }).click();
   }
-  await closePopUp(page, '[aria-label=close-notification]');
+  await closePopUp(page);
 
   await expect(page.locator('li >> a:text("Service Accounts")')).toHaveCount(1);
   await page.locator('li >> a:text("Service Accounts")').click();
-  // expect(await page.locator('h1:has-text("Service Accounts")').count() === 1).toBeTruthy();
   await expect(page.locator('h1', { hasText: 'Service Accounts' })).toHaveCount(1);
 };
 

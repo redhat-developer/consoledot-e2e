@@ -12,7 +12,7 @@ import {
   grantConsumerAccess
 } from '@lib/kafka';
 import { navigateToKafkaTopicsList, createKafkaTopic, navigeToMessages } from '@lib/topic';
-import { KafkaConsumer, KafkaProducer } from '../lib/clients';
+import { KafkaConsumer, KafkaProducer } from '@lib/clients';
 import { strict as assert } from 'assert';
 import { createServiceAccount, deleteServiceAccount, navigateToSAList } from '@lib/sa';
 
