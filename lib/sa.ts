@@ -4,7 +4,6 @@ import { closePopUp } from './popup';
 
 export const navigateToSAList = async function (page: Page) {
   if ((await page.getByRole('link', { name: 'Application and Data Services' }).count()) === 1) {
-    // await page.locator('li >> a:has-text("Application and Data Services")').click();
     await page.getByRole('link', { name: 'Application and Data Services' }).click();
   }
   await closePopUp(page);

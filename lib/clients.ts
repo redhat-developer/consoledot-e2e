@@ -75,7 +75,7 @@ export class KafkaConsumer extends KafkaClient {
     this.kafkaConsumer = this.kafka.consumer({ groupId: consumerGroup });
   }
 
-  public async consumeMessages(topic: string, expectedMsgCount: number, fromBeginning = true): Promise<boolean> {
+  public async consumeMessages(topic: string, expectedMsgCount: number, fromBeginning = true): Promise<number> {
     let msgCount = 0;
 
     try {
@@ -99,9 +99,9 @@ export class KafkaConsumer extends KafkaClient {
       setTimeout(() => {
         if (msgCount >= expectedMsgCount) {
           console.log('Received: ' + msgCount);
-          resolve(true);
+          resolve(msgCount);
         } else {
-          reject(false);
+          reject(0);
         }
       }, 20000);
     });

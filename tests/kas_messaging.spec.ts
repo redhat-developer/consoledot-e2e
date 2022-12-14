@@ -13,7 +13,6 @@ import {
 } from '@lib/kafka';
 import { navigateToKafkaTopicsList, createKafkaTopic, navigeToMessages } from '@lib/topic';
 import { KafkaConsumer, KafkaProducer } from '@lib/clients';
-import { strict as assert } from 'assert';
 import { createServiceAccount, deleteServiceAccount, navigateToSAList } from '@lib/sa';
 
 const testInstanceName = 'test-instance-messaging';
@@ -73,7 +72,7 @@ test.beforeEach(async ({ page }) => {
     // Producer 100 messages
     const producer = new KafkaProducer(bootstrap, credentials.clientID, credentials.clientSecret);
     const producerResponse = await producer.produceMessages(testTopicName, expectedMessageCount, testMessageKey);
-    assert(producerResponse === true);
+    expect(producerResponse === true);
   }
 });
 
@@ -85,7 +84,7 @@ test('Consume messages from topic', async ({ page }) => {
   // Consume 100 messages
   const consumer = new KafkaConsumer(bootstrap, consumerGroupId, credentials.clientID, credentials.clientSecret);
   const consumerResponse = await consumer.consumeMessages(testTopicName, expectedMessageCount);
-  assert(consumerResponse === true);
+  expect(consumerResponse >= expectedMessageCount);
 
   // Open Consumer Groups Tab to check dashboard
   await navigateToConsumerGroups(page);
@@ -97,6 +96,10 @@ test('Consume messages from topic', async ({ page }) => {
 // test_6messages.py browse_messages
 test('Browse messages', async ({ page }) => {
   await navigeToMessages(page, testInstanceName, testTopicName);
+
+  if (await page.locator('button:has-text("Check for new data")').isVisible()) {
+    await page.locator('button:has-text("Check for new data")').click();
+  }
 
   await expect(page.locator('table[aria-label="Messages table"]')).toContainText('value-' + testMessageKey);
   await expect(page.locator('table[aria-label="Messages table"]')).toContainText('key-' + testMessageKey);
