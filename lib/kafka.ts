@@ -12,6 +12,10 @@ export const createKafkaInstance = async function (page: Page, name: string, che
   await page.locator('button', { hasText: 'Create Kafka instance' }).click();
   await expect(page.getByText('Create a Kafka instance')).toHaveCount(1);
   await page.waitForSelector('[role=progressbar]', { state: 'detached' });
+
+  // FIXME: workaround for https://github.com/redhat-developer/app-services-ui-components/issues/590
+  await new Promise((resolve) => setTimeout(resolve, 500));
+
   await page.getByLabel('Name *').fill(name);
   // data-testid=modalCreateKafka-buttonSubmit
   await page.locator('button', { hasText: 'Create instance' }).click();
