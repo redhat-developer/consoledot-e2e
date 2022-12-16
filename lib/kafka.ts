@@ -43,6 +43,7 @@ export const deleteKafkaInstance = async function (page: Page, name: string, awa
     // ignore
   }
   // data-testid=modalDeleteKafka-buttonDelete
+  await new Promise((resolve) => setTimeout(resolve, 500));
   await page.locator('button', { hasText: 'Delete' }).click();
   // await for the instance to be deleted
   if (awaitDeletion) {
