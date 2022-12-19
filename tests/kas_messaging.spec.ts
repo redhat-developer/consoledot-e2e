@@ -97,7 +97,7 @@ test('Consume messages from topic', async ({ page }) => {
 test('Browse messages', async ({ page }) => {
   await navigeToMessages(page, testInstanceName, testTopicName);
 
-  await refreshMessages(page)
+  await refreshMessages(page);
 
   await expect(page.locator('table[aria-label="Messages table"]')).toContainText('value-' + testMessageKey);
   await expect(page.locator('table[aria-label="Messages table"]')).toContainText('key-' + testMessageKey);

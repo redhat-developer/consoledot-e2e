@@ -4,19 +4,19 @@ import { closePopUp } from './popup';
 
 export const navigateToApplicationAndDataServices = async function (page: Page) {
   if (!(await page.locator('button', { hasText: 'Streams for Apache Kafka' }).isVisible())) {
-    await page.getByRole('link', { name: 'Application and Data Services' }).click()
+    await page.getByRole('link', { name: 'Application and Data Services' }).click();
   }
-}
+};
 
 export const navigateToStreamsForApachaeKafka = async function (page: Page) {
   if (!(await page.locator('[data-testid=router-link]', { hasText: 'Kafka Instances' }).isVisible())) {
     await page.locator('button', { hasText: 'Streams for Apache Kafka' }).click();
   }
-}
+};
 
 export const navigateToKafkaList = async function (page: Page) {
-  navigateToApplicationAndDataServices(page)
-  navigateToStreamsForApachaeKafka(page)
+  navigateToApplicationAndDataServices(page);
+  navigateToStreamsForApachaeKafka(page);
 
   // if (!(await page.locator('[data-testid=router-link]', { hasText: 'Kafka Instances' }).isVisible())) {
   //   if (!(await page.locator('button', { hasText: 'Streams for Apache Kafka' }).isVisible())) {

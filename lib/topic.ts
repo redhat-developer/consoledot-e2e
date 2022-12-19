@@ -50,9 +50,9 @@ export const navigeToMessages = async function (page: Page, kafkaName: string, t
 
 export const refreshMessages = async function (page: Page) {
   try {
-    await expect(page.locator('table[aria-label="Messages table"]')).toHaveCount(1)
+    await expect(page.locator('table[aria-label="Messages table"]')).toHaveCount(1);
   } catch (e) {
-    await page.locator('button', { hasText: "Check for new data" }).click();
-    refreshMessages(page)
+    await page.locator('button', { hasText: 'Check for new data' }).click();
+    refreshMessages(page);
   }
-}
+};
