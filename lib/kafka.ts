@@ -2,13 +2,28 @@ import { expect, Page } from '@playwright/test';
 import { config } from './config';
 import { closePopUp } from './popup';
 
-export const navigateToKafkaList = async function (page: Page) {
+export const navigateToApplicationAndDataServices = async function (page: Page) {
+  if (!(await page.locator('button', { hasText: 'Streams for Apache Kafka' }).isVisible())) {
+    await page.getByRole('link', { name: 'Application and Data Services' }).click()
+  }
+}
+
+export const navigateToStreamsForApachaeKafka = async function (page: Page) {
   if (!(await page.locator('[data-testid=router-link]', { hasText: 'Kafka Instances' }).isVisible())) {
-    if (!(await page.locator('button', { hasText: 'Streams for Apache Kafka' }).isVisible())) {
-      await page.getByRole('link', { name: 'Application and Data Services' }).click();
-    }
     await page.locator('button', { hasText: 'Streams for Apache Kafka' }).click();
   }
+}
+
+export const navigateToKafkaList = async function (page: Page) {
+  navigateToApplicationAndDataServices(page)
+  navigateToStreamsForApachaeKafka(page)
+
+  // if (!(await page.locator('[data-testid=router-link]', { hasText: 'Kafka Instances' }).isVisible())) {
+  //   if (!(await page.locator('button', { hasText: 'Streams for Apache Kafka' }).isVisible())) {
+  //     await page.getByRole('link', { name: 'Application and Data Services' }).click();
+  //   }
+  //   await page.locator('button', { hasText: 'Streams for Apache Kafka' }).click();
+  // }
 
   await closePopUp(page);
 

@@ -46,14 +46,13 @@ export const navigeToMessages = async function (page: Page, kafkaName: string, t
   await expect(await page.locator('button', { hasText: 'Messages' })).toHaveCount(1);
 
   await page.locator('button', { hasText: 'Messages' }).click();
-
-  await expect(page.locator('table', { hasText: 'Messages table' })).toBeTruthy();
-
-  if (await page.locator('button:has-text("Check for new data")').isVisible()) {
-    await page.locator('button:has-text("Check for new data")').click();
-  }
-  // TODO deal with this, put it to some for or something
-  if (await page.locator('button:has-text("Check for new data")').isVisible()) {
-    await page.locator('button:has-text("Check for new data")').click();
-  }
 };
+
+export const refreshMessages = async function (page: Page) {
+  try {
+    await expect(page.locator('table[aria-label="Messages table"]')).toHaveCount(1)
+  } catch (e) {
+    await page.locator('button', { hasText: "Check for new data" }).click();
+    refreshMessages(page)
+  }
+}

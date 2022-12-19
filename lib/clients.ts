@@ -1,28 +1,79 @@
 import { Consumer, Producer, Kafka, EachMessagePayload, logLevel } from 'kafkajs';
 
+enum Mechanism {
+  plain = "plain",
+  oauthbearer = "oauthbearer"
+}
+
 class KafkaClient {
   bootstrapServer: string;
   username: string;
   password: string;
   kafka: Kafka;
 
-  constructor(bootstrapServer: string, username: string, password: string) {
+  constructor(bootstrapServer: string, username: string, password: string, oauthUrl: string = "") {
     this.bootstrapServer = bootstrapServer;
     this.username = username;
     this.password = password;
-    this.kafka = new Kafka({
-      brokers: [bootstrapServer],
-      ssl: true,
-      sasl: {
-        // TODO add oauth
-        mechanism: 'plain',
-        username: username,
-        password: password
-      },
-      logLevel: logLevel.INFO
-    });
+    if (oauthUrl == "") {
+      this.kafka = new Kafka({
+        brokers: [bootstrapServer],
+        ssl: true,
+        sasl: {
+          mechanism: Mechanism.plain,
+          username: username,
+          password: password
+        },
+        logLevel: logLevel.INFO
+      });
+    // } 
+    // else {
+    //   this.kafka = new Kafka({
+    //     brokers: [bootstrapServer],
+    //     ssl: true,
+    //     sasl: {
+    //       mechanism: Mechanism.oauthbearer,
+    //       oauthBearerProvider: async () => { 
+    //         // https://stackoverflow.com/questions/61444952/generating-oauth-2-0-access-token-with-javascript
+    //         const token = getToken()
+    //           return {
+    //             value: token
+    //           }
+    //       }
+    //     },
+    //     logLevel: logLevel.INFO
+    //   });
+    // }
+    }
   }
 }
+
+// function oauthBearerProvider() {
+//   let tokenPromise;
+
+//   async function getToken() {
+//     // Get token from OAuth endpoint
+//   }
+
+//   async function refreshToken() {
+//     let response = await getToken();
+
+//     const refreshDelay = (response.expires_in * 1000) - DEFAULT_REAUTH_THRESHOLD - OAUTH_TOKEN_RENEWAL_THRESHOLD;
+//     setTimeout(() => {
+//       tokenPromise = refreshToken();
+//     }, refreshDelay);
+
+//     return response.access_token;
+//   }
+
+//   tokenPromise = refreshToken();
+
+//   return async function() {
+//     return {
+//       value: await tokenPromise
+//     };
+//   };
+// }
 
 export class KafkaProducer extends KafkaClient {
   private producer: Producer;
@@ -78,33 +129,29 @@ export class KafkaConsumer extends KafkaClient {
   public async consumeMessages(topic: string, expectedMsgCount: number, fromBeginning = true): Promise<number> {
     let msgCount = 0;
 
-    try {
-      await this.kafkaConsumer.connect();
-      await this.kafkaConsumer.subscribe({ topic: topic, fromBeginning: fromBeginning });
 
-      await this.kafkaConsumer.run({
-        eachMessage: async (messagePayload: EachMessagePayload) => {
-          const { topic, partition, message } = messagePayload;
-          const prefix = `${topic}[${partition} | ${message.offset}] / ${message.timestamp}`;
-          console.log(`- ${prefix} ${message.key}#${message.value} -> ${msgCount}`);
-          msgCount++;
-        }
-      });
-    } catch (error) {
-      console.log('Error: ', error);
-      return error;
-    }
-
-    return await new Promise((resolve, reject) => {
-      setTimeout(() => {
-        if (msgCount >= expectedMsgCount) {
-          console.log('Received: ' + msgCount);
-          resolve(msgCount);
-        } else {
-          reject(0);
-        }
-      }, 20000);
+    return new Promise((resolve, reject) => {
+      try {
+        this.kafkaConsumer.connect()
+          .then(() => this.kafkaConsumer.subscribe({ topic: topic, fromBeginning: fromBeginning }))
+          .then(() => this.kafkaConsumer.run({
+              eachMessage: async (messagePayload: EachMessagePayload) => {
+                const { topic, partition, message } = messagePayload;
+                const prefix = `${topic}[${partition} | ${message.offset}] / ${message.timestamp}`;
+                console.log(`- ${prefix} ${message.key}#${message.value} -> ${msgCount}`);
+                msgCount++;
+                if (msgCount == expectedMsgCount) {
+                  console.log('Received: ' + msgCount);
+                  resolve(msgCount);
+                }
+              }
+            }));
+      } catch (error) {
+        console.log('Error: ', error);
+        reject(error);
+      }
     });
+
   }
 
   public async shutdown(): Promise<void> {

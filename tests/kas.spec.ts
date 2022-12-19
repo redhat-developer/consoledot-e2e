@@ -89,8 +89,8 @@ test('test Kafka list filtered by status', async ({ page }) => {
 
   // TODO: Probably race condition when deleting is finished too quickly
   // Currently it just make the test flaky so we should discuss what we will do with it
-  // await filterByStatus(page, 'Deleting');
-  // await expect(page.getByText(testInstanceName)).toBeTruthy();
+  await filterByStatus(page, 'Deleting');
+  await expect(page.getByText(testInstanceName)).toBeTruthy();
 
   // await for the kafka instance to be deleted
   await expect(page.getByText(`${testInstanceName}`, { exact: true })).toHaveCount(0, {

@@ -11,7 +11,7 @@ import {
   grantProducerAccess,
   grantConsumerAccess
 } from '@lib/kafka';
-import { navigateToKafkaTopicsList, createKafkaTopic, navigeToMessages } from '@lib/topic';
+import { navigateToKafkaTopicsList, createKafkaTopic, navigeToMessages, refreshMessages } from '@lib/topic';
 import { KafkaConsumer, KafkaProducer } from '@lib/clients';
 import { createServiceAccount, deleteServiceAccount, navigateToSAList } from '@lib/sa';
 
@@ -96,6 +96,8 @@ test('Consume messages from topic', async ({ page }) => {
 // test_6messages.py browse_messages
 test('Browse messages', async ({ page }) => {
   await navigeToMessages(page, testInstanceName, testTopicName);
+
+  await refreshMessages(page)
 
   await expect(page.locator('table[aria-label="Messages table"]')).toContainText('value-' + testMessageKey);
   await expect(page.locator('table[aria-label="Messages table"]')).toContainText('key-' + testMessageKey);
