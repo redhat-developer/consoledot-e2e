@@ -37,7 +37,7 @@ export const deleteKafkaInstance = async function (page: Page, name: string, awa
   await page.locator('button', { hasText: 'Delete instance' }).click();
   try {
     await expect(page.locator('input[name="mas-name-input"]')).toHaveCount(1, { timeout: 5000 });
-    
+
     // FIXME: workaround for https://github.com/redhat-developer/app-services-ui-components/issues/590
     // https://github.com/microsoft/playwright/issues/15734#issuecomment-1188245775
     await new Promise((resolve) => setTimeout(resolve, 500));
