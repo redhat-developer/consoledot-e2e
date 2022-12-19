@@ -15,7 +15,10 @@ export const createKafkaInstance = async function (page: Page, name: string, che
 
   // FIXME: workaround for https://github.com/redhat-developer/app-services-ui-components/issues/590
   // https://github.com/microsoft/playwright/issues/15734#issuecomment-1188245775
-  await page.getByLabel('Name *').type(name, { delay: 200 });
+  await new Promise((resolve) => setTimeout(resolve, 500));
+  await page.getByLabel('Name *').click();
+
+  await page.getByLabel('Name *').fill(name);
   // data-testid=modalCreateKafka-buttonSubmit
   await page.locator('button', { hasText: 'Create instance' }).click();
 
@@ -33,11 +36,14 @@ export const deleteKafkaInstance = async function (page: Page, name: string, awa
   await row.locator('[aria-label="Actions"]').click();
   await page.locator('button', { hasText: 'Delete instance' }).click();
   try {
-    await expect(page.locator('input[name="mas-name-input"]')).toHaveCount(1);
-
+    await expect(page.locator('input[name="mas-name-input"]')).toHaveCount(1, { timeout: 5000 });
+    
     // FIXME: workaround for https://github.com/redhat-developer/app-services-ui-components/issues/590
     // https://github.com/microsoft/playwright/issues/15734#issuecomment-1188245775
-    await page.locator('input[name="mas-name-input"]').type(name, { delay: 200 });
+    await new Promise((resolve) => setTimeout(resolve, 500));
+    await page.locator('input[name="mas-name-input"]').click();
+
+    await page.locator('input[name="mas-name-input"]').fill(name);
   } catch (err) {
     // Removal without confirmation
     // ignore
