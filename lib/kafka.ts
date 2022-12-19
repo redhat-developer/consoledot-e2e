@@ -122,7 +122,7 @@ export const grantProducerAccess = async function (page: Page, saId: string, top
 
   await page.getByPlaceholder('Enter prefix').click();
   await page.getByPlaceholder('Enter prefix').fill(topicName);
-  // TODO - This is just a workaround - create issue for `save` button which is disabled even if the prefix is written
+  // TODO - This is just a workaround - `save` button is disabled even if the prefix is written but not confirmed by another action
   await page.getByPlaceholder('Enter prefix').click();
 
   await page.getByRole('button').filter({ hasText: 'Save' }).click();
