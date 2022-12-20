@@ -25,7 +25,6 @@ let credentials;
 let bootstrap: string;
 
 test.beforeEach(async ({ page }) => {
-  // @ts-ignore
   test.skip(config.startingPage === config.startingPageDefault);
 
   await login(page);
