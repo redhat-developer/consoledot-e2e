@@ -16,10 +16,12 @@ class Config {
   readonly serviceAccountCreationTimeout: number;
   readonly serviceAccountDeletionTimeout: number;
 
+  readonly startingPageDefault = 'https://console.redhat.com';
+
   constructor() {
     this.username = process.env.TEST_USERNAME;
     this.password = process.env.TEST_PASSWORD;
-    this.startingPage = process.env.STARTING_PAGE || 'https://console.redhat.com';
+    this.startingPage = process.env.STARTING_PAGE || this.startingPageDefault;
     this.sessionID = uuid().substring(0, 16);
     this.instanceName = process.env.INSTANCE_NAME;
     if (this.instanceName == undefined) {
