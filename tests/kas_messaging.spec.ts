@@ -11,7 +11,7 @@ import {
   grantProducerAccess,
   grantConsumerAccess
 } from '@lib/kafka';
-import { navigateToKafkaTopicsList, createKafkaTopic, navigeToMessages, refreshMessages } from '@lib/topic';
+import { navigateToKafkaTopicsList, createKafkaTopic, navigateToMessages, refreshMessages } from '@lib/topic';
 import { KafkaConsumer, KafkaProducer } from '@lib/clients';
 import { createServiceAccount, deleteServiceAccount, navigateToSAList } from '@lib/sa';
 
@@ -86,7 +86,7 @@ test('Consume messages from topic', async ({ page }) => {
   // Consume 100 messages
   const consumer = new KafkaConsumer(bootstrap, consumerGroupId, credentials.clientID, credentials.clientSecret);
   const consumerResponse = await consumer.consumeMessages(testTopicName, expectedMessageCount);
-  expect(consumerResponse).toBeGreaterThanOrEqual(expectedMessageCount);
+  expect(consumerResponse).toEqual(expectedMessageCount);
 
   // Open Consumer Groups Tab to check dashboard
   await navigateToConsumerGroups(page);
@@ -97,7 +97,7 @@ test('Consume messages from topic', async ({ page }) => {
 
 // test_6messages.py browse_messages
 test('Browse messages', async ({ page }) => {
-  await navigeToMessages(page, testInstanceName, testTopicName);
+  await navigateToMessages(page, testInstanceName, testTopicName);
 
   await refreshMessages(page);
 

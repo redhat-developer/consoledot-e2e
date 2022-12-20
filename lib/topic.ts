@@ -36,7 +36,7 @@ export const deleteKafkaTopic = async function (page: Page, name: string) {
   await expect(page.getByText(name)).toHaveCount(0);
 };
 
-export const navigeToMessages = async function (page: Page, kafkaName: string, topicName: string) {
+export const navigateToMessages = async function (page: Page, kafkaName: string, topicName: string) {
   await navigateToKafkaList(page);
   await navigateToKafkaTopicsList(page, kafkaName);
   await expect(await page.locator('a', { hasText: topicName })).toHaveCount(1);
@@ -52,7 +52,7 @@ export const refreshMessages = async function (page: Page) {
   try {
     await expect(page.locator('table[aria-label="Messages table"]')).toHaveCount(1);
   } catch (e) {
-    await page.locator('button', { hasText: 'Check for new data' }).click();
-    refreshMessages(page);
+    await page.locator('button', { hasText: 'Check for new data' }).click({ timeout: 5000 });
+    await refreshMessages(page);
   }
 };

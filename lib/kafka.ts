@@ -15,15 +15,8 @@ export const navigateToStreamsForApachaeKafka = async function (page: Page) {
 };
 
 export const navigateToKafkaList = async function (page: Page) {
-  navigateToApplicationAndDataServices(page);
-  navigateToStreamsForApachaeKafka(page);
-
-  // if (!(await page.locator('[data-testid=router-link]', { hasText: 'Kafka Instances' }).isVisible())) {
-  //   if (!(await page.locator('button', { hasText: 'Streams for Apache Kafka' }).isVisible())) {
-  //     await page.getByRole('link', { name: 'Application and Data Services' }).click();
-  //   }
-  //   await page.locator('button', { hasText: 'Streams for Apache Kafka' }).click();
-  // }
+  await navigateToApplicationAndDataServices(page);
+  await navigateToStreamsForApachaeKafka(page);
 
   await closePopUp(page);
 

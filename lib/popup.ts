@@ -5,7 +5,7 @@ export const closePopUp = async function (page: Page) {
   try {
     await expect(page.locator(selector)).toHaveCount(0);
   } catch (e) {
-    await page.locator(selector).nth(0).click();
+    await page.locator(selector).nth(0).click({ timeout: 5000 });
     await closePopUp(page);
   }
 };

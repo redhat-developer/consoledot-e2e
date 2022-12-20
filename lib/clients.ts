@@ -110,6 +110,9 @@ export class KafkaConsumer extends KafkaClient {
       } catch (error) {
         console.log('Error: ', error);
         reject(error);
+      } finally {
+        // shutdown consumer
+        this.shutdown();
       }
     });
   }
