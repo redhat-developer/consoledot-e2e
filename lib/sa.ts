@@ -1,11 +1,16 @@
 import { expect, Page } from '@playwright/test';
 import { config } from './config';
+import { closePopUp } from './popup';
 
 export const navigateToSAList = async function (page: Page) {
-  await page.getByRole('link', { name: 'Application and Data Services' }).click();
-  // }
-  await page.getByRole('link', { name: 'Service Accounts' }).click();
-  await expect(page.getByRole('heading', { name: 'Service Accounts' })).toHaveCount(1);
+  if ((await page.getByRole('link', { name: 'Application and Data Services' }).count()) === 1) {
+    await page.getByRole('link', { name: 'Application and Data Services' }).click();
+  }
+  await closePopUp(page);
+
+  await expect(page.locator('li >> a:text("Service Accounts")')).toHaveCount(1);
+  await page.locator('li >> a:text("Service Accounts")').click();
+  await expect(page.locator('h1', { hasText: 'Service Accounts' })).toHaveCount(1);
 };
 
 export const createServiceAccount = async function (page: Page, name: string) {

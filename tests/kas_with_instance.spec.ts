@@ -4,8 +4,9 @@ import { config } from '@lib/config';
 import { navigateToKafkaList, deleteKafkaInstance, createKafkaInstance, waitForKafkaReady } from '@lib/kafka';
 import { navigateToKafkaTopicsList, createKafkaTopic, deleteKafkaTopic } from '@lib/topic';
 
-const testInstanceName = `test-instance-${config.sessionID}`;
-const testTopicName = `test-topic-${config.sessionID}`;
+const testInstanceName = config.instanceName;
+const testTopicPrefix = 'test-topic-';
+const testTopicName = `${testTopicPrefix}${config.sessionID}`;
 
 test.beforeEach(async ({ page }) => {
   await login(page);

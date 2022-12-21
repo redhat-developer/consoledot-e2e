@@ -3,13 +3,15 @@ import login from '@lib/auth';
 import { config } from '@lib/config';
 import { navigateToKafkaList, deleteKafkaInstance, createKafkaInstance, waitForKafkaReady } from '@lib/kafka';
 
+const testInstanceName = config.instanceName;
+
 test.beforeEach(async ({ page }) => {
   await login(page);
 
   await navigateToKafkaList(page);
 
   await page.waitForSelector('[role=progressbar]', { state: 'detached', timeout: config.kafkaInstanceCreationTimeout });
-
+  await page.waitForSelector('button:has-text("Create Kafka Instance")');
   for (const el of await page.locator(`tr >> a`).elementHandles()) {
     const name = await el.textContent();
     await deleteKafkaInstance(page, name);
@@ -23,16 +25,12 @@ test('check there are no Kafka instances', async ({ page }) => {
 
 // test_3kas.py test_kas_kafka_create_dont_wait_for_ready_delete_wait_for_delete
 test('create and delete a Kafka instance', async ({ page }) => {
-  const testInstanceName = `test-instance-${config.sessionID}`;
-
   await createKafkaInstance(page, testInstanceName);
   await deleteKafkaInstance(page, testInstanceName);
 });
 
 // test_3kas.py test_kas_kafka_create_wait_for_ready_delete_wait_for_delete
 test('create, wait for ready and delete a Kafka instance', async ({ page }) => {
-  const testInstanceName = `test-instance-${config.sessionID}`;
-
   await createKafkaInstance(page, testInstanceName);
   await waitForKafkaReady(page, testInstanceName);
   await deleteKafkaInstance(page, testInstanceName);
@@ -71,8 +69,6 @@ const filterByStatus = async function (page, status) {
 
 // test_3kas.py test_kas_kafka_filter_by_status
 test('test Kafka list filtered by status', async ({ page }) => {
-  const testInstanceName = `test-instance-${config.sessionID}`;
-
   await createKafkaInstance(page, testInstanceName);
   await expect(page.getByText(testInstanceName)).toBeVisible();
 
@@ -105,7 +101,6 @@ test('test Kafka list filtered by status', async ({ page }) => {
 // test_3kas.py test_try_to_create_kafka_instance_with_same_name
 // NOTE: this test is expected to be pretty fragile as it needs that the current instance is in "early" `Creating` status
 test('test fail to create Kafka instance with the same name', async ({ page }) => {
-  const testInstanceName = `test-instance-${config.sessionID}`;
   await createKafkaInstance(page, testInstanceName, false);
 
   await page.getByText('Create Kafka instance').click();
