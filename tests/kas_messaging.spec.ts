@@ -91,8 +91,6 @@ test('Consume messages from topic', async ({ page }) => {
   // Open Consumer Groups Tab to check dashboard
   await navigateToConsumerGroups(page);
   await expect(await page.getByText(consumerGroupId)).toHaveCount(1);
-  // Shutdown consumer
-  await consumer.shutdown();
 });
 
 // test_6messages.py browse_messages
