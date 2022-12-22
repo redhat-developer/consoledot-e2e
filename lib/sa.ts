@@ -3,8 +3,11 @@ import { config } from './config';
 import { closePopUp } from './popup';
 
 export const navigateToSAList = async function (page: Page) {
-  if ((await page.getByRole('link', { name: 'Application and Data Services' }).count()) === 1) {
+  try {
+    await expect(page.getByRole('link', { name: 'Application and Data Services' })).toHaveCount(1);
     await page.getByRole('link', { name: 'Application and Data Services' }).click();
+  } catch (e) {
+    // ignore
   }
   await closePopUp(page);
 
