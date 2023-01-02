@@ -216,7 +216,6 @@ test('create consumer group and check dashboard', async ({ page }) => {
   // kafka client
   await produceAndConsumeMessage(broker, credentials, testTopicName);
 
-
   // Open Consumer Groups Tab to check dashboard
   await navigateToConsumerGroups(page);
   await expect(page.getByText('test-group')).toHaveCount(1);
