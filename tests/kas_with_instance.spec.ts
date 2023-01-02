@@ -14,13 +14,15 @@ import {
 } from '@lib/kafka';
 import { navigateToKafkaTopicsList, createKafkaTopic, deleteKafkaTopic } from '@lib/topic';
 import { navigateToSAList, createServiceAccount, deleteServiceAccount } from '@lib/sa';
-import { produceAndConsumeMessage } from '@lib/client';
-import {} from '@lib/clients';
+import { KafkaProducer, KafkaConsumer } from '@lib/clients';
 
 const testInstanceName = config.instanceName;
 const testTopicPrefix = 'test-topic-';
 const testTopicName = `${testTopicPrefix}${config.sessionID}`;
 const testSaName = `test-sa-${config.sessionID}`;
+const expectedMessageCount = 1;
+const testMessageKey = 'key';
+const consumerGroupId = 'test-consumer-group';
 
 test.beforeEach(async ({ page }) => {
   await login(page);
@@ -211,14 +213,21 @@ test('create consumer group and check dashboard', async ({ page }) => {
 
   await navigateToAccess(page, testInstanceName);
   await grantProducerAccess(page, credentials.clientID, testTopicName);
-  await grantConsumerAccess(page, credentials.clientID, testTopicName, 'test-group');
+  await grantConsumerAccess(page, credentials.clientID, testTopicName, consumerGroupId);
 
-  // kafka client
-  await produceAndConsumeMessage(broker, credentials, testTopicName);
+  // Producer
+  const producer = new KafkaProducer(broker, credentials.clientID, credentials.clientSecret);
+  const producerResponse = await producer.produceMessages(testTopicName, expectedMessageCount, testMessageKey);
+  expect(producerResponse === true).toBeTruthy();
+
+  // Consumer
+  const consumer = new KafkaConsumer(broker, consumerGroupId, credentials.clientID, credentials.clientSecret);
+  const consumerResponse = await consumer.consumeMessages(testTopicName, expectedMessageCount);
+  expect(consumerResponse).toEqual(expectedMessageCount);
 
   // Open Consumer Groups Tab to check dashboard
   await navigateToConsumerGroups(page);
-  await expect(page.getByText('test-group')).toHaveCount(1);
+  await expect(page.getByText(consumerGroupId)).toHaveCount(1);
 
   await navigateToSAList(page);
 
