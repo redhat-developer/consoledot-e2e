@@ -5,24 +5,16 @@ import {
   navigateToKafkaList,
   deleteKafkaInstance,
   createKafkaInstance,
-  waitForKafkaReady,
-  navigateToAccess,
-  grantProducerAccess,
-  grantConsumerAccess,
-  navigateToConsumerGroups,
-  getBootstrapUrl
+  waitForKafkaReady
+  
 } from '@lib/kafka';
 import { navigateToKafkaTopicsList, createKafkaTopic, deleteKafkaTopic } from '@lib/topic';
-import { navigateToSAList, createServiceAccount, deleteServiceAccount } from '@lib/sa';
-import { KafkaProducer, KafkaConsumer } from '@lib/clients';
+
 
 const testInstanceName = config.instanceName;
 const testTopicPrefix = 'test-topic-';
 const testTopicName = `${testTopicPrefix}${config.sessionID}`;
-const testSaName = `test-sa-${config.sessionID}`;
-const expectedMessageCount = 1;
-const testMessageKey = 'key';
-const consumerGroupId = 'test-consumer-group';
+
 
 test.beforeEach(async ({ page }) => {
   await login(page);
@@ -194,42 +186,3 @@ test('create and delete a Kafka Topic', async ({ page }) => {
   await deleteKafkaTopic(page, testTopicName);
 });
 
-// test_6acl.py test_kafka_create_consumer_group_and_check_dashboard
-test('create consumer group and check dashboard', async ({ page }) => {
-  const instanceLinkSelector = page.getByText(testInstanceName);
-  const row = page.locator('tr', { has: instanceLinkSelector });
-
-  await waitForKafkaReady(page, testInstanceName);
-  await row.locator('[aria-label="Actions"]').click();
-  await page.getByText('Connection').click();
-
-  const broker = await getBootstrapUrl(page, testInstanceName);
-  console.log('broker: ' + broker);
-
-  await navigateToKafkaTopicsList(page, testInstanceName);
-  await createKafkaTopic(page, testTopicName);
-  await navigateToSAList(page);
-  const credentials = await createServiceAccount(page, testSaName);
-
-  await navigateToAccess(page, testInstanceName);
-  await grantProducerAccess(page, credentials.clientID, testTopicName);
-  await grantConsumerAccess(page, credentials.clientID, testTopicName, consumerGroupId);
-
-  // Producer
-  const producer = new KafkaProducer(broker, credentials.clientID, credentials.clientSecret);
-  const producerResponse = await producer.produceMessages(testTopicName, expectedMessageCount, testMessageKey);
-  expect(producerResponse === true).toBeTruthy();
-
-  // Consumer
-  const consumer = new KafkaConsumer(broker, consumerGroupId, credentials.clientID, credentials.clientSecret);
-  const consumerResponse = await consumer.consumeMessages(testTopicName, expectedMessageCount);
-  expect(consumerResponse).toEqual(expectedMessageCount);
-
-  // Open Consumer Groups Tab to check dashboard
-  await navigateToConsumerGroups(page);
-  await expect(page.getByText(consumerGroupId)).toHaveCount(1);
-
-  await navigateToSAList(page);
-
-  await deleteServiceAccount(page, testSaName);
-});

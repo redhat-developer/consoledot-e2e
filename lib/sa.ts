@@ -16,10 +16,6 @@ export const navigateToSAList = async function (page: Page) {
   await expect(page.locator('h1', { hasText: 'Service Accounts' })).toHaveCount(1);
 };
 
-export const navigateToServiceAccounts = async function (page: Page) {
-  await page.getByText('Service Accounts').click();
-  await expect(page.locator('h1:has-text("Service Accounts")')).toHaveCount(1);
-};
 
 export const createServiceAccount = async function (page: Page, name: string) {
   await page.locator('button', { hasText: 'Create service account' }).click();

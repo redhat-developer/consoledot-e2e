@@ -9,15 +9,17 @@ import {
   navigateToAccess,
   navigateToConsumerGroups,
   grantProducerAccess,
-  grantConsumerAccess
+  grantConsumerAccess,
+  waitForKafkaReady
 } from '@lib/kafka';
 import { navigateToKafkaTopicsList, createKafkaTopic, navigateToMessages, refreshMessages } from '@lib/topic';
 import { KafkaConsumer, KafkaProducer } from '@lib/clients';
 import { createServiceAccount, deleteServiceAccount, navigateToSAList } from '@lib/sa';
 
-const testInstanceName = 'test-instance-messaging';
-const testTopicName = `test-topic-name`;
-const testServiceAccountName = 'test-service-account';
+const testInstanceName = config.instanceName;
+const testTopicPrefix = 'test-topic-';
+const testTopicName = `${testTopicPrefix}${config.sessionID}`;
+const testServiceAccountName = `test-sa-${config.sessionID}`;
 const testMessageKey = 'key';
 const consumerGroupId = 'test-consumer-group';
 const expectedMessageCount = 100;
@@ -103,4 +105,32 @@ test('Browse messages', async ({ page }) => {
   const messageDetail = await page.locator('data-testid=message-details');
   await expect(messageDetail.locator('dt:has-text("Offset")')).toHaveCount(1);
   await expect(messageDetail.locator('dd:has-text("key-")')).toHaveCount(1);
+});
+
+// test_6acl.py test_kafka_create_consumer_group_and_check_dashboard
+test('create consumer group and check dashboard', async ({ page }) => {
+  const instanceLinkSelector = page.getByText(testInstanceName);
+  const row = page.locator('tr', { has: instanceLinkSelector });
+
+  await navigateToKafkaList(page);
+  await waitForKafkaReady(page, testInstanceName);
+  await row.locator('[aria-label="Actions"]').click();
+  await page.getByText('Connection').click();
+
+  const bootstrapUrl = await getBootstrapUrl(page, testInstanceName);
+  console.log('bootstrapUrl: ' + bootstrapUrl);
+
+  // Consumer
+  await navigateToAccess(page, testInstanceName);
+  await grantConsumerAccess(page, credentials.clientID, testTopicName, consumerGroupId);
+  const consumer = new KafkaConsumer(bootstrapUrl, consumerGroupId, credentials.clientID, credentials.clientSecret);
+  const consumerResponse = await consumer.consumeMessages(testTopicName, expectedMessageCount);
+  expect(consumerResponse).toEqual(expectedMessageCount);
+
+  // Open Consumer Groups Tab to check dashboard
+  await navigateToConsumerGroups(page);
+  await expect(page.getByText(consumerGroupId)).toHaveCount(1);
+
+  await navigateToSAList(page);
+  await deleteServiceAccount(page, testServiceAccountName);
 });
