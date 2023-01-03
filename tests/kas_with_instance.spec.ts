@@ -1,20 +1,12 @@
 import { test, expect } from '@playwright/test';
 import login from '@lib/auth';
 import { config } from '@lib/config';
-import {
-  navigateToKafkaList,
-  deleteKafkaInstance,
-  createKafkaInstance,
-  waitForKafkaReady
-  
-} from '@lib/kafka';
+import { navigateToKafkaList, deleteKafkaInstance, createKafkaInstance, waitForKafkaReady } from '@lib/kafka';
 import { navigateToKafkaTopicsList, createKafkaTopic, deleteKafkaTopic } from '@lib/topic';
-
 
 const testInstanceName = config.instanceName;
 const testTopicPrefix = 'test-topic-';
 const testTopicName = `${testTopicPrefix}${config.sessionID}`;
-
 
 test.beforeEach(async ({ page }) => {
   await login(page);
@@ -185,4 +177,3 @@ test('create and delete a Kafka Topic', async ({ page }) => {
   await createKafkaTopic(page, testTopicName);
   await deleteKafkaTopic(page, testTopicName);
 });
-
