@@ -80,6 +80,5 @@ export const expectMessageTableIsNotEmpty = async function (page: Page) {
 
 export const expectMessageTableIsEmpty = async function (page: Page) {
   const messageTable = await page.locator('table[aria-label="Messages table"] >> tbody >> tr');
-  console.log(await messageTable.count());
   await expect(await messageTable.count()).toBe(1);
 };
