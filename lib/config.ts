@@ -8,6 +8,8 @@ class Config {
   readonly startingPage: string;
   readonly sessionID: string;
   readonly instanceName: string;
+  readonly serviceAccount: string;
+  readonly testTopicName: string;
 
   readonly kafkaInstanceCreationTimeout: number;
   readonly kafkaInstanceDeletionTimeout: number;
@@ -34,6 +36,8 @@ class Config {
     if (this.instanceName == undefined) {
       this.instanceName = `test-instance-${this.sessionID}`;
     }
+    this.serviceAccount = `test-service-account-${this.sessionID}`;
+    this.testTopicName = `test-topic-${this.sessionID}`;
 
     // Timeouts
     this.kafkaInstanceCreationTimeout = 20 * 60 * 1000; // 20 minutes

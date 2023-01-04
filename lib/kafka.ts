@@ -48,29 +48,32 @@ export const createKafkaInstance = async function (page: Page, name: string, che
 export const deleteKafkaInstance = async function (page: Page, name: string, awaitDeletion = true) {
   const instanceLinkSelector = page.getByText(name);
   const row = page.locator('tr', { has: instanceLinkSelector });
-
-  await row.locator('[aria-label="Actions"]').click();
-  await page.locator('button', { hasText: 'Delete instance' }).click();
   try {
-    await expect(page.locator('input[name="mas-name-input"]')).toHaveCount(1, { timeout: 5000 });
+    await row.locator('[aria-label="Actions"]').click();
+    await page.locator('button', { hasText: 'Delete instance' }).click();
+    try {
+      await expect(page.locator('input[name="mas-name-input"]')).toHaveCount(1, { timeout: 5000 });
 
-    // FIXME: workaround for https://github.com/redhat-developer/app-services-ui-components/issues/590
-    // https://github.com/microsoft/playwright/issues/15734#issuecomment-1188245775
-    await new Promise((resolve) => setTimeout(resolve, 500));
-    await page.locator('input[name="mas-name-input"]').click();
+      // FIXME: workaround for https://github.com/redhat-developer/app-services-ui-components/issues/590
+      // https://github.com/microsoft/playwright/issues/15734#issuecomment-1188245775
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      await page.locator('input[name="mas-name-input"]').click();
 
-    await page.locator('input[name="mas-name-input"]').fill(name);
+      await page.locator('input[name="mas-name-input"]').fill(name);
+    } catch (err) {
+      // Removal without confirmation
+      // ignore
+    }
+    // data-testid=modalDeleteKafka-buttonDelete
+    await page.locator('button', { hasText: 'Delete' }).click();
+    // await for the instance to be deleted
+    if (awaitDeletion) {
+      await expect(page.getByText(`${name}`, { exact: true })).toHaveCount(0, {
+        timeout: config.kafkaInstanceDeletionTimeout
+      });
+    }
   } catch (err) {
-    // Removal without confirmation
-    // ignore
-  }
-  // data-testid=modalDeleteKafka-buttonDelete
-  await page.locator('button', { hasText: 'Delete' }).click();
-  // await for the instance to be deleted
-  if (awaitDeletion) {
-    await expect(page.getByText(`${name}`, { exact: true })).toHaveCount(0, {
-      timeout: config.kafkaInstanceDeletionTimeout
-    });
+    // Do Nothing as instance is not connected to this acocunt
   }
 };
 
