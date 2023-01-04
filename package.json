@@ -22,7 +22,6 @@
     "typescript": "^4.9.3"
   },
   "dependencies": {
-    "kafkajs": "^2.2.3",
     "uuid": "^9.0.0"
   }
 }
