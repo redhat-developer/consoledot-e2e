@@ -31,7 +31,7 @@ export const createKafkaInstance = async function (page: Page, name: string, che
 
   // FIXME: workaround for https://github.com/redhat-developer/app-services-ui-components/issues/590
   // https://github.com/microsoft/playwright/issues/15734#issuecomment-1188245775
-  await sleep(500)
+  await sleep(500);
   await page.getByLabel('Name *').click();
 
   await page.getByLabel('Name *').fill(name);
