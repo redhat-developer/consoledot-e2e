@@ -1,7 +1,6 @@
 import { expect, Page } from '@playwright/test';
 import { config } from './config';
 import { closePopUp } from './popup';
-import { sleep } from './common';
 
 export const navigateToApplicationAndDataServices = async function (page: Page) {
   if (!(await page.locator('button', { hasText: 'Streams for Apache Kafka' }).isVisible())) {
@@ -120,8 +119,6 @@ export const grantProducerAccess = async function (page: Page, saId: string, top
   await page.getByPlaceholder('Enter prefix').click();
 
   await page.getByRole('button').filter({ hasText: 'Save' }).click();
-  //Sleep 5s to propagate changes
-  await sleep(5000);
 };
 
 // TODO - we shouldn't use just prefix for topic/group but also complete name
@@ -164,8 +161,6 @@ export const grantConsumerAccess = async function (page: Page, saId: string, top
     .fill(consumerGroup);
 
   await page.getByRole('button').filter({ hasText: 'Save' }).click();
-  //Sleep 5s to propagate changes
-  await sleep(5000);
 };
 
 export const navigateToAccess = async function (page: Page, kafkaName: string) {
