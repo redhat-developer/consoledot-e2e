@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { config } from '@lib/config';
-import login from '@lib/auth';
+import login, { logout } from '@lib/auth';
 
 // test_1auth.py test_auth_logged_in
 test('perform login', async ({ page }) => {
@@ -24,8 +24,7 @@ test('perform login', async ({ page }) => {
 test('perform login and logout', async ({ page }) => {
   await login(page);
 
-  await page.getByRole('button', { name: /User Avatar/ }).click();
-  await page.getByRole('menuitem', { name: 'Log out' }).click();
+  await logout(page);
 
   await expect(page).toHaveTitle(/Log In | Red Hat IDP/);
 });

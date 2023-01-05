@@ -99,7 +99,7 @@ const filterByOwner = async function (page, name, skipClick = false) {
 
 // test_3kas.py test_kas_kafka_filter_by_owner
 test('test instances can be filtered by owner', async ({ page }) => {
-  await filterByOwner(page, config.username.substring(0, 5));
+  await filterByOwner(page, config.adminUsername.substring(0, 5));
   await expect(page.getByText(testInstanceName)).toBeTruthy();
 
   await filterByOwner(page, 'wrong');
@@ -127,7 +127,7 @@ test('test instances can be filtered by cloud provider', async ({ page }) => {
 
 // test_3kas.py test_kas_kafka_view_details_by_row_click_panel_opened
 test('test instance details on row click', async ({ page }) => {
-  await page.getByRole('gridcell', { name: `${config.username}` }).click();
+  await page.getByRole('gridcell', { name: `${config.adminUsername}` }).click();
 
   await expect(page.locator('h1', { hasText: `${testInstanceName}` })).toHaveCount(1);
 });
@@ -157,7 +157,7 @@ test('test instance quick options', async ({ page }) => {
   await page.getByRole('menuitem', { name: 'Change owner' }).click();
 
   await expect(page.getByText('Current owner')).toHaveCount(1);
-  await expect(page.getByRole('dialog', { name: 'Change owner' }).getByText(config.username)).toHaveCount(1);
+  await expect(page.getByRole('dialog', { name: 'Change owner' }).getByText(config.adminUsername)).toHaveCount(1);
 
   await page.getByRole('button', { name: 'Cancel' }).click();
 });
