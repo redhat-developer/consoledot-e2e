@@ -171,5 +171,5 @@ export const navigateToAccess = async function (page: Page, kafkaName: string) {
 };
 
 export const navigateToConsumerGroups = async function (page: Page) {
-  await page.getByTestId('pageKafka-tabConsumers').click();
+  await page.getByText('Consumer groups').click();
 };
