@@ -31,7 +31,7 @@ export const createKafkaInstance = async function (page: Page, name: string, che
 
   // FIXME: workaround for https://github.com/redhat-developer/app-services-ui-components/issues/590
   // https://github.com/microsoft/playwright/issues/15734#issuecomment-1188245775
-  await sleep(500);
+  await new Promise((resolve) => setTimeout(resolve, 500));
   await page.getByLabel('Name *').click();
 
   await page.getByLabel('Name *').fill(name);
@@ -122,6 +122,8 @@ export const grantProducerAccess = async function (page: Page, saId: string, top
   await page.getByPlaceholder('Enter prefix').click();
 
   await page.getByRole('button').filter({ hasText: 'Save' }).click();
+  //Sleep 5s to propagate changes
+  await sleep(5000);
 };
 
 // TODO - we shouldn't use just prefix for topic/group but also complete name
@@ -164,6 +166,8 @@ export const grantConsumerAccess = async function (page: Page, saId: string, top
     .fill(consumerGroup);
 
   await page.getByRole('button').filter({ hasText: 'Save' }).click();
+  //Sleep 5s to propagate changes
+  await sleep(5000);
 };
 
 export const navigateToAccess = async function (page: Page, kafkaName: string) {
