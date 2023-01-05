@@ -1,6 +1,7 @@
 import { expect, Page } from '@playwright/test';
 import { config } from './config';
 import { closePopUp } from './popup';
+import { BillingOptions } from './billing';
 
 export const navigateToApplicationAndDataServices = async function (page: Page) {
   if (!(await page.locator('button', { hasText: 'Streams for Apache Kafka' }).isVisible())) {
@@ -24,7 +25,12 @@ export const navigateToKafkaList = async function (page: Page) {
   await expect(await page.locator('h1', { hasText: 'Kafka Instances' })).toHaveCount(1);
 };
 
-export const createKafkaInstance = async function (page: Page, name: string, check = true) {
+export const createKafkaInstance = async function (
+  page: Page,
+  name: string,
+  check = true,
+  billingOption = BillingOptions.PREPAID
+) {
   await page.locator('button', { hasText: 'Create Kafka instance' }).click();
   await expect(page.getByText('Create a Kafka instance')).toHaveCount(1);
   await page.waitForSelector('[role=progressbar]', { state: 'detached' });
@@ -35,6 +41,14 @@ export const createKafkaInstance = async function (page: Page, name: string, che
   await page.getByLabel('Name *').click();
 
   await page.getByLabel('Name *').fill(name);
+
+  // Set billing options
+  try {
+    await page.locator('div:text-is("' + billingOption + '")').click();
+  } catch (err) {
+    // Billing option is not available so do nothing
+  }
+
   // data-testid=modalCreateKafka-buttonSubmit
   await page.locator('button', { hasText: 'Create instance' }).click();
 
@@ -180,4 +194,4 @@ export const navigateToConsumerGroups = async function (page: Page) {
 export const showKafkaDetails = async function (page: Page) {
   await page.locator('main >> [aria-label="Actions"]').click();
   await page.locator('button', { hasText: 'Details' }).click();
-}
+};
