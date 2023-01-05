@@ -176,3 +176,8 @@ export const navigateToAccess = async function (page: Page, kafkaName: string) {
 export const navigateToConsumerGroups = async function (page: Page) {
   await page.getByTestId('pageKafka-tabConsumers').click();
 };
+
+export const showKafkaDetails = async function (page: Page) {
+  await page.locator('main >> [aria-label="Actions"]').click();
+  await page.locator('button', { hasText: 'Details' }).click();
+}
