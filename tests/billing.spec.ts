@@ -14,7 +14,6 @@ test.describe('Stratosphere users has to be defined for these tests', () => {
     config.stratosphere3username == undefined ||
     config.stratosphere4username == undefined
   ) {
-    console.log('test se skipne');
     test.skip();
   }
 
