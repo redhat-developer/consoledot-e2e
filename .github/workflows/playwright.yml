@@ -19,4 +19,6 @@ jobs:
     secrets:
       username: ${{ secrets.RH_USERNAME }}
       password: ${{ secrets.RH_PASSWORD }}
+      admin-username: ${{ secrets.RH_USERNAME }}
+      admin-password: ${{ secrets.RH_PASSWORD }}
       chat-webhook: ${{ secrets.GOOGLE_CHAT_WEBHOOK }}
