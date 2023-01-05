@@ -60,18 +60,7 @@ test.describe('Stratosphere users has to be defined for these tests', () => {
     test(`Billing option for ${config.stratosphere3username}: ${billingOption}`, async ({ page }) => {
       currentUsername = config.stratosphere3username;
       await login(page, currentUsername, config.stratospherePassword);
-
-      switch (billingOption) {
-        case BillingOptions.PREPAID:
-          await performBillingTest(page, billingOption);
-          break;
-        case BillingOptions.AWS_MARKETPLACE:
-          await performBillingTest(page, billingOption);
-          break;
-        case BillingOptions.RH_MARKETPLACE:
-          await performBillingTest(page, billingOption);
-          break;
-      }
+      await performBillingTest(page, billingOption);
     });
   }
 });
