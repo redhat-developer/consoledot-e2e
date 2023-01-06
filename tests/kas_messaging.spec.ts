@@ -14,6 +14,7 @@ import {
 import { navigateToKafkaTopicsList, createKafkaTopic, navigateToMessages, refreshMessages } from '@lib/topic';
 import { KafkaConsumer, KafkaProducer } from '@lib/clients';
 import { createServiceAccount, deleteServiceAccount, navigateToSAList } from '@lib/sa';
+import { retry } from '@lib/common';
 
 const testInstanceName = 'test-instance-messaging';
 const testTopicName = `test-topic-name`;
@@ -72,7 +73,8 @@ test.beforeEach(async ({ page }) => {
 
   // Producer 100 messages
   const producer = new KafkaProducer(bootstrap, credentials.clientID, credentials.clientSecret);
-  const producerResponse = await producer.produceMessages(testTopicName, expectedMessageCount, testMessageKey);
+  const producerResponse = await retry(() =>
+    producer.produceMessages(testTopicName, expectedMessageCount, testMessageKey), 10, 1000);
   expect(producerResponse === true).toBeTruthy();
 });
 
@@ -83,7 +85,8 @@ test('Consume messages from topic', async ({ page }) => {
 
   // Consume 100 messages
   const consumer = new KafkaConsumer(bootstrap, consumerGroupId, credentials.clientID, credentials.clientSecret);
-  const consumerResponse = await consumer.consumeMessages(testTopicName, expectedMessageCount);
+  const consumerResponse = await retry(() =>
+    consumer.consumeMessages(testTopicName, expectedMessageCount), 10, 1000);
   expect(consumerResponse).toEqual(expectedMessageCount);
 
   // Open Consumer Groups Tab to check dashboard
