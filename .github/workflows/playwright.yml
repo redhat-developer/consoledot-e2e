@@ -1,4 +1,5 @@
 name: Playwright Tests
+
 on:
   push:
     branches: [ main ]
@@ -12,13 +13,73 @@ concurrency:
 
 jobs:
   playwright:
-    uses: apicurio/apicurio-gh-workflows/.github/workflows/playwright.yaml@main
-    with:
-      os: ubuntu-latest
-      notify-on-failure: true
-    secrets:
-      username: ${{ secrets.RH_USERNAME }}
-      password: ${{ secrets.RH_PASSWORD }}
-      admin-username: ${{ secrets.RH_USERNAME }}
-      admin-password: ${{ secrets.RH_PASSWORD }}
-      chat-webhook: ${{ secrets.GOOGLE_CHAT_WEBHOOK }}
+    name: Run Playwright Tests
+    continue-on-error: false
+    runs-on: ubuntu-latest
+    timeout-minutes: 600
+    steps:
+    - name: Checkout "${{ github.ref }}"
+      uses: actions/checkout@v3
+    - uses: actions/setup-node@v3
+      with:
+        node-version: 16
+        cache: 'npm'
+    - name: Install dependencies
+      run: npm ci
+
+    # Caching Playwright from: https://github.com/microsoft/playwright/issues/7249
+    - name: Get installed Playwright version
+      id: playwright-version
+      run: echo "version=$(npm ls @playwright/test | grep @playwright | sed 's/.*@//')" >> $GITHUB_OUTPUT
+    - uses: actions/cache@v3
+      id: playwright-cache
+      with:
+        path: '~/.cache/ms-playwright'
+        key: '${{ runner.os }}-playwright-deps-${{ steps.playwright-version.outputs.version }}'
+        restore-keys: |
+          ${{ runner.os }}-playwright-deps-
+    - name: Install Playwright's dependencies
+      if: steps.playwright-cache.outputs.cache-hit != 'true'
+      run: npx playwright install --with-deps chromium chrome msedge firefox webkit
+    # End of caching
+
+    # Some system dependencies are not cached
+    - name: Install Playwright's OS dependencies
+      run: npx playwright install-deps
+
+    - name: Run Playwright tests
+      env:
+        TEST_USERNAME: ${{ secrets.RH_USERNAME }}
+        TEST_PASSWORD: ${{ secrets.RH_PASSWORD }}
+        TEST_ADMIN_USERNAME: ${{ secrets.RH_USERNAME }}
+        TEST_ADMIN_PASSWORD: ${{ secrets.RH_PASSWORD }}
+      run: npx playwright test
+    - uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: "playwright-report-${{ runner.os }}"
+        path: playwright-report/
+        retention-days: 1
+    - uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: "test-results-${{ runner.os }}"
+        path: test-results/
+        retention-days: 1
+
+    - name: Release
+      # v1
+      uses: softprops/action-gh-release@1e07f4398721186383de40550babbdf2b84acfc5
+      if: always()
+      with:
+        tag_name: ${{ github.run_id }}
+        files: |
+          results.xml
+    - name: Google Chat Notification
+      # release/v1
+      uses: Co-qn/google-chat-notification@b9227d9daa4638c9782a5bd16c4abb86268127a1
+      with:
+        name: E2E Test
+        url: ${{ secrets.GOOGLE_CHAT_WEBHOOK }}
+        status: ${{ job.status }}
+      if: failure()
