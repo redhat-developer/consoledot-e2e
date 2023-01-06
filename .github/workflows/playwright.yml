@@ -57,13 +57,13 @@ jobs:
     - uses: actions/upload-artifact@v3
       if: always()
       with:
-        name: "playwright-report-${{ inputs.os }}"
+        name: "playwright-report-${{ runner.os }}"
         path: playwright-report/
         retention-days: 1
     - uses: actions/upload-artifact@v3
       if: always()
       with:
-        name: "test-results-${{ inputs.os }}"
+        name: "test-results-${{ runner.os }}"
         path: test-results/
         retention-days: 1
 
