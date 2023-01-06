@@ -23,15 +23,13 @@ import {
   applyFilter,
   setPartition,
   setTimestamp,
-  expectMessageTableIsNotEmpty,
-  expectMessageTableIsEmpty,
   setEpoch,
   setLimit
 } from '@lib/messages';
 
 const testInstanceName = 'test-instance-messaging';
 const testTopicName = `test-topic-name`;
-const testServiceAccountName = 'test-service-account';
+const testServiceAccountName = 'test-messaging-sa';
 const testMessageKey = 'key';
 const consumerGroupId = 'test-consumer-group';
 const expectedMessageCount = 100;
@@ -140,13 +138,13 @@ for (const filter of filters) {
     await navigateToMessages(page, testInstanceName, testTopicName);
 
     await refreshMessages(page);
+    const messageTable = page.locator('table[aria-label="Messages table"] >> tbody >> tr');
 
     switch (filter) {
       case FilterGroup.offset: {
         await pickFilterOption(page, FilterGroup.offset);
         await filterMessagesByOffset(page, '0', '20', Limit.ten);
 
-        let messageTable = await page.locator('table[aria-label="Messages table"] >> tbody >> tr');
         // Check that 1st message has offset 20
         await messageTable.nth(0).locator('td[data-label="Offset"]');
         await expect(messageTable.nth(0).locator('td[data-label="Offset"]')).toContainText('20');
@@ -155,7 +153,7 @@ for (const filter of filters) {
 
         // Set offset to 13 and limit to 50
         await filterMessagesByOffset(page, '0', '13', Limit.fifty);
-        messageTable = await page.locator('table[aria-label="Messages table"] >> tbody >> tr');
+        // messageTable = await page.locator('table[aria-label="Messages table"] >> tbody >> tr');
 
         // Check that 1st message has offset 13
         await expect(messageTable.nth(0).locator('td[data-label="Offset"]')).toContainText('13');
@@ -167,12 +165,14 @@ for (const filter of filters) {
         await setTimestamp(page, today.toISOString().slice(0, 10));
         await applyFilter(page);
         // Check that messages are in the table
-        await expectMessageTableIsNotEmpty(page);
+        await expect(await messageTable.count()).toBeGreaterThan(0);
+
         // Set epoch timestam to tomorrow and check that table is empty
         await setTimestamp(page, tomorrow.toISOString().slice(0, 10));
         await applyFilter(page);
         await expect(await page.getByText('No messages data')).toHaveCount(1);
-        await expectMessageTableIsEmpty(page);
+        // await expectMessageTableIsEmpty(page);
+        await expect(messageTable).toHaveCount(1);
         break;
       }
       case FilterGroup.epoch: {
@@ -180,9 +180,10 @@ for (const filter of filters) {
         await setEpoch(page, today.getTime());
         await applyFilter(page);
         // Check that messages are in the table
-        await expectMessageTableIsNotEmpty(page);
+        await expect(await messageTable.count()).toBeGreaterThan(0);
+
         // Set epoch timestam to tomorrow and check that table is empty
-        // Tomorrow's epoch doesn't work -> TODO create issue
+        // Tomorrow's epoch doesn't work -> https://issues.redhat.com/browse/MGDX-294
         // await setEpoch(page, tomorrow.getTime());
         // await applyFilter(page);
         // await expect(await page.getByText("No messages data")).toHaveCount(1)
@@ -194,7 +195,7 @@ for (const filter of filters) {
         await setPartition(page, '0');
         await setLimit(page, Limit.twenty);
         await applyFilter(page);
-        await expectMessageTableIsNotEmpty(page);
+        await expect(await messageTable.count()).toBeGreaterThan(0);
         break;
       }
     }
