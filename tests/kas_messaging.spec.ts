@@ -22,8 +22,8 @@ const testServiceAccountName = 'test-service-account';
 const testMessageKey = 'key';
 const consumerGroupId = 'test-consumer-group';
 const expectedMessageCount = 100;
-const reconnectCount = 10;
-const reconnectDelayMs = 1000;
+const reconnectCount = 5;
+const reconnectDelayMs = 500;
 let credentials;
 let bootstrap: string;
 
