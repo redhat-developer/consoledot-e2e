@@ -8,12 +8,14 @@ const testInstanceName = 'mk-ui-playwright-tests';
 let currentUsername = config.stratosphere1username;
 
 test.describe('Billing test cases', () => {
-    test.skip(config.stratosphere1username == undefined ||
+  test.skip(
+    config.stratosphere1username == undefined ||
       config.stratosphere2username == undefined ||
       config.stratosphere3username == undefined ||
       config.stratosphere4username == undefined ||
       config.stratospherePassword == undefined,
-      'Stratosphere users has to be defined for these tests');
+    'Stratosphere users has to be defined for these tests'
+  );
 
   test.afterEach(async ({ page }) => {
     try {
@@ -46,11 +48,11 @@ test.describe('Billing test cases', () => {
   let index = 0;
   for (const user of users) {
     test(`Billing check of user - ${index}${user}`, async ({ page }) => {
-        currentUsername = user;
-        await login(page, user, config.stratospherePassword);
-  
-        await setupKafkaFreshInstance(page, BillingOptions.PREPAID);
-        await showKafkaDetails(page);
+      currentUsername = user;
+      await login(page, user, config.stratospherePassword);
+
+      await setupKafkaFreshInstance(page, BillingOptions.PREPAID);
+      await showKafkaDetails(page);
     });
     index++;
   }
