@@ -65,7 +65,7 @@ jobs:
       with:
         name: "test-results-${{ runner.os }}"
         path: test-results/
-        retention-days: 1
+        retention-days: 5
 
     - name: Release
       # v1
