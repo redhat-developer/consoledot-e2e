@@ -1,5 +1,4 @@
 import { test, expect } from '@playwright/test';
-import { config } from '@lib/config';
 import login, { logout } from '@lib/auth';
 
 // test_1auth.py test_auth_logged_in
