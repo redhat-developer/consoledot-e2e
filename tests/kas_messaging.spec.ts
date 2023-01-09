@@ -22,6 +22,8 @@ const testServiceAccountName = 'test-service-account';
 const testMessageKey = 'key';
 const consumerGroupId = 'test-consumer-group';
 const expectedMessageCount = 100;
+const reconnectCount = 10;
+const reconnectDelayMs = 1000;
 let credentials;
 let bootstrap: string;
 
@@ -75,8 +77,8 @@ test.beforeEach(async ({ page }) => {
   const producer = new KafkaProducer(bootstrap, credentials.clientID, credentials.clientSecret);
   const producerResponse = await retry(
     () => producer.produceMessages(testTopicName, expectedMessageCount, testMessageKey),
-    10,
-    1000
+    reconnectCount,
+    reconnectDelayMs
   );
   expect(producerResponse === true).toBeTruthy();
 });
@@ -88,7 +90,11 @@ test('Consume messages from topic', async ({ page }) => {
 
   // Consume 100 messages
   const consumer = new KafkaConsumer(bootstrap, consumerGroupId, credentials.clientID, credentials.clientSecret);
-  const consumerResponse = await retry(() => consumer.consumeMessages(testTopicName, expectedMessageCount), 10, 1000);
+  const consumerResponse = await retry(
+    () => consumer.consumeMessages(testTopicName, expectedMessageCount),
+    reconnectCount,
+    reconnectDelayMs
+  );
   expect(consumerResponse).toEqual(expectedMessageCount);
 
   // Open Consumer Groups Tab to check dashboard
