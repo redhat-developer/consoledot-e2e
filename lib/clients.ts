@@ -61,7 +61,7 @@ export class KafkaProducer extends KafkaClient {
       })
       .catch((e) => {
         this.kafka.logger().error(`[${KafkaProducer.name}] ${e.message}`, { stack: e.stack });
-        return e;
+        throw e;
       });
   }
 
