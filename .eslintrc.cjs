@@ -5,6 +5,7 @@ module.exports = {
   plugins: ['@typescript-eslint'],
   rules: {
     "playwright/no-skipped-test": "off",
+    "playwright/no-conditional-in-test": "off"
   },
   root: true,
 };

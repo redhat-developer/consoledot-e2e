@@ -34,7 +34,6 @@ class Config {
     if (this.instanceName == undefined) {
       this.instanceName = `test-instance-${this.sessionID}`;
     }
-
     // Timeouts
     this.kafkaInstanceCreationTimeout = 20 * 60 * 1000; // 20 minutes
     this.kafkaInstanceDeletionTimeout = 10 * 60 * 1000; // 10 minutes

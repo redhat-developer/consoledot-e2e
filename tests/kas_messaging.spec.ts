@@ -15,10 +15,21 @@ import { navigateToKafkaTopicsList, createKafkaTopic, navigateToMessages, refres
 import { KafkaConsumer, KafkaProducer } from '@lib/clients';
 import { createServiceAccount, deleteServiceAccount, navigateToSAList } from '@lib/sa';
 import { retry } from '@lib/common';
+import {
+  Limit,
+  filterMessagesByOffset,
+  FilterGroup,
+  pickFilterOption,
+  applyFilter,
+  setPartition,
+  setTimestamp,
+  setEpoch,
+  setLimit
+} from '@lib/messages';
 
 const testInstanceName = 'test-instance-messaging';
 const testTopicName = `test-topic-name`;
-const testServiceAccountName = 'test-service-account';
+const testServiceAccountName = 'test-messaging-sa';
 const testMessageKey = 'key';
 const consumerGroupId = 'test-consumer-group';
 const expectedMessageCount = 100;
@@ -115,3 +126,78 @@ test('Browse messages', async ({ page }) => {
   await expect(messageDetail.locator('dt:has-text("Offset")')).toHaveCount(1);
   await expect(messageDetail.locator('dd:has-text("key-")')).toHaveCount(1);
 });
+
+const filters = [FilterGroup.offset, FilterGroup.timestamp, FilterGroup.epoch, FilterGroup.latest];
+for (const filter of filters) {
+  test(`Filter messages by ${filter}`, async ({ page }) => {
+    // Today and tomorrow date
+    const today = new Date();
+    const tomorrow = new Date();
+    tomorrow.setDate(today.getDate() + 1);
+
+    await navigateToMessages(page, testInstanceName, testTopicName);
+
+    await refreshMessages(page);
+    const messageTable = page.locator('table[aria-label="Messages table"] >> tbody >> tr');
+
+    switch (filter) {
+      case FilterGroup.offset: {
+        await pickFilterOption(page, FilterGroup.offset);
+        await filterMessagesByOffset(page, '0', '20', Limit.ten);
+
+        // Check that 1st message has offset 20
+        await messageTable.nth(0).locator('td[data-label="Offset"]');
+        await expect(messageTable.nth(0).locator('td[data-label="Offset"]')).toContainText('20');
+        // Check size of the table
+        await expect(await messageTable.count()).toBe(Limit.ten);
+
+        // Set offset to 13 and limit to 50
+        await filterMessagesByOffset(page, '0', '13', Limit.fifty);
+        // messageTable = await page.locator('table[aria-label="Messages table"] >> tbody >> tr');
+
+        // Check that 1st message has offset 13
+        await expect(messageTable.nth(0).locator('td[data-label="Offset"]')).toContainText('13');
+        await expect(await messageTable.count()).toBe(Limit.fifty);
+        break;
+      }
+      case FilterGroup.timestamp: {
+        await pickFilterOption(page, FilterGroup.timestamp);
+        await setTimestamp(page, today.toISOString().slice(0, 10));
+        await applyFilter(page);
+        // Check that messages are in the table
+        await expect(await messageTable.count()).toBeGreaterThan(0);
+
+        // Set epoch timestam to tomorrow and check that table is empty
+        await setTimestamp(page, tomorrow.toISOString().slice(0, 10));
+        await applyFilter(page);
+        await expect(await page.getByText('No messages data')).toHaveCount(1);
+        // await expectMessageTableIsEmpty(page);
+        await expect(messageTable).toHaveCount(1);
+        break;
+      }
+      case FilterGroup.epoch: {
+        await pickFilterOption(page, FilterGroup.epoch);
+        await setEpoch(page, today.getTime());
+        await applyFilter(page);
+        // Check that messages are in the table
+        await expect(await messageTable.count()).toBeGreaterThan(0);
+
+        // Set epoch timestam to tomorrow and check that table is empty
+        // Tomorrow's epoch doesn't work -> https://issues.redhat.com/browse/MGDX-294
+        // await setEpoch(page, tomorrow.getTime());
+        // await applyFilter(page);
+        // await expect(await page.getByText("No messages data")).toHaveCount(1)
+        // await expectMessageTableIsEmpty(page)
+        break;
+      }
+      case FilterGroup.latest: {
+        await pickFilterOption(page, FilterGroup.latest);
+        await setPartition(page, '0');
+        await setLimit(page, Limit.twenty);
+        await applyFilter(page);
+        await expect(await messageTable.count()).toBeGreaterThan(0);
+        break;
+      }
+    }
+  });
+}
