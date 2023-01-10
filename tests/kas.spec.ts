@@ -101,6 +101,8 @@ test('test Kafka list filtered by status', async ({ page }) => {
 // test_3kas.py test_try_to_create_kafka_instance_with_same_name
 // NOTE: this test is expected to be pretty fragile as it needs that the current instance is in "early" `Creating` status
 test('test fail to create Kafka instance with the same name', async ({ page }) => {
+  test.skip(true, 'Need a different account');
+
   await createKafkaInstance(page, testInstanceName, false);
 
   await page.getByText('Create Kafka instance').click();
