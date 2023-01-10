@@ -89,31 +89,31 @@ export class KafkaConsumer extends KafkaClient {
     let msgCount = 0;
 
     return new Promise((resolve, reject) => {
-      try {
-        this.kafkaConsumer
-          .connect()
-          .then(() => this.kafkaConsumer.subscribe({ topic: topic, fromBeginning: fromBeginning }))
-          .then(() =>
-            this.kafkaConsumer.run({
-              eachMessage: async (messagePayload: EachMessagePayload) => {
-                const { topic, partition, message } = messagePayload;
-                const prefix = `${topic}[${partition} | ${message.offset}] / ${message.timestamp}`;
-                console.log(`- ${prefix} ${message.key}#${message.value} -> ${msgCount}`);
-                msgCount++;
-                if (msgCount == expectedMsgCount) {
-                  console.log('Received: ' + msgCount);
-                  resolve(msgCount);
-                }
-              }
-            })
-          );
-      } catch (error) {
-        console.log('Error: ', error);
-        reject(error);
-      } finally {
-        // shutdown consumer
+      this.kafkaConsumer.on('consumer.crash', async (error) => {
         this.shutdown();
-      }
+        reject(error);
+      });
+
+      this.kafkaConsumer
+        .connect()
+        .then(() => {
+          this.kafkaConsumer.subscribe({ topic: topic, fromBeginning: fromBeginning });
+        })
+        .then(() => {
+          this.kafkaConsumer.run({
+            eachMessage: async (messagePayload: EachMessagePayload) => {
+              const { topic, partition, message } = messagePayload;
+              const prefix = `${topic}[${partition} | ${message.offset}] / ${message.timestamp}`;
+              console.log(`- ${prefix} ${message.key}#${message.value} -> ${msgCount}`);
+              msgCount++;
+              if (msgCount == expectedMsgCount) {
+                console.log('Received: ' + msgCount);
+                this.shutdown();
+                resolve(msgCount);
+              }
+            }
+          });
+        });
     });
   }
 

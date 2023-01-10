@@ -44,7 +44,7 @@ export const createKafkaInstance = async function (
 
   // Set billing options
   try {
-    await page.locator('div:text-is("' + billingOption + '")').click();
+    await page.locator('div:text-is("' + billingOption + '")').click({ timeout: 1000 });
   } catch (err) {
     // Billing option is not available so do nothing
   }
@@ -60,10 +60,8 @@ export const createKafkaInstance = async function (
 };
 
 export const deleteKafkaInstance = async function (page: Page, name: string, awaitDeletion = true) {
-  const instanceLinkSelector = page.getByText(name);
-  const row = page.locator('tr', { has: instanceLinkSelector });
   try {
-    await row.locator('[aria-label="Actions"]').click();
+    await showElementActions(page, name);
     await page.locator('button', { hasText: 'Delete instance' }).click();
     try {
       await expect(page.locator('input[name="mas-name-input"]')).toHaveCount(1, { timeout: 5000 });
@@ -104,9 +102,7 @@ export const waitForKafkaReady = async function (page: Page, name: string) {
 
 export const getBootstrapUrl = async function (page: Page, name: string) {
   await navigateToKafkaList(page);
-  const instanceLinkSelector = page.getByText(name);
-  const row = page.locator('tr', { has: instanceLinkSelector });
-  await row.locator('[aria-label="Actions"]').click();
+  await showElementActions(page, name);
 
   await page.locator('button', { hasText: 'Connection' }).click();
 
@@ -191,7 +187,14 @@ export const navigateToConsumerGroups = async function (page: Page) {
   await page.getByTestId('pageKafka-tabConsumers').click();
 };
 
-export const showKafkaDetails = async function (page: Page) {
-  await page.locator('main >> [aria-label="Actions"]').click();
+export const showElementActions = async function (page: Page, instanceName: string) {
+  const instanceLinkSelector = page.getByText(instanceName);
+  const row = page.locator('tr', { has: instanceLinkSelector });
+
+  await row.locator('[aria-label="Actions"]').click();
+};
+
+export const showKafkaDetails = async function (page: Page, instanceName: string) {
+  await showElementActions(page, instanceName);
   await page.locator('button', { hasText: 'Details' }).click();
 };

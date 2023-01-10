@@ -1,5 +1,5 @@
 import { expect, Page } from '@playwright/test';
-import { navigateToKafkaList, waitForKafkaReady } from './kafka';
+import { navigateToKafkaList, showElementActions, waitForKafkaReady } from './kafka';
 
 export const navigateToKafkaTopicsList = async function (page: Page, kafkaName: string) {
   await expect(page.getByText(kafkaName)).toHaveCount(1);
@@ -23,10 +23,7 @@ export const createKafkaTopic = async function (page: Page, name: string) {
 };
 
 export const deleteKafkaTopic = async function (page: Page, name: string) {
-  const instanceLinkSelector = page.getByText(name);
-  const row = page.locator('tr', { has: instanceLinkSelector });
-
-  await row.locator('[aria-label="Actions"]').click();
+  await showElementActions(page, name);
   // data-testid=tableTopics-actionDelete
   await page.locator('button', { hasText: 'Delete' }).click();
   await page.getByLabel('Type DELETE to confirm:').click();

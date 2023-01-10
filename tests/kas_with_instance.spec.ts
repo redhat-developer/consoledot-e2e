@@ -1,7 +1,13 @@
 import { test, expect } from '@playwright/test';
 import login from '@lib/auth';
 import { config } from '@lib/config';
-import { navigateToKafkaList, deleteKafkaInstance, createKafkaInstance, waitForKafkaReady } from '@lib/kafka';
+import {
+  navigateToKafkaList,
+  deleteKafkaInstance,
+  createKafkaInstance,
+  waitForKafkaReady,
+  showElementActions
+} from '@lib/kafka';
 import { navigateToKafkaTopicsList, createKafkaTopic, deleteKafkaTopic } from '@lib/topic';
 
 const testInstanceName = config.instanceName;
@@ -134,7 +140,7 @@ test('test instance details on row click', async ({ page }) => {
 
 // test_3kas.py test_kas_kafka_view_details_by_menu_click_panel_opened
 test('test instance details on menu click', async ({ page }) => {
-  await page.locator('main >> [aria-label="Actions"]').click();
+  await showElementActions(page, testInstanceName);
   await page.locator('button', { hasText: 'Details' }).click();
 
   await expect(page.locator('h1', { hasText: `${testInstanceName}` })).toHaveCount(1);
@@ -146,14 +152,14 @@ test('test instance details on menu click', async ({ page }) => {
 // test_3kas.py test_kas_kafka_view_details_by_connection_menu_click_panel_opened
 // ... and more ...
 test('test instance quick options', async ({ page }) => {
-  await page.locator('main >> [aria-label="Actions"]').click();
+  await showElementActions(page, testInstanceName);
   await page.locator('button', { hasText: 'Connection' }).click();
 
   await expect(page.getByRole('textbox', { name: 'Bootstrap server' })).toHaveCount(1);
 
   await page.locator('button[aria-label="Close drawer panel"]').click();
 
-  await page.locator('main >> [aria-label="Actions"]').click();
+  await showElementActions(page, testInstanceName);
   await page.getByRole('menuitem', { name: 'Change owner' }).click();
 
   await expect(page.getByText('Current owner')).toHaveCount(1);

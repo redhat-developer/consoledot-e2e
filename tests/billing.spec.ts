@@ -18,11 +18,6 @@ test.describe('Billing test cases', () => {
   );
 
   test.afterEach(async ({ page }) => {
-    try {
-      await login(page, currentUsername, config.stratospherePassword);
-    } catch (err) {
-      // Already logged in, do nothing
-    }
     await navigateToKafkaList(page);
     await deleteKafkaInstance(page, testInstanceName);
   });
@@ -38,7 +33,7 @@ test.describe('Billing test cases', () => {
 
   async function performBillingTest(page: Page, billingOption: BillingOptions) {
     await setupKafkaFreshInstance(page, billingOption);
-    await showKafkaDetails(page);
+    await showKafkaDetails(page, testInstanceName);
     await expect(await page.locator('dd:has-text("' + billingOption + '")')).toHaveCount(1);
   }
 
@@ -47,12 +42,12 @@ test.describe('Billing test cases', () => {
   // This is needed to avoid same names of the tests which results into playwright execution failure
   let index = 0;
   for (const user of users) {
-    test(`Billing check of user - ${index}${user}`, async ({ page }) => {
+    test(`Billing check of user - ${index}#${user}`, async ({ page }) => {
       currentUsername = user;
       await login(page, user, config.stratospherePassword);
 
       await setupKafkaFreshInstance(page, BillingOptions.PREPAID);
-      await showKafkaDetails(page);
+      await showKafkaDetails(page, testInstanceName);
     });
     index++;
   }
