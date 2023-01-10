@@ -89,10 +89,17 @@ export class KafkaConsumer extends KafkaClient {
     let msgCount = 0;
 
     return new Promise((resolve, reject) => {
+      this.kafkaConsumer.on('consumer.crash', async (error) => {
+        this.shutdown();
+        reject(error);
+      });
+
       this.kafkaConsumer
         .connect()
-        .then(() => this.kafkaConsumer.subscribe({ topic: topic, fromBeginning: fromBeginning }))
-        .then(() =>
+        .then(() => {
+          this.kafkaConsumer.subscribe({ topic: topic, fromBeginning: fromBeginning });
+        })
+        .then(() => {
           this.kafkaConsumer.run({
             eachMessage: async (messagePayload: EachMessagePayload) => {
               const { topic, partition, message } = messagePayload;
@@ -101,16 +108,11 @@ export class KafkaConsumer extends KafkaClient {
               msgCount++;
               if (msgCount == expectedMsgCount) {
                 console.log('Received: ' + msgCount);
+                this.shutdown();
                 resolve(msgCount);
               }
             }
-          })
-        )
-        .finally(() => {
-          if (msgCount != expectedMsgCount) {
-            reject();
-          }
-          this.shutdown();
+          });
         });
     });
   }
