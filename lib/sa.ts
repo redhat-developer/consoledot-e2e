@@ -1,6 +1,7 @@
 import { expect, Page } from '@playwright/test';
 import { config } from './config';
 import { closePopUp } from './popup';
+import { showElementActions } from './kafka';
 
 export const navigateToSAList = async function (page: Page) {
   try {
@@ -48,11 +49,11 @@ export const createServiceAccount = async function (page: Page, name: string) {
 };
 
 export const deleteServiceAccount = async function (page: Page, name: string) {
-  const instanceLinkSelector = page.getByText(name, { exact: true });
+  const saLinkSelector = page.getByText(name, { exact: true });
 
-  let count = await instanceLinkSelector.count();
+  let count = await saLinkSelector.count();
   while (count > 0) {
-    const row = page.locator('tr', { has: instanceLinkSelector.nth(0) });
+    const row = page.locator('tr', { has: saLinkSelector.nth(0) });
 
     await row.locator('[aria-label="Actions"]').nth(0).click();
 
@@ -62,7 +63,7 @@ export const deleteServiceAccount = async function (page: Page, name: string) {
     // #confirm__button
     await page.locator('button', { hasText: 'Delete' }).click();
 
-    await expect(instanceLinkSelector).toHaveCount(count - 1);
+    await expect(saLinkSelector).toHaveCount(count - 1);
 
     count--;
   }
@@ -74,10 +75,7 @@ export const deleteServiceAccount = async function (page: Page, name: string) {
 };
 
 export const resetServiceAccount = async function (page: Page, name: string) {
-  const instanceLinkSelector = page.getByText(name);
-  const row = page.locator('tr', { has: instanceLinkSelector });
-
-  await row.locator('[aria-label="Actions"]').click();
+  await showElementActions(page, name);
 
   await page.locator('button', { hasText: 'Reset credentials' }).click();
 
