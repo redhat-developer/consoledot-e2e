@@ -184,7 +184,7 @@ export const navigateToAccess = async function (page: Page, kafkaName: string) {
 };
 
 export const navigateToConsumerGroups = async function (page: Page) {
-  await page.click("text=Consumer groups");
+  await page.click('text=Consumer groups');
 };
 
 export const showElementActions = async function (page: Page, instanceName: string) {
