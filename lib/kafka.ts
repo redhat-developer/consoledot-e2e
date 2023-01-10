@@ -44,7 +44,7 @@ export const createKafkaInstance = async function (
 
   // Set billing options
   try {
-    await page.locator('div:text-is("' + billingOption + '")').click();
+    await page.locator('div:text-is("' + billingOption + '")').click({ timeout: 1000 });
   } catch (err) {
     // Billing option is not available so do nothing
   }

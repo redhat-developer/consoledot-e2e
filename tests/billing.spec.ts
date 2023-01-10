@@ -18,11 +18,6 @@ test.describe('Billing test cases', () => {
   );
 
   test.afterEach(async ({ page }) => {
-    try {
-      await login(page, currentUsername, config.stratospherePassword);
-    } catch (err) {
-      // Already logged in, do nothing
-    }
     await navigateToKafkaList(page);
     await deleteKafkaInstance(page, testInstanceName);
   });
