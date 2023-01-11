@@ -37,7 +37,7 @@ TEST_ADMIN_PASSWORD=...
 STARTING_PAGE=...
 ```
 
-now you can run the tests:
+Now you can run the tests:
 
 ```bash
 npm install # Install all the needed Node dependencies
