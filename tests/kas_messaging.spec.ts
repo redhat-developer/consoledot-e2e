@@ -107,7 +107,7 @@ test.afterAll(async ({ page }) => {
   if ((await page.locator('tr', { hasText: testServiceAccountName }).count()) !== 0) {
     await deleteServiceAccount(page, testServiceAccountName);
   }
-})
+});
 
 // test_6messages.py generate_messages_to_topic
 test('Consume messages from topic', async ({ page }) => {
