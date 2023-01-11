@@ -219,7 +219,11 @@ test('create consumer group and check dashboard', async ({ page }) => {
   await navigateToAccess(page, testInstanceName);
   await grantConsumerAccess(page, credentials.clientID, testTopicName, consumerGroupId);
   const consumer = new KafkaConsumer(bootstrapUrl, consumerGroupId, credentials.clientID, credentials.clientSecret);
-  const consumerResponse = await consumer.consumeMessages(testTopicName, expectedMessageCount);
+  const consumerResponse = await retry(
+    () => consumer.consumeMessages(testTopicName, expectedMessageCount),
+    reconnectCount,
+    reconnectDelayMs
+  );
   expect(consumerResponse).toEqual(expectedMessageCount);
 
   // Open Consumer Groups Tab to check dashboard
