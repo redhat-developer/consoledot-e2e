@@ -70,6 +70,7 @@ test.beforeEach(async ({ page }) => {
   await navigateToKafkaTopicsList(page, testInstanceName);
   // Do not create topic if it already exists
   await expect(page.getByText('Create topic')).toHaveCount(1);
+  await expect(page.getByText('Loading content')).toHaveCount(0);
   if ((await page.locator('a', { hasText: testTopicName }).count()) === 0) {
     await createKafkaTopic(page, testTopicName);
   }
