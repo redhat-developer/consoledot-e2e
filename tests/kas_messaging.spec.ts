@@ -99,13 +99,18 @@ test.beforeEach(async ({ page }) => {
 test.afterAll(async ({ page }) => {
   await navigateToKafkaList(page);
 
-  if ((await page.getByText(testInstanceName).count()) !== 0) {
+  try {
     await deleteKafkaInstance(page, testInstanceName);
+  } catch (error) {
+    //Ignore exception
   }
+
   await navigateToSAList(page);
 
-  if ((await page.locator('tr', { hasText: testServiceAccountName }).count()) !== 0) {
+  try {
     await deleteServiceAccount(page, testServiceAccountName);
+  } catch (error) {
+    //Ignore exception
   }
 });
 
