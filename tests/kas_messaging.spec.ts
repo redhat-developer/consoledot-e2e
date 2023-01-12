@@ -96,6 +96,24 @@ test.beforeEach(async ({ page }) => {
   expect(producerResponse === true).toBeTruthy();
 });
 
+test.afterAll(async ({ page }) => {
+  await navigateToKafkaList(page);
+
+  try {
+    await deleteKafkaInstance(page, testInstanceName);
+  } catch (error) {
+    //Ignore exception
+  }
+
+  await navigateToSAList(page);
+
+  try {
+    await deleteServiceAccount(page, testServiceAccountName);
+  } catch (error) {
+    //Ignore exception
+  }
+});
+
 // test_6messages.py generate_messages_to_topic
 test('Consume messages from topic', async ({ page }) => {
   await navigateToAccess(page, testInstanceName);
