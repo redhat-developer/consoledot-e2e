@@ -60,3 +60,5 @@ The CI only runs on the `main` branch to avoid sharing secrets on branches and f
 
 The only sensitive data in this project is the username and password used to login.
 Those are stored in [GitHub Encrypted Secrets](https://docs.github.com/en/actions/security-guides/encrypted-secrets).
+
+test - delete this!
