@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "prettier-format": "prettier --config .prettierrc 'tests/**/*.ts' 'lib/**/*.ts' --write",
-    "prettier-check": "prettier --config .prettierrc 'tests/**/*.ts' 'lib/**/*.ts' --check"
+    "prettier-check": "prettier --config .prettierrc 'tests/**/*.ts' 'lib/**/*.ts' --check",
+    "test": "npx playwright test"
   },
   "keywords": [],
   "author": "",
