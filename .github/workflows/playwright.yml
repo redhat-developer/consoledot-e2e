@@ -69,7 +69,8 @@ jobs:
 
     - name: Check results file existence
       id: check_results
-      uses: andstor/file-existence-action@v1
+      # v1
+      uses: andstor/file-existence-action@f02338908d150e00a4b8bebc2dad18bd9e5229b0
       with:
         files: "results.xml"
     - name: Release
