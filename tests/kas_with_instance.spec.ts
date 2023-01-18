@@ -183,3 +183,75 @@ test('create and delete a Kafka Topic', async ({ page }) => {
   await createKafkaTopic(page, testTopicName);
   await deleteKafkaTopic(page, testTopicName);
 });
+
+// test_4kafka.py test_edit_topic_properties_after_creation
+test('edit topic properties after creation', async ({ page }) => {
+  await navigateToKafkaTopicsList(page, testInstanceName);
+  await createKafkaTopic(page, testTopicName);
+
+  const instanceLinkSelector = page.getByText(testTopicName);
+  const row = page.locator('tr', { has: instanceLinkSelector });
+
+  await row.locator('[aria-label="Actions"]').click();
+  await page.getByText('Edit topic configuration').click();
+
+  // store previous num partitions value to compare afterwards
+  const numPartitionsBefore: string = await page.locator('input[name="num-partitions"]').getAttribute('value');
+
+  for (let i = 0; i < 2; i++) {
+    await page.locator('button[name="num-partitions"]').nth(1).click();
+  }
+  await page.locator('button[name="num-partitions"]').first().click();
+
+  for (let i = 0; i < 2; i++) {
+    await page.locator('button[name="retention-ms"]').nth(1).click();
+  }
+  await page.locator('button[name="retention-ms"]').first().click();
+
+  await page.locator('button:has-text("days")').click();
+  await page.getByText('hours').click();
+  await page.locator('label:has-text("hours") input[type="number"]').click();
+
+  await page.locator('label:has-text("bytes") input[type="number"]').click();
+  for (let i = 0; i < 2; i++) {
+    await page.locator('button[name="retention-bytes"]').nth(1).click();
+  }
+  await page.locator('button[name="retention-bytes"]').first().click();
+
+  await page.getByLabel('bytes').check();
+  await page.locator('button:has-text("bytes")').click();
+  await page.getByText('kibibytes').click();
+
+  await expect(page.locator('button:has-text("Delete")')).toHaveCount(1);
+  await page.locator('button:has-text("Delete")').click();
+  await page.getByText('Compact').first().click();
+  await page.locator('button:has-text("Compact")').click();
+
+  await page.getByTestId('tabProperties-actionSave').click();
+
+  await expect(page.locator('h1:has-text("' + testTopicName + '")')).toHaveCount(1);
+
+  await page.getByTestId('pageTopic-tabProperties').click();
+
+  // HERE WE BEGIN THE COMPARISON
+  await expect(page.getByLabel('Partitions').getAttribute('value')).not.toBe(numPartitionsBefore);
+
+  const rt = await page
+    .locator(
+      'section[role="group"]:has-text("Core configurationBefore deploying your topic, we recommend entering all core co")'
+    )
+    .getByLabel('Retention time')
+    .getAttribute('value');
+  await expect(rt).toMatch('28800000 ms (8 hours)');
+
+  const rs = await page.getByLabel('Retention size').getAttribute('value');
+  await expect(rs).toMatch('2048 bytes (2 kibibytes)');
+
+  const cp = await page.getByLabel('Cleanup policy').getAttribute('value');
+  await expect(cp).not.toMatch('Delete');
+
+  // CLEANUP
+  await page.getByTestId('tabProperties-actionDelete').click();
+  await page.getByLabel('Type DELETE to confirm:').fill('DELETE');
+  await page.getByTestId('modalDeleteTopic-buttonDelete').click();
+});
