@@ -43,6 +43,8 @@ Now you can run the tests:
 npm install # Install all the needed Node dependencies
 npx playwright install # Install all the Playwright dependencies and needed browsers
 npx playwright test --project chromium # Executes the tests on a selected browser (`chromium` in this case)
+npm test-chrome # package.json has prepared scripts so you don't need to call whole npx command
+npm test-firefox
 ```
 
 if you need to debug you can use the Playwright console and have a Playwright helper available in console by executing:
