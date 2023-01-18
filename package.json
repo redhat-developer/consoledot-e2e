@@ -6,7 +6,10 @@
   "scripts": {
     "prettier-format": "prettier --config .prettierrc 'tests/**/*.ts' 'lib/**/*.ts' --write",
     "prettier-check": "prettier --config .prettierrc 'tests/**/*.ts' 'lib/**/*.ts' --check",
-    "test": "npx playwright test"
+    "test": "npx playwright test",
+    "test-chrome": "npx playwright test --project chromium",
+    "test-firefox": "npx playwright test --project firefox",
+    "test-webkit": "npx playwright test --project webkit"
   },
   "keywords": [],
   "author": "",
