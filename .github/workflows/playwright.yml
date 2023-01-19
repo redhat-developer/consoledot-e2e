@@ -53,6 +53,8 @@ jobs:
         TEST_PASSWORD: ${{ secrets.RH_PASSWORD }}
         TEST_ADMIN_USERNAME: ${{ secrets.RH_USERNAME }}
         TEST_ADMIN_PASSWORD: ${{ secrets.RH_PASSWORD }}
+        TEST_2_USERNAME: ${{ secrets.RH_USERNAME_2 }}
+        TEST_2_PASSWORD: ${{ secrets.RH_PASSWORD_2 }}
       run: npx playwright test --project chromium
     - uses: actions/upload-artifact@v3
       if: always()
