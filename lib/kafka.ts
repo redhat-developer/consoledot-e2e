@@ -176,6 +176,51 @@ export const grantConsumerAccess = async function (page: Page, saId: string, top
   await page.getByRole('button').filter({ hasText: 'Save' }).click();
 };
 
+export const grantManageAccess = async function (page: Page, saId: string) {
+  await page.getByTestId('actionManagePermissions').click();
+  await page.getByRole('button', { name: 'Options menu' }).click();
+  await page.getByRole('option').filter({ hasText: saId }).click();
+  await page.getByRole('button', { name: 'Next' }).click();
+  await page.getByTestId('permissions-dropdown-toggle').click();
+
+  await page
+    .getByRole('menuitem', {
+      name: 'Manage access Provides access to add and remove permissions on this Kafka instance'
+    })
+    .click();
+
+  await page.getByRole('button').filter({ hasText: 'Save' }).click();
+};
+
+export const findAccessRow = async function (page: Page, account: string, permission: string, resource: string) {
+  return page
+    .locator('tr')
+    .filter({ has: page.getByText(account) })
+    .filter({ has: page.getByText(permission) })
+    .filter({ has: page.getByText(resource) });
+};
+
+export const revokeAccess = async function (
+  page: Page,
+  account: string,
+  permission: string,
+  resource: string,
+  awaitDeletion: boolean
+) {
+  const row = await findAccessRow(page, account, permission, resource);
+  if ((await row.count()) == 1) {
+    // GetByRole sometimes works, sometimes it does not.
+    // await row.getByRole('button', { name: 'Actions' }).click();
+    await row.locator('button').click();
+    await page.locator('button', { hasText: 'Delete' }).click();
+
+    // await for the permission to be revoked
+    if (awaitDeletion) {
+      await expect(row).toHaveCount(0);
+    }
+  }
+};
+
 export const navigateToAccess = async function (page: Page, kafkaName: string) {
   await navigateToKafkaList(page);
   await expect(page.getByText(kafkaName)).toHaveCount(1);
