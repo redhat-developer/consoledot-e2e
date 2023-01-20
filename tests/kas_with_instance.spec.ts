@@ -189,54 +189,57 @@ test('edit topic properties after creation', async ({ page }) => {
   await navigateToKafkaTopicsList(page, testInstanceName);
   await createKafkaTopic(page, testTopicName);
 
-  const instanceLinkSelector = page.getByText(testTopicName);
-  const row = page.locator('tr', { has: instanceLinkSelector });
-
+  const row = page.locator('tr', { hasText: testTopicName });
   await row.locator('[aria-label="Actions"]').click();
   await page.getByText('Edit topic configuration').click();
 
-  // store previous num partitions value to compare afterwards
   const numPartitionsBefore: string = await page.locator('input[name="num-partitions"]').getAttribute('value');
-
+  const numPartitionsButton = page.locator('button[name="num-partitions"]');
   for (let i = 0; i < 2; i++) {
-    await page.locator('button[name="num-partitions"]').nth(1).click();
+    await numPartitionsButton.nth(1).click();
   }
-  await page.locator('button[name="num-partitions"]').first().click();
+  await numPartitionsButton.nth(0).click();
+  await expect(page.locator('input[name="num-partitions"]')).not.toHaveValue(numPartitionsBefore);
 
+  // Retention Time
+  const retentionTimeButton = page.locator('button[name="retention-ms"]');
+  const retentionTimeBefore = await page.locator('label:has-text("days") input[type="number"]').getAttribute('value');
   for (let i = 0; i < 2; i++) {
-    await page.locator('button[name="retention-ms"]').nth(1).click();
+    await retentionTimeButton.nth(1).click();
   }
-  await page.locator('button[name="retention-ms"]').first().click();
+  await retentionTimeButton.nth(0).click();
+  await expect(page.locator('label:has-text("days") input[type="number"]')).not.toHaveValue(retentionTimeBefore);
 
   await page.locator('button:has-text("days")').click();
-  await page.getByText('hours').click();
-  await page.locator('label:has-text("hours") input[type="number"]').click();
+  await page.locator('button', { hasText: 'hours' }).click();
 
-  await page.locator('label:has-text("bytes") input[type="number"]').click();
+  // Retention Size
+  const retentionSizeButton = page.locator('button[name="retention-bytes"]');
+  const retentionSizeBefore = await page.locator('label:has-text("bytes") input[type="number"]').getAttribute('value');
   for (let i = 0; i < 2; i++) {
-    await page.locator('button[name="retention-bytes"]').nth(1).click();
+    await retentionSizeButton.nth(1).click();
   }
-  await page.locator('button[name="retention-bytes"]').first().click();
+  await retentionSizeButton.nth(0).click();
+  await expect(page.locator('label:has-text("bytes") input[type="number"]')).not.toHaveValue(retentionSizeBefore);
 
-  await page.getByLabel('bytes').check();
   await page.locator('button:has-text("bytes")').click();
-  await page.getByText('kibibytes').click();
+  await page.locator('button', { hasText: 'kibibytes' }).click();
 
+  // CleanUp Policy
   await expect(page.locator('button:has-text("Delete")')).toHaveCount(1);
   await page.locator('button:has-text("Delete")').click();
   await page.getByText('Compact').first().click();
   await page.locator('button:has-text("Compact")').click();
 
-  await page.getByTestId('tabProperties-actionSave').click();
+  await page.locator('button', { hasText: 'Save' }).click();
 
   await expect(page.getByText('Increase the number of partitions?')).toHaveCount(1);
   await page.getByRole('button', { name: 'Yes' }).click();
 
+  // Here we begin the comparison
   await expect(page.locator('h1:has-text("' + testTopicName + '")')).toHaveCount(1);
+  await page.locator('button', { hasText: 'Properties' }).click();
 
-  await page.getByTestId('pageTopic-tabProperties').click();
-
-  // HERE WE BEGIN THE COMPARISON
   await expect(page.getByLabel('Partitions').getAttribute('value')).not.toBe(numPartitionsBefore);
 
   const rt = await page
@@ -253,8 +256,8 @@ test('edit topic properties after creation', async ({ page }) => {
   const cp = await page.getByLabel('Cleanup policy').getAttribute('value');
   await expect(cp).not.toMatch('Delete');
 
-  // CLEANUP
-  await page.getByTestId('tabProperties-actionDelete').click();
+  // Topic CleanUp
+  await page.locator('button', { hasText: 'Delete topic' }).click();
   await page.getByLabel('Type DELETE to confirm:').fill('DELETE');
-  await page.getByTestId('modalDeleteTopic-buttonDelete').click();
+  await page.locator('footer').locator('button', { hasText: 'Delete' }).click();
 });
