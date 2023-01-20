@@ -27,6 +27,6 @@ export default async function login(
 }
 
 export async function logout(page: Page) {
-  await page.getByRole('button', { name: /User Avatar/ }).click();
-  await page.getByRole('menuitem', { name: 'Log out' }).click();
+  await page.locator('#UserMenu').click();
+  await page.locator('button', { hasText: 'Log out' }).click();
 }
