@@ -193,7 +193,7 @@ test('edit topic properties after creation', async ({ page }) => {
   await row.locator('[aria-label="Actions"]').click();
   await page.getByText('Edit topic configuration').click();
 
-  await expect(page.locator('input[name="num-partitions"]')).toHaveValue('1', {timeout: 3000});
+  await expect(page.locator('input[name="num-partitions"]')).toHaveValue('1', { timeout: 3000 });
   const numPartitionsBefore: string = await page.locator('input[name="num-partitions"]').getAttribute('value');
   const numPartitionsButton = page.locator('button[name="num-partitions"]');
   for (let i = 0; i < 2; i++) {
