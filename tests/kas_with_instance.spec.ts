@@ -195,6 +195,7 @@ test('edit topic properties after creation', async ({ page }) => {
 
   await expect(page.locator('input[name="num-partitions"]')).toHaveValue('1', { timeout: 3000 });
   const numPartitionsBefore: string = await page.locator('input[name="num-partitions"]').getAttribute('value');
+  console.log('numPartitionsBefore: ' + numPartitionsBefore);
   const numPartitionsButton = page.locator('button[name="num-partitions"]');
   for (let i = 0; i < 2; i++) {
     await numPartitionsButton.nth(1).click();
@@ -243,9 +244,11 @@ test('edit topic properties after creation', async ({ page }) => {
 
   // Here we begin the comparison
   await expect(page.locator('h1:has-text("' + testTopicName + '")')).toHaveCount(1);
-  await page.locator('button', { hasText: 'Properties' }).click();
+  await page.getByTestId('pageTopic-tabProperties').click();
 
-  await expect(page.getByLabel('Partitions').getAttribute('value')).not.toBe(numPartitionsBefore);
+  const numPartitionsAfter: string = await page.getByLabel('Partitions').getAttribute('value');
+  console.log('numPartitionsAfter: ' + numPartitionsAfter);
+  await expect(numPartitionsAfter).not.toBe(numPartitionsBefore);
 
   const rt = await page
     .locator(
