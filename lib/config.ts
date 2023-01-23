@@ -3,6 +3,8 @@ import { v1 as uuid } from 'uuid';
 class Config {
   readonly username: string;
   readonly password: string;
+  readonly username_2: string;
+  readonly password_2: string;
   readonly adminUsername: string;
   readonly adminPassword: string;
   // Billing credentials
@@ -31,6 +33,8 @@ class Config {
     // Load credentials
     this.username = process.env.TEST_USERNAME;
     this.password = process.env.TEST_PASSWORD;
+    this.username_2 = process.env.TEST_2_USERNAME;
+    this.password_2 = process.env.TEST_2_PASSWORD;
     this.adminUsername = process.env.TEST_ADMIN_USERNAME;
     this.adminPassword = process.env.TEST_ADMIN_PASSWORD;
     this.stratosphere1username = process.env.STRATOSPHERE_SCENARIO_1_USER;
