@@ -29,7 +29,8 @@ export const createKafkaInstance = async function (
   page: Page,
   name: string,
   check = true,
-  billingOption = BillingOptions.PREPAID
+  billingOption = BillingOptions.PREPAID,
+  provider: string
 ) {
   await page.locator('button', { hasText: 'Create Kafka instance' }).click();
   await expect(page.getByText('Create a Kafka instance')).toHaveCount(1);
@@ -41,6 +42,13 @@ export const createKafkaInstance = async function (
   await page.getByLabel('Name *').click();
 
   await page.getByLabel('Name *').fill(name);
+
+  // Choose Cloud provider if different from AWS
+  try {
+    await page.locator('div:text-is("' + provider + '")').click({ timeout: 1000 });
+  } catch (err) {
+    // Billing option is not available so do nothing
+  }
 
   // Set billing options
   try {

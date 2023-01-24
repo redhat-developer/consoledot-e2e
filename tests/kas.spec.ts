@@ -119,3 +119,9 @@ test('test fail to create Kafka instance with the same name', async ({ page }) =
 
   await deleteKafkaInstance(page, testInstanceName);
 });
+
+test('create GCP Kafka instance', async ({ page }) => {
+  await createKafkaInstance(page, testInstanceName, false, null, 'Google Cloud Platform');
+  await waitForKafkaReady(page, testInstanceName);
+  await deleteKafkaInstance(page, testInstanceName);
+});
