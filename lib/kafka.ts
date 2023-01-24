@@ -30,7 +30,7 @@ export const createKafkaInstance = async function (
   name: string,
   check = true,
   billingOption = BillingOptions.PREPAID,
-  provider: string
+  provider
 ) {
   await page.locator('button', { hasText: 'Create Kafka instance' }).click();
   await expect(page.getByText('Create a Kafka instance')).toHaveCount(1);
