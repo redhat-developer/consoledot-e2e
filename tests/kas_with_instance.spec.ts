@@ -193,14 +193,16 @@ test('edit topic properties after creation', async ({ page }) => {
   await row.locator('[aria-label="Actions"]').click();
   await page.getByText('Edit topic configuration').click();
 
+  // we wait 3 seconds to fetch the data
   await expect(page.locator('input[name="num-partitions"]')).toHaveValue('1', { timeout: 3000 });
   const numPartitionsBefore: string = await page.locator('input[name="num-partitions"]').getAttribute('value');
-  console.log('numPartitionsBefore: ' + numPartitionsBefore);
+  console.log('Number of partitions by default: ' + numPartitionsBefore);
   const numPartitionsButton = page.locator('button[name="num-partitions"]');
   for (let i = 0; i < 2; i++) {
     await numPartitionsButton.nth(1).click();
   }
   await numPartitionsButton.nth(0).click();
+  // we check the value has been changed
   await expect(page.locator('input[name="num-partitions"]')).not.toHaveValue(numPartitionsBefore);
 
   // Retention Time
@@ -208,6 +210,7 @@ test('edit topic properties after creation', async ({ page }) => {
   page.locator('label:has-text("days") input[type="number"]').click();
   const retentionTimeBefore = await page.locator('label:has-text("days") input[type="number"]').getAttribute('value');
   const retentionTimeButton = page.locator('button[name="retention-ms"]');
+  // we increase by 2 and decrease by 1 to test + & - buttons
   for (let i = 0; i < 2; i++) {
     await retentionTimeButton.nth(1).click();
   }
@@ -222,6 +225,7 @@ test('edit topic properties after creation', async ({ page }) => {
   await page.locator('label:has-text("bytes") input[type="number"]').click();
   const retentionSizeBefore = await page.locator('label:has-text("bytes") input[type="number"]').getAttribute('value');
   const retentionSizeButton = page.locator('button[name="retention-bytes"]');
+  // we increase by 2 and decrease by 1 to test + & - buttons
   for (let i = 0; i < 2; i++) {
     await retentionSizeButton.nth(1).click();
   }
