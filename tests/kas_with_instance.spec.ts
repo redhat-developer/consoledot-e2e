@@ -183,3 +183,93 @@ test('create and delete a Kafka Topic', async ({ page }) => {
   await createKafkaTopic(page, testTopicName);
   await deleteKafkaTopic(page, testTopicName);
 });
+
+// test_4kafka.py test_edit_topic_properties_after_creation
+test('edit topic properties after creation', async ({ page }) => {
+  await navigateToKafkaTopicsList(page, testInstanceName);
+  await createKafkaTopic(page, testTopicName);
+
+  const row = page.locator('tr', { hasText: testTopicName });
+  await row.locator('[aria-label="Actions"]').click();
+  await page.getByText('Edit topic configuration').click();
+
+  // we wait 3 seconds to fetch the data
+  await expect(page.locator('input[name="num-partitions"]')).toHaveValue('1', { timeout: 3000 });
+  const numPartitionsBefore: string = await page.locator('input[name="num-partitions"]').getAttribute('value');
+  console.log('Number of partitions by default: ' + numPartitionsBefore);
+  const numPartitionsButton = page.locator('button[name="num-partitions"]');
+  for (let i = 0; i < 2; i++) {
+    await numPartitionsButton.nth(1).click();
+  }
+  await numPartitionsButton.nth(0).click();
+  // we check the value has been changed
+  await expect(page.locator('input[name="num-partitions"]')).not.toHaveValue(numPartitionsBefore);
+
+  // Retention Time
+  await expect(page.locator('label:has-text("days") input[type="number"]')).toHaveCount(1);
+  page.locator('label:has-text("days") input[type="number"]').click();
+  const retentionTimeBefore = await page.locator('label:has-text("days") input[type="number"]').getAttribute('value');
+  const retentionTimeButton = page.locator('button[name="retention-ms"]');
+  // we increase by 2 and decrease by 1 to test + & - buttons
+  for (let i = 0; i < 2; i++) {
+    await retentionTimeButton.nth(1).click();
+  }
+  await retentionTimeButton.nth(0).click();
+  await expect(page.locator('label:has-text("days") input[type="number"]')).not.toHaveValue(retentionTimeBefore);
+
+  await page.locator('button:has-text("days")').click();
+  await page.locator('button', { hasText: 'hours' }).click();
+
+  // Retention Size
+  await expect(page.locator('label:has-text("bytes") input[type="number"]')).toHaveCount(1);
+  await page.locator('label:has-text("bytes") input[type="number"]').click();
+  const retentionSizeBefore = await page.locator('label:has-text("bytes") input[type="number"]').getAttribute('value');
+  const retentionSizeButton = page.locator('button[name="retention-bytes"]');
+  // we increase by 2 and decrease by 1 to test + & - buttons
+  for (let i = 0; i < 2; i++) {
+    await retentionSizeButton.nth(1).click();
+  }
+  await retentionSizeButton.nth(0).click();
+  await expect(page.locator('label:has-text("bytes") input[type="number"]')).not.toHaveValue(retentionSizeBefore);
+
+  await page.locator('button:has-text("bytes")').click();
+  await page.locator('button', { hasText: 'kibibytes' }).click();
+
+  // CleanUp Policy
+  await expect(page.locator('button:has-text("Delete")')).toHaveCount(1);
+  await page.locator('button:has-text("Delete")').click();
+  await page.getByText('Compact').first().click();
+  await page.locator('button:has-text("Compact")').click();
+
+  await page.locator('button', { hasText: 'Save' }).click();
+
+  await expect(page.getByText('Increase the number of partitions?')).toHaveCount(1);
+  await page.getByRole('button', { name: 'Yes' }).click();
+
+  // Here we begin the comparison
+  await expect(page.locator('h1:has-text("' + testTopicName + '")')).toHaveCount(1);
+  await page.getByTestId('pageTopic-tabProperties').click();
+
+  const numPartitionsAfter: string = await page.getByLabel('Partitions').getAttribute('value');
+  console.log('numPartitionsAfter: ' + numPartitionsAfter);
+  await expect(numPartitionsAfter).not.toBe(numPartitionsBefore);
+
+  const rt = await page
+    .locator(
+      'section[role="group"]:has-text("Core configurationBefore deploying your topic, we recommend entering all core co")'
+    )
+    .getByLabel('Retention time')
+    .getAttribute('value');
+  await expect(rt).toMatch('28800000 ms (8 hours)');
+
+  const rs = await page.getByLabel('Retention size').getAttribute('value');
+  await expect(rs).toMatch('2048 bytes (2 kibibytes)');
+
+  const cp = await page.getByLabel('Cleanup policy').getAttribute('value');
+  await expect(cp).not.toMatch('Delete');
+
+  // Topic CleanUp
+  await page.locator('button', { hasText: 'Delete topic' }).click();
+  await page.getByLabel('Type DELETE to confirm:').fill('DELETE');
+  await page.locator('footer').locator('button', { hasText: 'Delete' }).click();
+});
