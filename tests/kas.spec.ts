@@ -2,6 +2,7 @@ import { test, expect } from '@playwright/test';
 import login from '@lib/auth';
 import { config } from '@lib/config';
 import { navigateToKafkaList, deleteKafkaInstance, createKafkaInstance, waitForKafkaReady } from '@lib/kafka';
+import { CloudProviders } from '@lib/cloudproviders';
 
 const testInstanceName = config.instanceName;
 
@@ -117,5 +118,10 @@ test('test fail to create Kafka instance with the same name', async ({ page }) =
 
   await page.locator('#modalCreateKafka > button').click();
 
+  await deleteKafkaInstance(page, testInstanceName);
+});
+
+test('create GCP Kafka instance', async ({ page }) => {
+  await createKafkaInstance(page, testInstanceName, false, null, CloudProviders.GCP);
   await deleteKafkaInstance(page, testInstanceName);
 });
