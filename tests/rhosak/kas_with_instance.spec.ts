@@ -177,11 +177,55 @@ test('test instance dashboard on instance name click', async ({ page }) => {
   await expect(page.getByTestId('pageKafka-tabDashboard')).toHaveCount(1);
 });
 
+// test_4kas.py test_kafka_dashboard_default
+test('test kafka dashboard default', async ({ page }) => {
+  await waitForKafkaReady(page, testInstanceName);
+  await page.locator('a', { hasText: `${testInstanceName}` }).click();
+  await expect(page.locator('h1', { hasText: `${testInstanceName}` })).toHaveCount(1);
+  await expect(page.locator('button').locator('span', { hasText: 'Dashboard' })).toHaveCount(1);
+  await expect(page.locator('h3', { hasText: 'Topics' })).toHaveCount(1);
+  await expect(page.locator('h3', { hasText: 'Topic partitions' })).toHaveCount(1);
+  await expect(page.locator('h3', { hasText: 'Consumer groups' })).toHaveCount(1);
+  await expect(page.locator('h3', { hasText: '0' })).toHaveCount(3);
+});
+
 // test_4kafka.py test_kafka_topic_create
 test('create and delete a Kafka Topic', async ({ page }) => {
   await navigateToKafkaTopicsList(page, testInstanceName);
   await createKafkaTopic(page, testTopicName);
   await deleteKafkaTopic(page, testTopicName);
+});
+
+// test_4kafka.py test_kafka_topics_opened
+test('test kafka topics opened', async ({ page }) => {
+  await waitForKafkaReady(page, testInstanceName);
+  await page.locator('a', { hasText: `${testInstanceName}` }).click();
+  await page.locator('button[aria-label="Topics"]').click();
+  await expect(page.locator('h2', { hasText: 'No topics' })).toBeVisible();
+  await expect(page.locator('button', { hasText: 'Create topic' })).toBeVisible();
+});
+
+// test_4kafka.py test_kafka_topic_check_does_not_exist
+test('test kafka topic check does not exist', async ({ page }) => {
+  await waitForKafkaReady(page, testInstanceName);
+  await page.locator('a', { hasText: `${testInstanceName}` }).click();
+  await expect(page.locator('h1', { hasText: `${testInstanceName}` })).toHaveCount(1);
+  await page.locator('button[aria-label="Topics"]').click();
+  // expecting not to find topic row
+  await expect(page.getByText(testTopicName)).not.toBeVisible();
+});
+
+// test_4kafka.py test_kafka_try_create_topic_with_same_name
+test('test kafka try create topic with same name', async ({ page }) => {
+  await waitForKafkaReady(page, testInstanceName);
+  await page.locator('a', { hasText: `${testInstanceName}` }).click();
+  await page.locator('button[aria-label="Topics"]').click();
+  await createKafkaTopic(page, testTopicName);
+  await expect(page.locator('tr', { hasText: `${testTopicName}` })).toHaveCount(1);
+  await page.locator('button', { hasText: 'Create topic' }).click();
+  await page.getByPlaceholder('Enter topic name').fill(testTopicName);
+  await page.locator('button', { hasText: 'Next' }).click();
+  await expect(page.getByText(`${testTopicName}` + ' already exists. Try a different name')).toBeVisible();
 });
 
 // test_4kafka.py test_edit_topic_properties_after_creation
