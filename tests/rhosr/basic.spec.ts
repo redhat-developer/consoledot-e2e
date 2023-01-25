@@ -12,7 +12,10 @@ test('perform login', async ({ page }) => {
     })
     .click();
   await page.getByRole('button', { name: 'Service Registry' }).click();
-  await page.getByRole('region', { name: 'Service Registry' }).getByRole('link', { name: 'Service Registry Instances' }).click();
+  await page
+    .getByRole('region', { name: 'Service Registry' })
+    .getByRole('link', { name: 'Service Registry Instances' })
+    .click();
 
   await expect(page).toHaveTitle(/Service Registry | Red Hat OpenShift Application Services/);
   await expect(page.getByRole('heading', { name: /Service Registry Instances/ })).toBeVisible();
