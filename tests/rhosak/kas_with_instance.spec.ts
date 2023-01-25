@@ -212,7 +212,7 @@ test('test kafka topic check does not exist', async ({ page }) => {
   await expect(page.locator('h1', { hasText: `${testInstanceName}` })).toHaveCount(1);
   await page.locator('button[aria-label="Topics"]').click();
   // expecting not to find topic row
-  await expect(page.getByText(testTopicName)).not.toBeVisible();
+  await expect(page.getByText(testTopicName)).toBeHidden();
 });
 
 // test_4kafka.py test_kafka_try_create_topic_with_same_name
