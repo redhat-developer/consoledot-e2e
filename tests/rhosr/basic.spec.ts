@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import login, { logout } from '@lib/auth';
+import login from '@lib/auth';
 
 test('perform login', async ({ page }) => {
   await login(page);
