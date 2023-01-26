@@ -5,3 +5,4 @@ node_modules/
 .env
 .*_env
 .DS_Store
+.idea
