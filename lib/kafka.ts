@@ -2,6 +2,7 @@ import { expect, Page } from '@playwright/test';
 import { config } from './config';
 import { closePopUp } from './popup';
 import { BillingOptions } from './billing';
+import { CloudProviders } from './cloudproviders';
 
 export const navigateToApplicationAndDataServices = async function (page: Page) {
   if (!(await page.locator('button', { hasText: 'Streams for Apache Kafka' }).isVisible())) {
@@ -30,7 +31,7 @@ export const createKafkaInstance = async function (
   name: string,
   check = true,
   billingOption = BillingOptions.PREPAID,
-  provider
+  provider = CloudProviders.AWS
 ) {
   await page.locator('button', { hasText: 'Create Kafka instance' }).click();
   await expect(page.getByText('Create a Kafka instance')).toHaveCount(1);
