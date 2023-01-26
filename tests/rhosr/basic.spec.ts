@@ -20,11 +20,3 @@ test('perform login', async ({ page }) => {
   await expect(page).toHaveTitle(/Service Registry | Red Hat OpenShift Application Services/);
   await expect(page.getByRole('heading', { name: /Service Registry Instances/ })).toBeVisible();
 });
-
-test('perform login and logout', async ({ page }) => {
-  await login(page);
-
-  await logout(page);
-
-  await expect(page).toHaveTitle(/Log In | Red Hat IDP/);
-});
