@@ -44,6 +44,10 @@ const config: PlaywrightTestConfig = {
     screenshot: 'on',
     /* ignore https certificate authority if STARTING_PAGE is defined */
     ignoreHTTPSErrors: process.env.STARTING_PAGE ? true : false,
+    launchOptions: {
+      /*Enable slow mode in ms between clicks etc... */
+      slowMo: parseInt(process.env.SLOW_MODE || '0'),
+    },
   },
 
   /* Configure projects for major browsers */
