@@ -58,6 +58,11 @@ if you need to debug you can use the Playwright console and have a Playwright he
 PWDEBUG=1 npx playwright test --project chromium --debug
 ```
 
+For enabling slow mode 1s for debugging use
+```bash
+SLOW_MODE=1000 playwright test
+```
+
 ### Setup
 
 This repository uses GitHub Actions as infrastructure to run the tests agains publicly accessible services.
