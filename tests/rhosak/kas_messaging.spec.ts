@@ -28,11 +28,11 @@ import {
   setLimit
 } from '@lib/messages';
 
-const testInstanceName = 'test-instance-messaging';
-const testTopicName = `test-topic-name`;
-const testServiceAccountName = 'test-messaging-sa';
+const testInstanceName = config.instanceName;
+const testTopicName = `test-topic-name-${config.sessionID}`;
+const testServiceAccountName = `test-messaging-sa-${config.sessionID}`;
 const testMessageKey = 'key';
-const consumerGroupId = 'test-consumer-group';
+const consumerGroupId = `test-consumer-group-${config.sessionID}`;
 const expectedMessageCount = 100;
 const reconnectCount = 5;
 const reconnectDelayMs = 500;
