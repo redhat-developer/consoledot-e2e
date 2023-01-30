@@ -37,6 +37,7 @@ test.beforeEach(async ({ page }) => {
 
     if ((await page.getByText(testInstanceName).count()) === 0) {
       await createKafkaInstance(page, testInstanceName);
+      await waitForKafkaReady(page, testInstanceName);
     }
   }
 });
@@ -53,7 +54,6 @@ test.afterAll(async ({ page }) => {
 
 // test_4kafka.py test_kafka_consumer_groups_empty
 test('test kafka consumer groups empty', async ({ page }) => {
-  await waitForKafkaReady(page, testInstanceName);
   await page.locator('a', { hasText: `${testInstanceName}` }).click();
   await navigateToConsumerGroups(page);
   await expect(page.locator('h2', { hasText: 'No consumer groups' })).toHaveCount(1);
@@ -62,7 +62,6 @@ test('test kafka consumer groups empty', async ({ page }) => {
 // CHEQUEADO
 // test_4kafka.py test_kafka_access_default
 test('test kafka access default', async ({ page }) => {
-  await waitForKafkaReady(page, testInstanceName);
   await page.locator('a', { hasText: `${testInstanceName}` }).click();
   await navigateToAccess(page, testInstanceName);
   await expect(page.locator('th', { hasText: 'Account' })).toHaveCount(1);
