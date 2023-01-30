@@ -168,19 +168,11 @@ test('test instance quick options', async ({ page }) => {
   await page.getByRole('button', { name: 'Cancel' }).click();
 });
 
-// test_4kas.py test_kafka_dashboard_opened
+// test_4kas.py test_kafka_dashboard_opened & test_kafka_dashboard_default
 test('test instance dashboard on instance name click', async ({ page }) => {
   await waitForKafkaReady(page, testInstanceName);
   await page.locator('a', { hasText: `${testInstanceName}` }).click();
 
-  await expect(page.locator('h1', { hasText: `${testInstanceName}` })).toHaveCount(1);
-  await expect(page.getByTestId('pageKafka-tabDashboard')).toHaveCount(1);
-});
-
-// test_4kas.py test_kafka_dashboard_default
-test('test kafka dashboard default', async ({ page }) => {
-  await waitForKafkaReady(page, testInstanceName);
-  await page.locator('a', { hasText: `${testInstanceName}` }).click();
   await expect(page.locator('h1', { hasText: `${testInstanceName}` })).toHaveCount(1);
   await expect(page.locator('button').locator('span', { hasText: 'Dashboard' })).toHaveCount(1);
   await expect(page.locator('h3', { hasText: 'Topics' })).toHaveCount(1);
