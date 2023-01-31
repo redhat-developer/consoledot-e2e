@@ -1,6 +1,5 @@
 import { test, expect } from '@playwright/test';
 import login from '@lib/auth';
-import { closePopUp } from '@lib/popup';
 import { config } from '@lib/config';
 import {
   navigateToKafkaList,
