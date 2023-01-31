@@ -11,8 +11,7 @@ import {
 import { navigateToKafkaTopicsList, createKafkaTopic, deleteKafkaTopic } from '@lib/topic';
 
 const testInstanceName = config.instanceName;
-const testTopicPrefix = 'test-topic-';
-const testTopicName = `${testTopicPrefix}${config.sessionID}`;
+const testTopicName = `test-topic-${config.sessionID}`;
 
 test.beforeEach(async ({ page }) => {
   await login(page);
@@ -39,6 +38,21 @@ test.beforeEach(async ({ page }) => {
 
     if ((await page.getByText(testInstanceName).count()) === 0) {
       await createKafkaInstance(page, testInstanceName);
+    }
+  }
+});
+
+test.afterEach(async ({ page }) => {
+  await navigateToKafkaList(page);
+  await navigateToKafkaTopicsList(page, testInstanceName);
+  await page.waitForSelector('[aria-label="Topic list table"]', {
+    state: 'attached',
+    timeout: config.generalTimeout
+  });
+  for (const el of await page.locator(`tr >> a`).elementHandles()) {
+    const name = await el.textContent();
+    if (name === testTopicName) {
+      await deleteKafkaTopic(page, testTopicName);
     }
   }
 });

@@ -28,6 +28,7 @@ class Config {
   readonly serviceAccountDeletionTimeout: number;
 
   readonly startingPageDefault = 'https://console.redhat.com';
+  readonly generalTimeout: number;
 
   constructor() {
     // Load credentials
@@ -60,6 +61,8 @@ class Config {
 
     this.serviceAccountCreationTimeout = 30 * 1000; // 30 seconds
     this.serviceAccountDeletionTimeout = 30 * 1000; // 30 seconds
+
+    this.generalTimeout = 10 * 1000; // 10 seconds
   }
 }
 
