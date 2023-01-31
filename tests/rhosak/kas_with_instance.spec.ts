@@ -45,8 +45,8 @@ test.beforeEach(async ({ page }) => {
 test.afterEach(async ({ page }) => {
   await navigateToKafkaList(page);
   await navigateToKafkaTopicsList(page, testInstanceName);
-  await page.waitForSelector('[aria-label="Topic list table"]', {
-    state: 'attached',
+  await page.waitForSelector('[role=progressbar]', {
+    state: 'detached',
     timeout: config.generalTimeout
   });
   for (const el of await page.locator(`tr >> a`).elementHandles()) {
@@ -195,9 +195,15 @@ test('test instance dashboard on instance name click', async ({ page }) => {
   await expect(page.locator('h3', { hasText: '0' })).toHaveCount(3);
 });
 
-// test_4kafka.py test_kafka_topic_create
-test('create and delete a Kafka Topic', async ({ page }) => {
-  await navigateToKafkaTopicsList(page, testInstanceName);
+// test_4kafka.py test_kafka_topic_check_does_not_exist & test_kafka_topic_create
+test('check Topic does not exist and create and delete', async ({ page }) => {
+  await waitForKafkaReady(page, testInstanceName);
+  await page.locator('a', { hasText: `${testInstanceName}` }).click();
+  await expect(page.locator('h1', { hasText: `${testInstanceName}` })).toHaveCount(1);
+  await page.locator('button[aria-label="Topics"]').click();
+  // expecting not to find topic row
+  await expect(page.getByText(testTopicName)).toBeHidden();
+
   await createKafkaTopic(page, testTopicName);
   await deleteKafkaTopic(page, testTopicName);
 });
@@ -209,16 +215,6 @@ test('test kafka topics opened', async ({ page }) => {
   await page.locator('button[aria-label="Topics"]').click();
   await expect(page.locator('h2', { hasText: 'No topics' })).toBeVisible();
   await expect(page.locator('button', { hasText: 'Create topic' })).toBeVisible();
-});
-
-// test_4kafka.py test_kafka_topic_check_does_not_exist
-test('test kafka topic check does not exist', async ({ page }) => {
-  await waitForKafkaReady(page, testInstanceName);
-  await page.locator('a', { hasText: `${testInstanceName}` }).click();
-  await expect(page.locator('h1', { hasText: `${testInstanceName}` })).toHaveCount(1);
-  await page.locator('button[aria-label="Topics"]').click();
-  // expecting not to find topic row
-  await expect(page.getByText(testTopicName)).toBeHidden();
 });
 
 // test_4kafka.py test_kafka_try_create_topic_with_same_name
