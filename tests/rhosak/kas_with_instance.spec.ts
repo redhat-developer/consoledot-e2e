@@ -6,7 +6,9 @@ import {
   deleteKafkaInstance,
   createKafkaInstance,
   waitForKafkaReady,
-  showElementActions
+  showElementActions,
+  navigateToAccess,
+  navigateToConsumerGroups
 } from '@lib/kafka';
 import { navigateToKafkaTopicsList, createKafkaTopic, deleteKafkaTopic } from '@lib/topic';
 
@@ -38,6 +40,7 @@ test.beforeEach(async ({ page }) => {
 
     if ((await page.getByText(testInstanceName).count()) === 0) {
       await createKafkaInstance(page, testInstanceName);
+      await waitForKafkaReady(page, testInstanceName);
     }
   }
 });
@@ -46,8 +49,7 @@ test.afterEach(async ({ page }) => {
   await navigateToKafkaList(page);
   await navigateToKafkaTopicsList(page, testInstanceName);
   await page.waitForSelector('[role=progressbar]', {
-    state: 'detached',
-    timeout: config.generalTimeout
+    state: 'detached'
   });
   for (const el of await page.locator(`tr >> a`).elementHandles()) {
     const name = await el.textContent();
@@ -58,8 +60,18 @@ test.afterEach(async ({ page }) => {
 });
 
 // test_3kas.py test_number_of_shown_kafka_instances
-test('test shown Kafka instances', async ({ page }) => {
+// & test_4kafka.py test_kafka_consumer_groups_empty & test_kafka_access_default
+test('test shown Kafka instances and check access and consumer groups default', async ({ page }) => {
   await expect(page.locator('tr')).toHaveCount(2); // title and 1 instance
+
+  await page.locator('a', { hasText: `${testInstanceName}` }).click();
+  await navigateToConsumerGroups(page);
+  await expect(page.locator('h2', { hasText: 'No consumer groups' })).toHaveCount(1);
+
+  await navigateToAccess(page, testInstanceName);
+  await expect(page.locator('th', { hasText: 'Account' })).toHaveCount(1);
+  await expect(page.locator('th', { hasText: 'Permission' })).toHaveCount(1);
+  await expect(page.locator('th', { hasText: 'Resource' })).toHaveCount(1);
 });
 
 // test_3kas.py test_try_to_create_second_kafka_instance
