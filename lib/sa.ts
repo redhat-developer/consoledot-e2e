@@ -28,7 +28,7 @@ export const createServiceAccount = async function (page: Page, name: string) {
 
   await page.locator('button:text-is("Create")').click();
 
-  await expect(page.getByText('Credentials successfully generated')).toHaveCount(1);
+  await expect(page.getByRole('heading', { name: 'Credentials successfully generated' })).toHaveCount(1);
 
   const clientID = await page.locator('[aria-label="Client ID"]').inputValue();
   const clientSecret = await page.locator('[aria-label="Client secret"]').inputValue();
