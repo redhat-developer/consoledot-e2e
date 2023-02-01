@@ -6,13 +6,14 @@ import {
   deleteKafkaInstance,
   createKafkaInstance,
   waitForKafkaReady,
-  showElementActions
+  showElementActions,
+  navigateToAccess,
+  navigateToConsumerGroups
 } from '@lib/kafka';
 import { navigateToKafkaTopicsList, createKafkaTopic, deleteKafkaTopic } from '@lib/topic';
 
 const testInstanceName = config.instanceName;
-const testTopicPrefix = 'test-topic-';
-const testTopicName = `${testTopicPrefix}${config.sessionID}`;
+const testTopicName = `test-topic-${config.sessionID}`;
 
 test.beforeEach(async ({ page }) => {
   await login(page);
@@ -39,13 +40,38 @@ test.beforeEach(async ({ page }) => {
 
     if ((await page.getByText(testInstanceName).count()) === 0) {
       await createKafkaInstance(page, testInstanceName);
+      await waitForKafkaReady(page, testInstanceName);
+    }
+  }
+});
+
+test.afterEach(async ({ page }) => {
+  await navigateToKafkaList(page);
+  await navigateToKafkaTopicsList(page, testInstanceName);
+  await page.waitForSelector('[role=progressbar]', {
+    state: 'detached'
+  });
+  for (const el of await page.locator(`tr >> a`).elementHandles()) {
+    const name = await el.textContent();
+    if (name === testTopicName) {
+      await deleteKafkaTopic(page, testTopicName);
     }
   }
 });
 
 // test_3kas.py test_number_of_shown_kafka_instances
-test('test shown Kafka instances', async ({ page }) => {
+// & test_4kafka.py test_kafka_consumer_groups_empty & test_kafka_access_default
+test('test shown Kafka instances and check access and consumer groups default', async ({ page }) => {
   await expect(page.locator('tr')).toHaveCount(2); // title and 1 instance
+
+  await page.locator('a', { hasText: `${testInstanceName}` }).click();
+  await navigateToConsumerGroups(page);
+  await expect(page.locator('h2', { hasText: 'No consumer groups' })).toHaveCount(1);
+
+  await navigateToAccess(page, testInstanceName);
+  await expect(page.locator('th', { hasText: 'Account' })).toHaveCount(1);
+  await expect(page.locator('th', { hasText: 'Permission' })).toHaveCount(1);
+  await expect(page.locator('th', { hasText: 'Resource' })).toHaveCount(1);
 });
 
 // test_3kas.py test_try_to_create_second_kafka_instance
@@ -168,20 +194,45 @@ test('test instance quick options', async ({ page }) => {
   await page.getByRole('button', { name: 'Cancel' }).click();
 });
 
-// test_4kas.py test_kafka_dashboard_opened
+// test_4kas.py test_kafka_dashboard_opened & test_kafka_dashboard_default
 test('test instance dashboard on instance name click', async ({ page }) => {
   await waitForKafkaReady(page, testInstanceName);
   await page.locator('a', { hasText: `${testInstanceName}` }).click();
 
   await expect(page.locator('h1', { hasText: `${testInstanceName}` })).toHaveCount(1);
-  await expect(page.getByTestId('pageKafka-tabDashboard')).toHaveCount(1);
+  await expect(page.locator('button').locator('span', { hasText: 'Dashboard' })).toHaveCount(1);
+  await expect(page.locator('h3', { hasText: 'Topics' })).toHaveCount(1);
+  await expect(page.locator('h3', { hasText: 'Topic partitions' })).toHaveCount(1);
+  await expect(page.locator('h3', { hasText: 'Consumer groups' })).toHaveCount(1);
+  await expect(page.locator('h3', { hasText: '0' })).toHaveCount(3);
 });
 
-// test_4kafka.py test_kafka_topic_create
-test('create and delete a Kafka Topic', async ({ page }) => {
-  await navigateToKafkaTopicsList(page, testInstanceName);
+// test_4kafka.py test_kafka_topic_check_does_not_exist & test_kafka_topics_opened & test_kafka_topic_create
+test('check Topic does not exist and create and delete', async ({ page }) => {
+  await waitForKafkaReady(page, testInstanceName);
+  await page.locator('a', { hasText: `${testInstanceName}` }).click();
+  await expect(page.locator('h1', { hasText: `${testInstanceName}` })).toHaveCount(1);
+  await page.locator('button[aria-label="Topics"]').click();
+  await expect(page.locator('h2', { hasText: 'No topics' })).toBeVisible();
+  await expect(page.locator('button', { hasText: 'Create topic' })).toBeVisible();
+  // expecting not to find topic row
+  await expect(page.locator('td', { hasText: `${testTopicName}` })).toHaveCount(0);
+
   await createKafkaTopic(page, testTopicName);
   await deleteKafkaTopic(page, testTopicName);
+});
+
+// test_4kafka.py test_kafka_try_create_topic_with_same_name
+test('test kafka try create topic with same name', async ({ page }) => {
+  await waitForKafkaReady(page, testInstanceName);
+  await page.locator('a', { hasText: `${testInstanceName}` }).click();
+  await page.locator('button[aria-label="Topics"]').click();
+  await createKafkaTopic(page, testTopicName);
+  await expect(page.locator('tr', { hasText: `${testTopicName}` })).toHaveCount(1);
+  await page.locator('button', { hasText: 'Create topic' }).click();
+  await page.getByPlaceholder('Enter topic name').fill(testTopicName);
+  await page.locator('button', { hasText: 'Next' }).click();
+  await expect(page.getByText(`${testTopicName}` + ' already exists. Try a different name')).toBeVisible();
 });
 
 // test_4kafka.py test_edit_topic_properties_after_creation
