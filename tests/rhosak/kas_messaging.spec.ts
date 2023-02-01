@@ -96,19 +96,24 @@ test.beforeEach(async ({ page }) => {
   expect(producerResponse === true).toBeTruthy();
 });
 
+test.afterEach(async ({ page }) => {
+  console.log('ENTRANDO EN EL AFTEREACH');
+  await navigateToSAList(page);
+  console.log('LLEGAMOS A SA LIST');
+  try {
+    console.log("testServiceAccountName" + testServiceAccountName);
+    await deleteServiceAccount(page, testServiceAccountName);
+    console.log('PROCEDEMOS A BORRAR SA');
+  } catch (error) {
+    //Ignore exception
+  }
+});
+
 test.afterAll(async ({ page }) => {
   await navigateToKafkaList(page);
 
   try {
     await deleteKafkaInstance(page, testInstanceName);
-  } catch (error) {
-    //Ignore exception
-  }
-
-  await navigateToSAList(page);
-
-  try {
-    await deleteServiceAccount(page, testServiceAccountName);
   } catch (error) {
     //Ignore exception
   }

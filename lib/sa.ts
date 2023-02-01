@@ -49,7 +49,7 @@ export const createServiceAccount = async function (page: Page, name: string) {
 };
 
 export const deleteServiceAccount = async function (page: Page, name: string) {
-  const saLinkSelector = page.getByText(name, { exact: true });
+  const saLinkSelector = page.getByText(name);
 
   let count = await saLinkSelector.count();
   while (count > 0) {
