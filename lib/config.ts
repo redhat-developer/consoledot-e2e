@@ -20,6 +20,8 @@ class Config {
 
   readonly kafkaInstanceCreationTimeout: number;
   readonly kafkaInstanceDeletionTimeout: number;
+  readonly serviceRegistryInstanceCreationTimeout: number;
+  readonly serviceRegistryInstanceDeletionTimeout: number;
 
   readonly minKafkaStreamingUnits: number;
   readonly maxKafkaStreamingUnits: number;
@@ -54,6 +56,8 @@ class Config {
     // Timeouts
     this.kafkaInstanceCreationTimeout = 20 * 60 * 1000; // 20 minutes
     this.kafkaInstanceDeletionTimeout = 10 * 60 * 1000; // 10 minutes
+    this.serviceRegistryInstanceCreationTimeout = 1 * 60 * 1000; // 1 minute
+    this.serviceRegistryInstanceDeletionTimeout = 1 * 60 * 1000; // 1 minute
 
     this.minKafkaStreamingUnits = 1;
     this.maxKafkaStreamingUnits = 2;
