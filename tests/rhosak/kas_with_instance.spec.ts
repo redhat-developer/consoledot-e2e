@@ -216,7 +216,7 @@ test('check Topic does not exist and create and delete', async ({ page }) => {
   await expect(page.locator('h2', { hasText: 'No topics' })).toBeVisible();
   await expect(page.locator('button', { hasText: 'Create topic' })).toBeVisible();
   // expecting not to find topic row
-  await expect(await page.locator('td', {hasText: `${testTopicName}`})).toHaveCount(0);
+  await expect(page.locator('td', { hasText: `${testTopicName}` })).toHaveCount(0);
 
   await createKafkaTopic(page, testTopicName);
   await deleteKafkaTopic(page, testTopicName);
