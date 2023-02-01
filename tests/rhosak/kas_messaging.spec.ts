@@ -101,7 +101,7 @@ test.afterEach(async ({ page }) => {
   await navigateToSAList(page);
   console.log('LLEGAMOS A SA LIST');
   try {
-    console.log("testServiceAccountName" + testServiceAccountName);
+    console.log('testServiceAccountName' + testServiceAccountName);
     await deleteServiceAccount(page, testServiceAccountName);
     console.log('PROCEDEMOS A BORRAR SA');
   } catch (error) {
