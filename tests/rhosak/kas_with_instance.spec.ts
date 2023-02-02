@@ -91,8 +91,8 @@ const filterByName = async function (page, name, skipClick = false) {
 
   await page.locator('button[role="option"]:has-text("Name")').click();
 
-  await page.getByRole('searchbox', { name: 'Filter by name' }).click();
-  await page.getByRole('searchbox', { name: 'Filter by name' }).fill(name);
+  await page.getByTestId('large-viewport-toolbar').getByPlaceholder('Filter by name').click();
+  await page.getByTestId('large-viewport-toolbar').getByPlaceholder('Filter by name').fill(name);
 
   if (!skipClick) {
     await page.getByRole('button', { name: 'Search' }).click();
@@ -121,8 +121,8 @@ const filterByOwner = async function (page, name, skipClick = false) {
 
   await page.locator('button[role="option"]:has-text("Owner")').click();
 
-  await page.getByRole('searchbox', { name: 'Filter by owner' }).click();
-  await page.getByRole('searchbox', { name: 'Filter by owner' }).fill(name);
+  await page.getByTestId('large-viewport-toolbar').getByPlaceholder('Filter by owner').click();
+  await page.getByTestId('large-viewport-toolbar').getByPlaceholder('Filter by owner').fill(name);
 
   if (!skipClick) {
     await page.getByRole('button', { name: 'Search' }).click();
@@ -146,14 +146,14 @@ test('test instances can be filtered by owner', async ({ page }) => {
 // test_3kas.py test_kas_kafka_filter_by_region
 // TODO: region can only be ordered, not filtered ???
 test('test instances can be filtered by region', async ({ page }) => {
-  await page.getByRole('button', { name: 'Region' }).click();
+  await page.locator('button', { hasText: 'Region' }).click();
   await expect(page.getByText(testInstanceName)).toBeTruthy();
 });
 
 // test_3kas.py test_kas_kafka_filter_by_cloud_provider
 // TODO: cloud provider can only be ordered, not filtered ???
 test('test instances can be filtered by cloud provider', async ({ page }) => {
-  await page.getByRole('button', { name: 'Cloud provider' }).click();
+  await page.locator('button', { hasText: 'Cloud provider' }).click();
   await expect(page.getByText(testInstanceName)).toBeTruthy();
 });
 
@@ -178,6 +178,7 @@ test('test instance details on menu click', async ({ page }) => {
 // test_3kas.py test_kas_kafka_view_details_by_connection_menu_click_panel_opened
 // ... and more ...
 test('test instance quick options', async ({ page }) => {
+  await waitForKafkaReady(page, testInstanceName);
   await showElementActions(page, testInstanceName);
   await page.locator('button', { hasText: 'Connection' }).click();
 
