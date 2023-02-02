@@ -49,27 +49,17 @@ export const createServiceAccount = async function (page: Page, name: string) {
 };
 
 export const deleteServiceAccount = async function (page: Page, name: string) {
-  const saLinkSelector = page.getByText(name);
+  const saLinkSelector = page.locator('td', { hasText: name });
 
-  let count = await saLinkSelector.count();
-  while (count > 0) {
-    const row = page.locator('tr', { has: saLinkSelector.nth(0) });
+  const row = page.locator('tr', { has: saLinkSelector.nth(0) });
 
-    await row.locator('[aria-label="Actions"]').nth(0).click();
+  await row.locator('[aria-label="Actions"]').nth(0).click();
 
-    await expect(page.getByText('Delete service account')).toBeEnabled();
-    await page.locator('button', { hasText: 'Delete service account' }).click();
+  await expect(page.getByText('Delete service account')).toBeEnabled();
+  await page.locator('button', { hasText: 'Delete service account' }).click();
+  await page.locator('button', { hasText: 'Delete' }).click();
 
-    // #confirm__button
-    await page.locator('button', { hasText: 'Delete' }).click();
-
-    await expect(saLinkSelector).toHaveCount(count - 1);
-
-    count--;
-  }
-
-  // await for all the accounts with the same name to be deleted
-  await expect(page.getByText(`${name}`, { exact: true })).toHaveCount(0, {
+  await expect(page.locator('td', { hasText: name })).toHaveCount(0, {
     timeout: config.serviceAccountDeletionTimeout
   });
 };
