@@ -99,7 +99,6 @@ test.beforeEach(async ({ page }) => {
 test.afterEach(async ({ page }) => {
   await navigateToSAList(page);
   try {
-    console.log('testServiceAccountName' + testServiceAccountName);
     await deleteServiceAccount(page, testServiceAccountName);
   } catch (error) {
     //Ignore exception
