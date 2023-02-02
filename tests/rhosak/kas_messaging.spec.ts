@@ -77,9 +77,6 @@ test.beforeEach(async ({ page }) => {
 
   await navigateToSAList(page);
   await expect(page.getByText('Create service account')).toHaveCount(1);
-  if ((await page.locator('tr', { hasText: testServiceAccountName }).count()) !== 0) {
-    await deleteServiceAccount(page, testServiceAccountName);
-  }
   credentials = await createServiceAccount(page, testServiceAccountName);
   bootstrap = await getBootstrapUrl(page, testInstanceName);
 
