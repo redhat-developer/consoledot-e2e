@@ -97,13 +97,10 @@ test.beforeEach(async ({ page }) => {
 });
 
 test.afterEach(async ({ page }) => {
-  console.log('ENTRANDO EN EL AFTEREACH');
   await navigateToSAList(page);
-  console.log('LLEGAMOS A SA LIST');
   try {
     console.log('testServiceAccountName' + testServiceAccountName);
     await deleteServiceAccount(page, testServiceAccountName);
-    console.log('PROCEDEMOS A BORRAR SA');
   } catch (error) {
     //Ignore exception
   }
