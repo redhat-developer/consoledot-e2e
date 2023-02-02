@@ -15,27 +15,22 @@ test.beforeEach(async ({ page }) => {
     state: 'detached',
     timeout: config.serviceAccountCreationTimeout
   });
-
-  await deleteServiceAccount(page, testServiceAccountPrefix);
 });
 
-test.afterAll(async ({ page }) => {
+test.afterEach(async ({ page }) => {
   await deleteServiceAccount(page, testServiceAccountName);
 });
 
 // test_5sa.py test_sa_create
 test('test service account creation', async ({ page }) => {
   await createServiceAccount(page, testServiceAccountName);
-  await deleteServiceAccount(page, testServiceAccountName);
 });
 
-// test_5sa.py test_sa_create
+// test_5sa.py test_sa_reset
 test('test service account credentials reset', async ({ page }) => {
   const credentials = await createServiceAccount(page, testServiceAccountName);
   const credentials_reset = await resetServiceAccount(page, testServiceAccountName);
 
   await expect(credentials.clientID).toBe(credentials_reset.clientID);
   await expect(credentials.clientSecret).not.toBe(credentials_reset.clientSecret);
-
-  await deleteServiceAccount(page, testServiceAccountName);
 });
