@@ -1,30 +1,8 @@
 import { expect, Page } from '@playwright/test';
 import { config } from './config';
-import { closePopUp } from './popup';
 import { BillingOptions } from './billing';
 import { CloudProviders } from './cloudproviders';
-
-export const navigateToApplicationAndDataServices = async function (page: Page) {
-  if (!(await page.locator('button', { hasText: 'Streams for Apache Kafka' }).isVisible())) {
-    await page.getByRole('link', { name: 'Application and Data Services' }).click();
-  }
-};
-
-export const navigateToStreamsForApachaeKafka = async function (page: Page) {
-  if (!(await page.locator('[data-testid=router-link]', { hasText: 'Kafka Instances' }).isVisible())) {
-    await page.locator('button', { hasText: 'Streams for Apache Kafka' }).click();
-  }
-};
-
-export const navigateToKafkaList = async function (page: Page) {
-  await navigateToApplicationAndDataServices(page);
-  await navigateToStreamsForApachaeKafka(page);
-
-  await closePopUp(page);
-
-  await page.locator('[data-testid=router-link]', { hasText: 'Kafka Instances' }).click();
-  await expect(await page.locator('h1', { hasText: 'Kafka Instances' })).toHaveCount(1);
-};
+import { navigateToKafkaList } from './navigation';
 
 export const createKafkaInstance = async function (
   page: Page,
