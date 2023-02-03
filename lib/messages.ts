@@ -53,5 +53,5 @@ export const filterMessagesByOffset = async function (page: Page, partition: str
 };
 
 export const applyFilter = async function (page: Page) {
-  await page.locator('button[aria-label="Search"]').click();
+  await page.locator('.pf-c-toolbar__item > .pf-c-button').first().click();
 };
