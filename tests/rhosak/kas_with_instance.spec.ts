@@ -2,7 +2,6 @@ import { test, expect } from '@playwright/test';
 import login from '@lib/auth';
 import { config } from '@lib/config';
 import {
-  navigateToKafkaList,
   deleteKafkaInstance,
   createKafkaInstance,
   waitForKafkaReady,
@@ -11,6 +10,7 @@ import {
   navigateToConsumerGroups
 } from '@lib/kafka';
 import { navigateToKafkaTopicsList, createKafkaTopic, deleteKafkaTopic } from '@lib/topic';
+import { navigateToKafkaList } from '@lib/navigation';
 
 const testInstanceName = config.instanceName;
 const testTopicName = `test-topic-${config.sessionID}`;

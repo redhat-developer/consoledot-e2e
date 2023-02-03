@@ -1,8 +1,9 @@
 import login from '@lib/auth';
 import { BillingOptions } from '@lib/billing';
 import { config } from '@lib/config';
-import { createKafkaInstance, deleteKafkaInstance, navigateToKafkaList, showKafkaDetails } from '@lib/kafka';
+import { createKafkaInstance, deleteKafkaInstance, showKafkaDetails } from '@lib/kafka';
 import test, { Page, expect } from '@playwright/test';
+import { navigateToKafkaList } from '@lib/navigation';
 
 const testInstanceName = 'mk-ui-playwright-tests';
 let currentUsername = config.stratosphere1username;

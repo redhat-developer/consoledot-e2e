@@ -1,8 +1,9 @@
 import { test, expect } from '@playwright/test';
 import login from '@lib/auth';
 import { config } from '@lib/config';
-import { navigateToKafkaList, deleteKafkaInstance, createKafkaInstance, waitForKafkaReady } from '@lib/kafka';
+import { deleteKafkaInstance, createKafkaInstance, waitForKafkaReady } from '@lib/kafka';
 import { CloudProviders } from '@lib/cloudproviders';
+import { navigateToKafkaList } from '@lib/navigation';
 
 const testInstanceName = config.instanceName;
 

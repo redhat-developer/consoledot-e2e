@@ -2,7 +2,6 @@ import { test, expect } from '@playwright/test';
 import login, { logout } from '@lib/auth';
 import { config } from '@lib/config';
 import {
-  navigateToKafkaList,
   deleteKafkaInstance,
   createKafkaInstance,
   navigateToAccess,
@@ -11,6 +10,7 @@ import {
   revokeAccess,
   waitForKafkaReady
 } from '@lib/kafka';
+import { navigateToKafkaList } from '@lib/navigation';
 
 const testInstanceName = config.instanceName;
 
