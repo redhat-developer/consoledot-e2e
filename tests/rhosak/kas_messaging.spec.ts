@@ -148,6 +148,8 @@ test('Browse messages', async ({ page }) => {
 const filters = [FilterGroup.offset, FilterGroup.timestamp, FilterGroup.epoch, FilterGroup.latest];
 for (const filter of filters) {
   test(`Filter messages by ${filter}`, async ({ page }) => {
+    // Skip FilterBy tests meanwhile there is reported Bug https://issues.redhat.com/browse/MGDSTRM-10574
+    test.skip();
     // Today and tomorrow date
     const today = new Date();
     const tomorrow = new Date();
