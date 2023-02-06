@@ -72,7 +72,7 @@ test.beforeEach(async ({ page }) => {
   await expect(page.getByText('Create topic')).toHaveCount(1);
   await expect(page.getByText('Loading content')).toHaveCount(0);
   if ((await page.locator('a', { hasText: testTopicName }).count()) === 0) {
-    await createKafkaTopic(page, testTopicName);
+    await createKafkaTopic(page, testTopicName, true);
   }
 
   await navigateToSAList(page);

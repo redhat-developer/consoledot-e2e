@@ -9,7 +9,7 @@ import {
   navigateToAccess,
   navigateToConsumerGroups
 } from '@lib/kafka';
-import { navigateToKafkaTopicsList, createKafkaTopic, deleteKafkaTopic } from '@lib/topic';
+import { navigateToKafkaTopicsList, createKafkaTopic, deleteKafkaTopic, navigateToProperties } from '@lib/topic';
 import { navigateToKafkaList } from '@lib/navigation';
 
 const testInstanceName = config.instanceName;
@@ -178,7 +178,6 @@ test('test instance details on menu click', async ({ page }) => {
 // test_3kas.py test_kas_kafka_view_details_by_connection_menu_click_panel_opened
 // ... and more ...
 test('test instance quick options', async ({ page }) => {
-  await waitForKafkaReady(page, testInstanceName);
   await showElementActions(page, testInstanceName);
   await page.locator('button', { hasText: 'Connection' }).click();
 
@@ -197,7 +196,6 @@ test('test instance quick options', async ({ page }) => {
 
 // test_4kas.py test_kafka_dashboard_opened & test_kafka_dashboard_default
 test('test instance dashboard on instance name click', async ({ page }) => {
-  await waitForKafkaReady(page, testInstanceName);
   await page.locator('a', { hasText: `${testInstanceName}` }).click();
 
   await expect(page.locator('h1', { hasText: `${testInstanceName}` })).toHaveCount(1);
@@ -210,7 +208,6 @@ test('test instance dashboard on instance name click', async ({ page }) => {
 
 // test_4kafka.py test_kafka_topic_check_does_not_exist & test_kafka_topics_opened & test_kafka_topic_create
 test('check Topic does not exist and create and delete', async ({ page }) => {
-  await waitForKafkaReady(page, testInstanceName);
   await page.locator('a', { hasText: `${testInstanceName}` }).click();
   await expect(page.locator('h1', { hasText: `${testInstanceName}` })).toHaveCount(1);
   await page.locator('button[aria-label="Topics"]').click();
@@ -219,16 +216,15 @@ test('check Topic does not exist and create and delete', async ({ page }) => {
   // expecting not to find topic row
   await expect(page.locator('td', { hasText: `${testTopicName}` })).toHaveCount(0);
 
-  await createKafkaTopic(page, testTopicName);
+  await createKafkaTopic(page, testTopicName, true);
   await deleteKafkaTopic(page, testTopicName);
 });
 
 // test_4kafka.py test_kafka_try_create_topic_with_same_name
 test('test kafka try create topic with same name', async ({ page }) => {
-  await waitForKafkaReady(page, testInstanceName);
   await page.locator('a', { hasText: `${testInstanceName}` }).click();
   await page.locator('button[aria-label="Topics"]').click();
-  await createKafkaTopic(page, testTopicName);
+  await createKafkaTopic(page, testTopicName, true);
   await expect(page.locator('tr', { hasText: `${testTopicName}` })).toHaveCount(1);
   await page.locator('button', { hasText: 'Create topic' }).click();
   await page.getByPlaceholder('Enter topic name').fill(testTopicName);
@@ -236,10 +232,39 @@ test('test kafka try create topic with same name', async ({ page }) => {
   await expect(page.getByText(`${testTopicName}` + ' already exists. Try a different name')).toBeVisible();
 });
 
+test('create Topic with properties different than default', async ({ page }) => {
+  await navigateToKafkaTopicsList(page, testInstanceName);
+  await createKafkaTopic(page, testTopicName, false);
+
+  // Checking phase
+  await navigateToProperties(page, testInstanceName, testTopicName);
+
+  await expect(await page.getByLabel('Partitions').getAttribute('value')).not.toBe(1);
+
+  const rt = await page
+    .locator(
+      'section[role="group"]:has-text("Core configurationBefore deploying your topic, we recommend entering all core co")'
+    )
+    .getByLabel('Retention time')
+    .getAttribute('value');
+  await expect(rt).not.toMatch('604800000 ms (7 days)');
+
+  const rs = await page.getByLabel('Retention size').getAttribute('value');
+  await expect(rs).not.toMatch('Unlimited');
+
+  const cp = await page.getByLabel('Cleanup policy').getAttribute('value');
+  await expect(cp).not.toMatch('delete');
+
+  // Topic CleanUp
+  await page.locator('button', { hasText: 'Delete topic' }).click();
+  await page.getByLabel('Type DELETE to confirm:').fill('DELETE');
+  await page.locator('footer').locator('button', { hasText: 'Delete' }).click();
+});
+
 // test_4kafka.py test_edit_topic_properties_after_creation
 test('edit topic properties after creation', async ({ page }) => {
   await navigateToKafkaTopicsList(page, testInstanceName);
-  await createKafkaTopic(page, testTopicName);
+  await createKafkaTopic(page, testTopicName, true);
 
   const row = page.locator('tr', { hasText: testTopicName });
   await row.locator('[aria-label="Actions"]').click();
@@ -299,8 +324,7 @@ test('edit topic properties after creation', async ({ page }) => {
   await page.getByRole('button', { name: 'Yes' }).click();
 
   // Here we begin the comparison
-  await expect(page.locator('h1:has-text("' + testTopicName + '")')).toHaveCount(1);
-  await page.getByTestId('pageTopic-tabProperties').click();
+  await navigateToProperties(page, testInstanceName, testTopicName);
 
   const numPartitionsAfter: string = await page.getByLabel('Partitions').getAttribute('value');
   console.log('numPartitionsAfter: ' + numPartitionsAfter);
