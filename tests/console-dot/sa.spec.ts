@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import login from '@lib/auth';
 import { config } from '@lib/config';
-import { navigateToSAList, createServiceAccount, deleteServiceAccount, resetServiceAccount } from '@lib/sa';
+import { navigateToSAList, createServiceAccount, deleteServiceAccount, resetServiceAccount, deleteAllServiceAccounts } from '@lib/sa';
 
 const testServiceAccountPrefix = 'test-service-account-';
 const testServiceAccountName = `${testServiceAccountPrefix}${config.sessionID}`;
@@ -18,6 +18,7 @@ test.beforeEach(async ({ page }) => {
 });
 
 test.afterEach(async ({ page }) => {
+  await deleteAllServiceAccounts(page);
   await deleteServiceAccount(page, testServiceAccountName);
 });
 

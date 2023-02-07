@@ -3,6 +3,7 @@ import { config } from './config';
 import { BillingOptions } from './billing';
 import { CloudProviders } from './cloudproviders';
 import { navigateToKafkaList } from './navigation';
+import { resourceStore } from './resource_store';
 
 export const createKafkaInstance = async function (
   page: Page,
@@ -14,6 +15,8 @@ export const createKafkaInstance = async function (
   await page.locator('button', { hasText: 'Create Kafka instance' }).click();
   await expect(page.getByText('Create a Kafka instance')).toHaveCount(1);
   await page.waitForSelector('[role=progressbar]', { state: 'detached' });
+
+  resourceStore.addKafka(name);
 
   // FIXME: workaround for https://github.com/redhat-developer/app-services-ui-components/issues/590
   // https://github.com/microsoft/playwright/issues/15734#issuecomment-1188245775
@@ -71,6 +74,7 @@ export const deleteKafkaInstance = async function (page: Page, name: string, awa
         timeout: config.kafkaInstanceDeletionTimeout
       });
     }
+    resourceStore.removeKafka(name);
   } catch (err) {
     // Do Nothing as instance is not connected to this acocunt
   }
@@ -229,4 +233,10 @@ export const showElementActions = async function (page: Page, instanceName: stri
 export const showKafkaDetails = async function (page: Page, instanceName: string) {
   await showElementActions(page, instanceName);
   await page.locator('button', { hasText: 'Details' }).click();
+};
+
+export const deleteAllKafkas = async function (page: Page) {
+  resourceStore.getKafkaList.forEach(((kafkaName) => {
+    console.log(kafkaName);
+  }));
 };
