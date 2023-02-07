@@ -1,4 +1,4 @@
-import { expect, Page } from '@playwright/test';
+import { test, expect, Page } from '@playwright/test';
 import { config } from './config';
 import { BillingOptions } from './billing';
 import { CloudProviders } from './cloudproviders';
@@ -18,6 +18,16 @@ export const createKafkaInstance = async function (
   // FIXME: workaround for https://github.com/redhat-developer/app-services-ui-components/issues/590
   // https://github.com/microsoft/playwright/issues/15734#issuecomment-1188245775
   await new Promise((resolve) => setTimeout(resolve, 500));
+
+  // Check whether we run out of quota
+  const outOfQuota: boolean = await page
+    .getByText('All regions in the selected cloud provider are temporarily unavailable. Select a')
+    .isVisible();
+  console.log('outOfQuota: ' + outOfQuota);
+  if (outOfQuota) {
+    console.log('OUT OF QUOTA: All regions in the selected cloud provider are temporarily unavailable. => SKIP TEST');
+    test.skip();
+  }
   await page.getByLabel('Name *').click();
 
   await page.getByLabel('Name *').fill(name);
