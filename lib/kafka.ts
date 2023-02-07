@@ -20,9 +20,9 @@ export const createKafkaInstance = async function (
   await new Promise((resolve) => setTimeout(resolve, 500));
 
   // Check whether we run out of quota
-  const outOfQuota: boolean = await page.getByText(
-    'All regions in the selected cloud provider are temporarily unavailable. Select a'
-  ).isVisible();
+  const outOfQuota: boolean = await page
+    .getByText('All regions in the selected cloud provider are temporarily unavailable. Select a')
+    .isVisible();
   console.log('outOfQuota: ' + outOfQuota);
   if (outOfQuota) {
     console.log('OUT OF QUOTA: All regions in the selected cloud provider are temporarily unavailable. => SKIP TEST');
