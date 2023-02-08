@@ -35,20 +35,20 @@ export class ResourceStore {
   }
 
   removeKafka(kafka: string) {
-    this.kafkaList = this.kafkaList.filter(function(element){ 
-      return element != kafka; 
+    this.kafkaList = this.kafkaList.filter(function (element) {
+      return element != kafka;
     });
   }
 
   removeServiceAccount(sa: string) {
-    this.serviceAccountList = this.serviceAccountList.filter(function(element){ 
-      return element != sa; 
+    this.serviceAccountList = this.serviceAccountList.filter(function (element) {
+      return element != sa;
     });
   }
 
   removeServiceRegistry(serviceRegistry: string) {
-    this.serviceRegistryList = this.serviceRegistryList.filter(function(element){ 
-      return element != serviceRegistry; 
+    this.serviceRegistryList = this.serviceRegistryList.filter(function (element) {
+      return element != serviceRegistry;
     });
   }
 
@@ -65,4 +65,4 @@ export class ResourceStore {
   }
 }
 
-export const resourceStore = new ResourceStore()
+export const resourceStore = new ResourceStore();

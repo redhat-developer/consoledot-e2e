@@ -102,5 +102,5 @@ export const deleteAllServiceAccounts = async function (page: Page) {
       //Ignore exception
     }
   }
-  resourceStore.clearServiceAccountList()
+  resourceStore.clearServiceAccountList();
 };

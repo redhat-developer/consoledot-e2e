@@ -245,5 +245,5 @@ export const deleteAllKafkas = async function (page: Page) {
       //Ignore exception
     }
   }
-  resourceStore.clearKafkaList()
+  resourceStore.clearKafkaList();
 };
