@@ -95,12 +95,12 @@ test.beforeEach(async ({ page }) => {
 });
 
 test.afterEach(async ({ page }) => {
-  deleteAllServiceAccounts(page);
+  await deleteAllServiceAccounts(page);
 });
 
 test.afterAll(async ({ page }) => {
-  deleteAllServiceAccounts(page);
-  deleteAllKafkas(page);
+  await deleteAllServiceAccounts(page);
+  await deleteAllKafkas(page);
 });
 
 // test_6messages.py generate_messages_to_topic
