@@ -9,11 +9,12 @@ import {
   navigateToConsumerGroups,
   grantProducerAccess,
   grantConsumerAccess,
-  waitForKafkaReady
+  waitForKafkaReady,
+  deleteAllKafkas
 } from '@lib/kafka';
 import { navigateToKafkaTopicsList, createKafkaTopic, navigateToMessages, refreshMessages } from '@lib/topic';
 import { KafkaConsumer, KafkaProducer } from '@lib/clients';
-import { createServiceAccount, deleteServiceAccount, navigateToSAList } from '@lib/sa';
+import { createServiceAccount, deleteAllServiceAccounts, deleteServiceAccount, navigateToSAList } from '@lib/sa';
 import { retry } from '@lib/common';
 import {
   Limit,
@@ -93,23 +94,9 @@ test.beforeEach(async ({ page }) => {
   expect(producerResponse === true).toBeTruthy();
 });
 
-test.afterEach(async ({ page }) => {
-  await navigateToSAList(page);
-  try {
-    await deleteServiceAccount(page, testServiceAccountName);
-  } catch (error) {
-    //Ignore exception
-  }
-});
-
 test.afterAll(async ({ page }) => {
-  await navigateToKafkaList(page);
-
-  try {
-    await deleteKafkaInstance(page, testInstanceName);
-  } catch (error) {
-    //Ignore exception
-  }
+  deleteAllServiceAccounts(page);
+  deleteAllKafkas(page);
 });
 
 // test_6messages.py generate_messages_to_topic

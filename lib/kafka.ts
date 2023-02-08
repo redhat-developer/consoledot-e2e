@@ -236,7 +236,14 @@ export const showKafkaDetails = async function (page: Page, instanceName: string
 };
 
 export const deleteAllKafkas = async function (page: Page) {
-  resourceStore.getKafkaList.forEach(((kafkaName) => {
-    console.log(kafkaName);
-  }));
+  const kafkaList = resourceStore.getKafkaList;
+  await navigateToKafkaList(page);
+  for (const kafkaName of kafkaList) {
+    try {
+      await deleteKafkaInstance(page, kafkaName);
+    } catch (error) {
+      //Ignore exception
+    }
+  }
+  resourceStore.clearKafkaList()
 };

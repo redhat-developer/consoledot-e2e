@@ -93,7 +93,14 @@ export const resetServiceAccount = async function (page: Page, name: string) {
 };
 
 export const deleteAllServiceAccounts = async function (page: Page) {
-  resourceStore.getSeviceAccountList.forEach(((saName) => {
-    console.log(saName);
-  }));
+  const saList = resourceStore.getSeviceAccountList;
+  await navigateToSAList(page);
+  for (const saName of saList) {
+    try {
+      await deleteServiceAccount(page, saName);
+    } catch (error) {
+      //Ignore exception
+    }
+  }
+  resourceStore.clearServiceAccountList()
 };
