@@ -94,6 +94,10 @@ test.beforeEach(async ({ page }) => {
   expect(producerResponse === true).toBeTruthy();
 });
 
+test.afterEach(async ({ page }) => {
+  deleteAllServiceAccounts(page);
+});
+
 test.afterAll(async ({ page }) => {
   deleteAllServiceAccounts(page);
   deleteAllKafkas(page);
