@@ -1,9 +1,10 @@
 import { test, expect } from '@playwright/test';
 import login from '@lib/auth';
 import { config } from '@lib/config';
-import { deleteKafkaInstance, createKafkaInstance, waitForKafkaReady } from '@lib/kafka';
+import { deleteKafkaInstance, createKafkaInstance, waitForKafkaReady, deleteAllKafkas } from '@lib/kafka';
 import { CloudProviders } from '@lib/cloudproviders';
 import { navigateToKafkaList } from '@lib/navigation';
+import { deleteAllServiceAccounts } from '@lib/sa';
 
 const testInstanceName = config.instanceName;
 
@@ -18,6 +19,11 @@ test.beforeEach(async ({ page }) => {
     const name = await el.textContent();
     await deleteKafkaInstance(page, name);
   }
+});
+
+test.afterAll(async ({ page }) => {
+  await deleteAllServiceAccounts(page);
+  await deleteAllKafkas(page);
 });
 
 // test_3kas.py test_kas_kafka_check_does_not_exist

@@ -2,6 +2,7 @@ import { expect, Page } from '@playwright/test';
 import { config } from './config';
 import { closePopUp } from './popup';
 import { showElementActions } from './kafka';
+import { resourceStore } from './resource_store';
 
 export const navigateToSAList = async function (page: Page) {
   try {
@@ -45,6 +46,8 @@ export const createServiceAccount = async function (page: Page, name: string) {
   const table = await page.locator('[aria-label="Service account list"]');
   await expect(table.getByText(name)).toHaveCount(1);
 
+  resourceStore.addServiceAccount(name);
+
   return { clientID: clientID, clientSecret: clientSecret };
 };
 
@@ -62,6 +65,8 @@ export const deleteServiceAccount = async function (page: Page, name: string) {
   await expect(page.locator('td', { hasText: name })).toHaveCount(0, {
     timeout: config.serviceAccountDeletionTimeout
   });
+
+  resourceStore.removeServiceAccount(name);
 };
 
 export const resetServiceAccount = async function (page: Page, name: string) {
@@ -85,4 +90,17 @@ export const resetServiceAccount = async function (page: Page, name: string) {
   await page.locator('button', { hasText: 'Close' }).click();
 
   return { clientID: clientID, clientSecret: clientSecret };
+};
+
+export const deleteAllServiceAccounts = async function (page: Page) {
+  const saList = resourceStore.getSeviceAccountList;
+  await navigateToSAList(page);
+  for (const saName of saList) {
+    try {
+      await deleteServiceAccount(page, saName);
+    } catch (error) {
+      //Ignore exception
+    }
+  }
+  resourceStore.clearServiceAccountList();
 };

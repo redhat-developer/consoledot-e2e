@@ -7,10 +7,12 @@ import {
   waitForKafkaReady,
   showElementActions,
   navigateToAccess,
-  navigateToConsumerGroups
+  navigateToConsumerGroups,
+  deleteAllKafkas
 } from '@lib/kafka';
 import { navigateToKafkaTopicsList, createKafkaTopic, deleteKafkaTopic, navigateToProperties } from '@lib/topic';
 import { navigateToKafkaList } from '@lib/navigation';
+import { deleteAllServiceAccounts } from '@lib/sa';
 
 const testInstanceName = config.instanceName;
 const testTopicName = `test-topic-${config.sessionID}`;
@@ -57,6 +59,11 @@ test.afterEach(async ({ page }) => {
       await deleteKafkaTopic(page, testTopicName);
     }
   }
+});
+
+test.afterAll(async ({ page }) => {
+  await deleteAllServiceAccounts(page);
+  await deleteAllKafkas(page);
 });
 
 // test_3kas.py test_number_of_shown_kafka_instances
