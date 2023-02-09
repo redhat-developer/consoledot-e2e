@@ -65,6 +65,7 @@ test.beforeEach(async ({ page }) => {
 
     if ((await page.getByText(testInstanceName).count()) === 0) {
       await createKafkaInstance(page, testInstanceName);
+      await waitForKafkaReady(page, testInstanceName);
     }
   }
 
@@ -218,7 +219,6 @@ test('create consumer group and check dashboard', async ({ page }) => {
   const row = page.locator('tr', { has: instanceLinkSelector });
 
   await navigateToKafkaList(page);
-  await waitForKafkaReady(page, testInstanceName);
   await row.locator('[aria-label="Actions"]').click();
   await page.getByText('Connection').click();
 
