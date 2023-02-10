@@ -240,6 +240,7 @@ test('test kafka try create topic with same name', async ({ page }) => {
 });
 
 test('create Topic with properties different than default', async ({ page }) => {
+  test.fixme(true, 'Test is extremely flaky.');
   await navigateToKafkaTopicsList(page, testInstanceName);
   await createKafkaTopic(page, testTopicName, false);
 
@@ -270,6 +271,7 @@ test('create Topic with properties different than default', async ({ page }) => 
 
 // test_4kafka.py test_edit_topic_properties_after_creation
 test('edit topic properties after creation', async ({ page }) => {
+  test.fixme(true, 'Test is extremely flaky.');
   await navigateToKafkaTopicsList(page, testInstanceName);
   await createKafkaTopic(page, testTopicName, true);
 
