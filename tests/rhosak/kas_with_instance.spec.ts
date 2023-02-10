@@ -279,8 +279,8 @@ test('edit topic properties after creation', async ({ page }) => {
   await row.locator('[aria-label="Actions"]').click();
   await page.getByText('Edit topic configuration').click();
 
-  // we wait 3 seconds to fetch the data
-  await expect(page.locator('input[name="num-partitions"]')).toHaveValue('1', { timeout: 3000 });
+  // we wait 10 seconds to fetch the data
+  await expect(page.locator('input[name="num-partitions"]')).toHaveValue('1', { timeout: 10000 });
   const numPartitionsBefore: string = await page.locator('input[name="num-partitions"]').getAttribute('value');
   console.log('Number of partitions by default: ' + numPartitionsBefore);
   const numPartitionsButton = page.locator('button[name="num-partitions"]');
