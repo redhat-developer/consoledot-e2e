@@ -12,8 +12,8 @@ test.beforeEach(async ({ page }) => {
   await navigateToSAList(page);
 
   await page.waitForSelector('[role=progressbar]', {
-    state: 'detached',
-    timeout: config.serviceAccountCreationTimeout
+    state: 'detached'/* ,
+    timeout: config.serviceAccountCreationTimeout */
   });
 });
 

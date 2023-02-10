@@ -51,8 +51,8 @@ test.beforeEach(async ({ page }) => {
     // Test instance present, nothing to do!
   } else {
     await page.waitForSelector('[role=progressbar]', {
-      state: 'detached',
-      timeout: config.kafkaInstanceCreationTimeout
+      state: 'detached'/* ,
+      timeout: config.kafkaInstanceCreationTimeout */
     });
 
     for (const el of await page.locator(`tr >> a`).elementHandles()) {
