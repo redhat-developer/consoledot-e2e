@@ -28,7 +28,7 @@ test.beforeEach(async ({ page }) => {
     // Test instance present, nothing to do!
   } else {
     await page.waitForSelector('[role=progressbar]', {
-      state: 'detached'/* ,
+      state: 'detached' /* ,
       timeout: config.kafkaInstanceCreationTimeout */
     });
 
@@ -278,7 +278,7 @@ test('edit topic properties after creation', async ({ page }) => {
   await page.getByText('Edit topic configuration').click();
 
   // we wait 3 seconds to fetch the data
-  await expect(page.locator('input[name="num-partitions"]')).toHaveValue('1'/* , { timeout: 3000 } */);
+  await expect(page.locator('input[name="num-partitions"]')).toHaveValue('1' /* , { timeout: 3000 } */);
   const numPartitionsBefore: string = await page.locator('input[name="num-partitions"]').getAttribute('value');
   console.log('Number of partitions by default: ' + numPartitionsBefore);
   const numPartitionsButton = page.locator('button[name="num-partitions"]');

@@ -62,9 +62,11 @@ export const deleteServiceAccount = async function (page: Page, name: string) {
   await page.locator('button', { hasText: 'Delete service account' }).click();
   await page.locator('button', { hasText: 'Delete' }).click();
 
-  await expect(page.locator('td', { hasText: name })).toHaveCount(0/* , {
+  await expect(page.locator('td', { hasText: name })).toHaveCount(
+    0 /* , {
     timeout: config.serviceAccountDeletionTimeout
-  } */);
+  } */
+  );
 
   resourceStore.removeServiceAccount(name);
 };

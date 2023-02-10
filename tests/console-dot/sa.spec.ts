@@ -12,7 +12,7 @@ test.beforeEach(async ({ page }) => {
   await navigateToSAList(page);
 
   await page.waitForSelector('[role=progressbar]', {
-    state: 'detached'/* ,
+    state: 'detached' /* ,
     timeout: config.serviceAccountCreationTimeout */
   });
 });

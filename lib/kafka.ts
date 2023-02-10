@@ -20,7 +20,7 @@ export const createKafkaInstance = async function (
 
   // FIXME: workaround for https://github.com/redhat-developer/app-services-ui-components/issues/590
   // https://github.com/microsoft/playwright/issues/15734#issuecomment-1188245775
-  await new Promise((resolve) => setTimeout(resolve/* , 500 */));
+  await new Promise((resolve) => setTimeout(resolve /* , 500 */));
   await page.getByLabel('Name *').click();
 
   await page.getByLabel('Name *').fill(name);
@@ -54,11 +54,11 @@ export const deleteKafkaInstance = async function (page: Page, name: string, awa
     await showElementActions(page, name);
     await page.locator('button', { hasText: 'Delete instance' }).click();
     try {
-      await expect(page.locator('input[name="mas-name-input"]')).toHaveCount(1/* , { timeout: 5000 } */);
+      await expect(page.locator('input[name="mas-name-input"]')).toHaveCount(1 /* , { timeout: 5000 } */);
 
       // FIXME: workaround for https://github.com/redhat-developer/app-services-ui-components/issues/590
       // https://github.com/microsoft/playwright/issues/15734#issuecomment-1188245775
-      await new Promise((resolve) => setTimeout(resolve/* , 500 */));
+      await new Promise((resolve) => setTimeout(resolve /* , 500 */));
       await page.locator('input[name="mas-name-input"]').click();
 
       await page.locator('input[name="mas-name-input"]').fill(name);
@@ -70,9 +70,11 @@ export const deleteKafkaInstance = async function (page: Page, name: string, awa
     await page.locator('button', { hasText: 'Delete' }).click();
     // await for the instance to be deleted
     if (awaitDeletion) {
-      await expect(page.getByText(`${name}`, { exact: true })).toHaveCount(0/* , {
+      await expect(page.getByText(`${name}`, { exact: true })).toHaveCount(
+        0 /* , {
         timeout: config.kafkaInstanceDeletionTimeout
-      } */);
+      } */
+      );
     }
     resourceStore.removeKafka(name);
   } catch (err) {
@@ -82,13 +84,17 @@ export const deleteKafkaInstance = async function (page: Page, name: string, awa
 
 export const waitForKafkaReady = async function (page: Page, name: string) {
   // no loading in progress
-  await page.waitForSelector('[role=progressbar]', { state: 'detached'/* , timeout: config.kafkaInstanceCreationTimeout */} );
+  await page.waitForSelector('[role=progressbar]', {
+    state: 'detached' /* , timeout: config.kafkaInstanceCreationTimeout */
+  });
 
   const instanceLinkSelector = page.getByText(name);
   const row = page.locator('tr', { has: instanceLinkSelector });
-  await expect(row.getByText('Ready', { exact: true })).toHaveCount(1/* , {
+  await expect(row.getByText('Ready', { exact: true })).toHaveCount(
+    1 /* , {
     timeout: config.kafkaInstanceCreationTimeout
-  } */);
+  } */
+  );
 };
 
 export const getBootstrapUrl = async function (page: Page, name: string) {

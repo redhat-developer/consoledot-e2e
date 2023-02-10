@@ -13,7 +13,9 @@ test.beforeEach(async ({ page }) => {
 
   await navigateToKafkaList(page);
 
-  await page.waitForSelector('[role=progressbar]', { state: 'detached'/* , timeout: config.kafkaInstanceCreationTimeout */ });
+  await page.waitForSelector('[role=progressbar]', {
+    state: 'detached' /* , timeout: config.kafkaInstanceCreationTimeout */
+  });
   await page.waitForSelector('button:has-text("Create Kafka Instance")');
   for (const el of await page.locator(`tr >> a`).elementHandles()) {
     const name = await el.textContent();
@@ -101,9 +103,11 @@ test('test Kafka list filtered by status', async ({ page }) => {
   await expect(page.getByText(testInstanceName)).toBeTruthy();
 
   // await for the kafka instance to be deleted
-  await expect(page.getByText(`${testInstanceName}`, { exact: true })).toHaveCount(0/* , {
+  await expect(page.getByText(`${testInstanceName}`, { exact: true })).toHaveCount(
+    0 /* , {
     timeout: config.kafkaInstanceDeletionTimeout
-  } */);
+  } */
+  );
 });
 
 // test_3kas.py test_try_to_create_kafka_instance_with_same_name
