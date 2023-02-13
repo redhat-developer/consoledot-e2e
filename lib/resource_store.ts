@@ -19,7 +19,7 @@ export class ResourceStore {
   }
 
   get getServiceRegistryList(): string[] {
-    return this.getServiceRegistryList;
+    return this.serviceRegistryList;
   }
 
   addKafka(kafka: string) {
