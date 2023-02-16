@@ -83,7 +83,7 @@ export const navigateToMessages = async function (page: Page, kafkaName: string,
 export const navigateToProperties = async function (page: Page, kafkaName: string, topicName: string) {
   await navigateToKafkaList(page);
   await navigateToKafkaTopicsList(page, kafkaName);
-  await expect( page.locator('a', { hasText: `${topicName}` })).toHaveCount(1);
+  await expect(page.locator('a', { hasText: `${topicName}` })).toHaveCount(1);
   await page.locator('a', { hasText: `${topicName}` }).click();
   await expect(page.locator('h1:has-text("' + `${topicName}` + '")')).toHaveCount(1);
   await page.getByTestId('pageTopic-tabProperties').click();

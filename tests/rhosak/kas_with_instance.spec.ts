@@ -329,7 +329,7 @@ test('edit topic properties after creation', async ({ page }) => {
   await page.getByRole('button', { name: 'Yes' }).click();
 
   await expect(page.getByRole('heading', { name: 'No consumer groups' })).toHaveCount(1);
-  
+
   // Here we begin the comparison
   await navigateToProperties(page, testInstanceName, testTopicName);
 
