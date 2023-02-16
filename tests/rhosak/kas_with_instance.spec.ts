@@ -22,8 +22,6 @@ test.beforeEach(async ({ page }) => {
 
   await navigateToKafkaList(page);
 
-  await expect(page.getByRole('button', { name: 'Create Kafka instance' })).toBeVisible();
-
   if ((await page.getByText(testInstanceName).count()) > 0 && (await page.locator('tr').count()) === 2) {
     // Test instance present, nothing to do!
   } else {
@@ -109,7 +107,7 @@ const filterByName = async function (page, name, skipClick = false) {
 // test_3kas.py test_kas_kafka_filter_by_name
 test('test instances can be filtered by name', async ({ page }) => {
   await filterByName(page, 'test');
-  await expect(page.getByText(testInstanceName)).toBeTruthy();
+  expect(page.getByText(testInstanceName)).toBeTruthy();
 
   await filterByName(page, 'wrong');
   await expect(page.getByText('No results found')).toHaveCount(1);
@@ -139,7 +137,7 @@ const filterByOwner = async function (page, name, skipClick = false) {
 // test_3kas.py test_kas_kafka_filter_by_owner
 test('test instances can be filtered by owner', async ({ page }) => {
   await filterByOwner(page, config.adminUsername.substring(0, 5));
-  await expect(page.getByText(testInstanceName)).toBeTruthy();
+  expect(page.getByText(testInstanceName)).toBeTruthy();
 
   await filterByOwner(page, 'wrong');
   await expect(page.getByText('No results found')).toHaveCount(1);
@@ -154,14 +152,14 @@ test('test instances can be filtered by owner', async ({ page }) => {
 // TODO: region can only be ordered, not filtered ???
 test('test instances can be filtered by region', async ({ page }) => {
   await page.locator('button', { hasText: 'Region' }).click();
-  await expect(page.getByText(testInstanceName)).toBeTruthy();
+  expect(page.getByText(testInstanceName)).toBeTruthy();
 });
 
 // test_3kas.py test_kas_kafka_filter_by_cloud_provider
 // TODO: cloud provider can only be ordered, not filtered ???
 test('test instances can be filtered by cloud provider', async ({ page }) => {
   await page.locator('button', { hasText: 'Cloud provider' }).click();
-  await expect(page.getByText(testInstanceName)).toBeTruthy();
+  expect(page.getByText(testInstanceName)).toBeTruthy();
 });
 
 // test_3kas.py test_kas_kafka_view_details_by_row_click_panel_opened
@@ -240,14 +238,13 @@ test('test kafka try create topic with same name', async ({ page }) => {
 });
 
 test('create Topic with properties different than default', async ({ page }) => {
-  test.fixme(true, 'Test is extremely flaky.');
   await navigateToKafkaTopicsList(page, testInstanceName);
   await createKafkaTopic(page, testTopicName, false);
 
   // Checking phase
   await navigateToProperties(page, testInstanceName, testTopicName);
 
-  await expect(await page.getByLabel('Partitions').getAttribute('value')).not.toBe(1);
+  expect(await page.getByLabel('Partitions').getAttribute('value')).not.toBe(1);
 
   const rt = await page
     .locator(
@@ -255,13 +252,13 @@ test('create Topic with properties different than default', async ({ page }) => 
     )
     .getByLabel('Retention time')
     .getAttribute('value');
-  await expect(rt).not.toMatch('604800000 ms (7 days)');
+  expect(rt).not.toMatch('604800000 ms (7 days)');
 
   const rs = await page.getByLabel('Retention size').getAttribute('value');
-  await expect(rs).not.toMatch('Unlimited');
+  expect(rs).not.toMatch('Unlimited');
 
   const cp = await page.getByLabel('Cleanup policy').getAttribute('value');
-  await expect(cp).not.toMatch('delete');
+  expect(cp).not.toMatch('delete');
 
   // Topic CleanUp
   await page.locator('button', { hasText: 'Delete topic' }).click();
@@ -271,7 +268,6 @@ test('create Topic with properties different than default', async ({ page }) => 
 
 // test_4kafka.py test_edit_topic_properties_after_creation
 test('edit topic properties after creation', async ({ page }) => {
-  test.fixme(true, 'Test is extremely flaky.');
   await navigateToKafkaTopicsList(page, testInstanceName);
   await createKafkaTopic(page, testTopicName, true);
 
@@ -332,12 +328,14 @@ test('edit topic properties after creation', async ({ page }) => {
   await expect(page.getByText('Increase the number of partitions?')).toHaveCount(1);
   await page.getByRole('button', { name: 'Yes' }).click();
 
+  await expect(page.getByRole('heading', { name: 'No consumer groups' })).toHaveCount(1);
+  
   // Here we begin the comparison
   await navigateToProperties(page, testInstanceName, testTopicName);
 
   const numPartitionsAfter: string = await page.getByLabel('Partitions').getAttribute('value');
   console.log('numPartitionsAfter: ' + numPartitionsAfter);
-  await expect(numPartitionsAfter).not.toBe(numPartitionsBefore);
+  expect(numPartitionsAfter).not.toBe(numPartitionsBefore);
 
   const rt = await page
     .locator(
@@ -345,13 +343,13 @@ test('edit topic properties after creation', async ({ page }) => {
     )
     .getByLabel('Retention time')
     .getAttribute('value');
-  await expect(rt).toMatch('28800000 ms (8 hours)');
+  expect(rt).toMatch('28800000 ms (8 hours)');
 
   const rs = await page.getByLabel('Retention size').getAttribute('value');
-  await expect(rs).toMatch('2048 bytes (2 kibibytes)');
+  expect(rs).toMatch('2048 bytes (2 kibibytes)');
 
   const cp = await page.getByLabel('Cleanup policy').getAttribute('value');
-  await expect(cp).not.toMatch('Delete');
+  expect(cp).not.toMatch('Delete');
 
   // Topic CleanUp
   await page.locator('button', { hasText: 'Delete topic' }).click();

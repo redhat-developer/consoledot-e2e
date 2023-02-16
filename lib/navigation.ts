@@ -30,12 +30,13 @@ export const navigateToProductList = async function (page: Page, product: string
   // Open link to list of tested product instances
   await page.locator('[data-testid=router-link]', { hasText: productList }).click();
   // Check that page with list of tested product instances is opened
-  await expect(await page.locator('h1', { hasText: productList })).toHaveCount(1);
+  await expect(page.locator('h1', { hasText: productList })).toHaveCount(1);
 };
 
 // Navigates to list of Streams for Apache Kafka instances
 export const navigateToKafkaList = async function (page: Page) {
   await navigateToProductList(page, 'Streams for Apache Kafka', 'Kafka Instances');
+  await expect(page.getByRole('button', { name: 'Create Kafka instance' })).toBeVisible();
 };
 
 // Navigates to list of Service Registry instances
