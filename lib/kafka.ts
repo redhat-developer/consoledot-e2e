@@ -4,6 +4,7 @@ import { BillingOptions } from './billing';
 import { CloudProviders } from './cloudproviders';
 import { navigateToKafkaList } from './navigation';
 import { resourceStore } from './resource_store';
+import { closePopUp } from './popup';
 
 export const createKafkaInstance = async function (
   page: Page,
@@ -214,6 +215,8 @@ export const revokeAccess = async function (
 
 export const navigateToAccess = async function (page: Page, kafkaName: string) {
   await navigateToKafkaList(page);
+  // Close pop-up notifications if present
+  await closePopUp(page);
   await expect(page.getByText(kafkaName)).toHaveCount(1);
   await page.getByText(kafkaName).click();
   await page.getByTestId('pageKafka-tabPermissions').click();
