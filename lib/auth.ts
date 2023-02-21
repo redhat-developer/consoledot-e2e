@@ -1,5 +1,4 @@
 import { expect, Page } from '@playwright/test';
-import blockAnalyticsDomains from './blocker';
 import { config } from './config';
 
 export default async function login(
@@ -7,7 +6,10 @@ export default async function login(
   username: string = config.adminUsername,
   password: string = config.adminPassword
 ) {
-  await blockAnalyticsDomains(page);
+  // Disable analytics
+  await page.addInitScript(() => {
+    window.localStorage.setItem('chrome:analytics:disable', String(true));
+  });
 
   // Go to starting Page
   await page.goto(config.startingPage);
