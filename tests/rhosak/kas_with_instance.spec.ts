@@ -240,14 +240,13 @@ test('test kafka try create topic with same name', async ({ page }) => {
 });
 
 test('create Topic with properties different than default', async ({ page }) => {
-  test.fixme(true, 'Test is extremely flaky.');
   await navigateToKafkaTopicsList(page, testInstanceName);
   await createKafkaTopic(page, testTopicName, false);
 
   // Checking phase
   await navigateToProperties(page, testInstanceName, testTopicName);
 
-  await expect(await page.getByLabel('Partitions').getAttribute('value')).not.toBe(1);
+  await expect(page.getByLabel('Partitions').getAttribute('value')).not.toBe(1);
 
   const rt = await page
     .locator(
@@ -255,13 +254,13 @@ test('create Topic with properties different than default', async ({ page }) => 
     )
     .getByLabel('Retention time')
     .getAttribute('value');
-  await expect(rt).not.toMatch('604800000 ms (7 days)');
+  expect(rt).not.toMatch('604800000 ms (7 days)');
 
   const rs = await page.getByLabel('Retention size').getAttribute('value');
-  await expect(rs).not.toMatch('Unlimited');
+  expect(rs).not.toMatch('Unlimited');
 
   const cp = await page.getByLabel('Cleanup policy').getAttribute('value');
-  await expect(cp).not.toMatch('delete');
+  expect(cp).not.toMatch('delete');
 
   // Topic CleanUp
   await page.locator('button', { hasText: 'Delete topic' }).click();
@@ -271,7 +270,6 @@ test('create Topic with properties different than default', async ({ page }) => 
 
 // test_4kafka.py test_edit_topic_properties_after_creation
 test('edit topic properties after creation', async ({ page }) => {
-  test.fixme(true, 'Test is extremely flaky.');
   await navigateToKafkaTopicsList(page, testInstanceName);
   await createKafkaTopic(page, testTopicName, true);
 
@@ -331,13 +329,14 @@ test('edit topic properties after creation', async ({ page }) => {
 
   await expect(page.getByText('Increase the number of partitions?')).toHaveCount(1);
   await page.getByRole('button', { name: 'Yes' }).click();
+  await expect(page.locator('h2', { hasText: 'No consumer groups' })).toHaveCount(1);
 
   // Here we begin the comparison
   await navigateToProperties(page, testInstanceName, testTopicName);
 
   const numPartitionsAfter: string = await page.getByLabel('Partitions').getAttribute('value');
   console.log('numPartitionsAfter: ' + numPartitionsAfter);
-  await expect(numPartitionsAfter).not.toBe(numPartitionsBefore);
+  expect(numPartitionsAfter).not.toBe(numPartitionsBefore);
 
   const rt = await page
     .locator(
@@ -345,13 +344,13 @@ test('edit topic properties after creation', async ({ page }) => {
     )
     .getByLabel('Retention time')
     .getAttribute('value');
-  await expect(rt).toMatch('28800000 ms (8 hours)');
+  expect(rt).toMatch('28800000 ms (8 hours)');
 
   const rs = await page.getByLabel('Retention size').getAttribute('value');
-  await expect(rs).toMatch('2048 bytes (2 kibibytes)');
+  expect(rs).toMatch('2048 bytes (2 kibibytes)');
 
   const cp = await page.getByLabel('Cleanup policy').getAttribute('value');
-  await expect(cp).not.toMatch('Delete');
+  expect(cp).not.toMatch('Delete');
 
   // Topic CleanUp
   await page.locator('button', { hasText: 'Delete topic' }).click();
