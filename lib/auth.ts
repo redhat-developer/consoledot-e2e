@@ -1,6 +1,7 @@
 import { expect, Page } from '@playwright/test';
 import blockAnalyticsDomains from './blocker';
 import { config } from './config';
+import { addConsoleLogListeners } from './console_err_listener';
 
 export default async function login(
   page: Page,
@@ -8,6 +9,11 @@ export default async function login(
   password: string = config.adminPassword
 ) {
   await blockAnalyticsDomains(page);
+
+  // move that into page object model when it will be implemented
+  if (config.enableErrLogging) {
+    addConsoleLogListeners(page);
+  }
 
   // Go to starting Page
   await page.goto(config.startingPage);

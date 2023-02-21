@@ -31,6 +31,8 @@ class Config {
 
   readonly startingPageDefault = 'https://console.redhat.com';
 
+  readonly enableErrLogging: boolean;
+
   constructor() {
     // Load credentials
     this.username = process.env.TEST_USERNAME;
@@ -64,6 +66,9 @@ class Config {
 
     this.serviceAccountCreationTimeout = 30 * 1000; // 30 seconds
     this.serviceAccountDeletionTimeout = 30 * 1000; // 30 seconds
+
+    //logging
+    this.enableErrLogging = !!process.env.ENABLE_ERR_LOGGING;
   }
 }
 
