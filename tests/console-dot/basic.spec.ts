@@ -1,9 +1,10 @@
 import { test, expect } from '@playwright/test';
-import login, { logout } from '@lib/auth';
+import { ConsoleDotAuthPage } from '@lib/auth';
 
 // test_1auth.py test_auth_logged_in
 test('perform login', async ({ page }) => {
-  await login(page);
+  const consoleDotAuthPage = new ConsoleDotAuthPage(page)
+  await consoleDotAuthPage.login();
 
   // navigate to Kafka
   await page.locator('#chr-c-sidebar').getByText('Application and Data Services').click();
@@ -21,9 +22,10 @@ test('perform login', async ({ page }) => {
 
 // test_1auth.py test_auth_log_out
 test('perform login and logout', async ({ page }) => {
-  await login(page);
+  const consoleDotAuthPage = new ConsoleDotAuthPage(page)
+  await consoleDotAuthPage.login();
 
-  await logout(page);
+  await consoleDotAuthPage.logout();
 
   await expect(page).toHaveTitle(/Log In | Red Hat IDP/);
 });

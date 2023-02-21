@@ -1,38 +1,63 @@
-import { expect, Page } from '@playwright/test';
+import { expect, Locator, Page } from '@playwright/test';
 import blockAnalyticsDomains from './blocker';
 import { config } from './config';
 import { addConsoleLogListeners } from './console_err_listener';
 
-export default async function login(
-  page: Page,
-  username: string = config.adminUsername,
-  password: string = config.adminPassword
-) {
-  await blockAnalyticsDomains(page);
+export class ConsoleDotAuthPage {
+  readonly page: Page;
+  readonly usernameField: Locator;
+  readonly passwordField: Locator;
+  readonly nextButton: Locator;
+  readonly submitButton: Locator;
+  readonly welcomePage: Locator;
+  readonly userMenu: Locator;
+  readonly logoutButton: Locator;
 
-  // move that into page object model when it will be implemented
-  if (config.enableErrLogging) {
-    addConsoleLogListeners(page);
+  constructor(page: Page) {
+    this.page = page;
+    this.usernameField = page.locator('#username-verification');
+    this.passwordField = page.locator('#password');
+    this.nextButton = page.locator('button', { hasText: 'Next' });
+    this.submitButton = page.locator('#rh-password-verification-submit-button');
+    this.welcomePage = page.getByText('Gain increased visibility into your hybrid cloud');
+    this.userMenu = page.locator('#UserMenu');
+    this.logoutButton = page.locator('button', { hasText: 'Log out' });
+
+    // move that into page object model when it will be implemented
+    if (config.enableErrLogging) {
+      addConsoleLogListeners(page);
+    }
   }
 
-  // Go to starting Page
-  await page.goto(config.startingPage);
+  // Got to starting page
+  async goto() {
+    await this.page.goto(config.startingPage);
+     // Expect a title "to contain" a substring.
+     await expect(this.page).toHaveTitle(/Log In | Red Hat IDP/);
+  }
 
-  // Expect a title "to contain" a substring.
-  await expect(page).toHaveTitle(/Log In | Red Hat IDP/);
+  async login(
+    username: string = config.adminUsername,
+    password: string = config.adminPassword
+  ) {
+    await blockAnalyticsDomains(this.page);
+  
+    // Go to starting Page
+    this.goto()
+    
+    // do login
+    await this.usernameField.fill(username);
+    await this.nextButton.click();
+    await this.passwordField.fill(password);
+    await this.submitButton.click();
+  
+    // check we landed on the right page
+    await expect(this.page).toHaveTitle(/Home/, { timeout: 10000 });
+    await expect(this.welcomePage).toBeTruthy();
+  }
 
-  // do login
-  await page.locator('#username-verification').fill(username);
-  await page.getByText('Next').click();
-  await page.locator('#password').fill(password);
-  await page.locator('#rh-password-verification-submit-button').click();
-
-  // check we landed on the right page
-  await expect(page).toHaveTitle(/Home/, { timeout: 10000 });
-  await expect(page.getByText('Gain increased visibility into your hybrid cloud')).toBeTruthy();
-}
-
-export async function logout(page: Page) {
-  await page.locator('#UserMenu').click();
-  await page.locator('button', { hasText: 'Log out' }).click();
+  async logout() {
+    await this.userMenu.click();
+    await this.logoutButton.click();
+  }
 }
