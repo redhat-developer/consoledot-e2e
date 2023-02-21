@@ -55,9 +55,7 @@ test.afterEach(async ({ page }) => {
   });
   for (const el of await page.locator(`tr >> a`).elementHandles()) {
     const name = await el.textContent();
-    if (name === testTopicName) {
-      await deleteKafkaTopic(page, testTopicName);
-    }
+    await deleteKafkaTopic(page, name);
   }
 });
 
@@ -329,6 +327,9 @@ test('edit topic properties after creation', async ({ page }) => {
 
   await expect(page.getByText('Increase the number of partitions?')).toHaveCount(1);
   await page.getByRole('button', { name: 'Yes' }).click();
+  await page.waitForSelector('[role=progressbar]', {
+    state: 'detached'
+  });
   await expect(page.locator('h2', { hasText: 'No consumer groups' })).toHaveCount(1);
 
   // Here we begin the comparison
