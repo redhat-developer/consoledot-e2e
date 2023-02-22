@@ -70,6 +70,7 @@ jobs:
         retention-days: 5
 
     - name: Check results file existence
+      if: always()
       id: check_results
       # v1
       uses: andstor/file-existence-action@f02338908d150e00a4b8bebc2dad18bd9e5229b0
