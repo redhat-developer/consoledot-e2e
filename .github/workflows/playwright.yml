@@ -69,17 +69,10 @@ jobs:
         path: test-results/
         retention-days: 5
 
-    - name: Check results file existence
-      if: always()
-      id: check_results
-      # v1
-      uses: andstor/file-existence-action@f02338908d150e00a4b8bebc2dad18bd9e5229b0
-      with:
-        files: "results.xml"
     - name: Release
       # v1
       uses: softprops/action-gh-release@1e07f4398721186383de40550babbdf2b84acfc5
-      if: steps.check_results.outputs.files_exists == 'true'
+      if: success() || failure()
       with:
         tag_name: ${{ github.run_id }}
         files: |
