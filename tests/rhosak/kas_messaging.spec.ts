@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import login from '@lib/auth';
+import { ConsoleDotAuthPage } from '@lib/pom/auth';
 import { config } from '@lib/config';
 import {
   deleteKafkaInstance,
@@ -11,11 +11,11 @@ import {
   grantConsumerAccess,
   waitForKafkaReady,
   deleteAllKafkas
-} from '@lib/kafka';
-import { navigateToKafkaTopicsList, createKafkaTopic, navigateToMessages, refreshMessages } from '@lib/topic';
-import { KafkaConsumer, KafkaProducer } from '@lib/clients';
-import { createServiceAccount, deleteAllServiceAccounts, deleteServiceAccount, navigateToSAList } from '@lib/sa';
-import { retry } from '@lib/common';
+} from '@lib/pom/streams/kafkaInstances';
+import { navigateToKafkaTopicsList, createKafkaTopic, navigateToMessages, refreshMessages } from '@lib/pom/topic';
+import { KafkaConsumer, KafkaProducer } from '@lib/utils/clients';
+import { ServiceAccountPage } from '@lib/pom/serviceAccounts/sa';
+import { retry } from '@lib/utils/common';
 import {
   Limit,
   filterMessagesByOffset,
@@ -26,8 +26,8 @@ import {
   setTimestamp,
   setEpoch,
   setLimit
-} from '@lib/messages';
-import { navigateToKafkaList } from '@lib/navigation';
+} from '@lib/pom/messages';
+import { navigateToKafkaList } from '@lib/pom/navigation';
 
 const testInstanceName = config.instanceName;
 const testTopicName = `test-topic-name-${config.sessionID}`;
@@ -41,7 +41,9 @@ let credentials;
 let bootstrap: string;
 
 test.beforeEach(async ({ page }) => {
-  await login(page);
+  const consoleDotAuthPage = new ConsoleDotAuthPage(page);
+  const serviceAccountPage = new ServiceAccountPage(page);
+  await consoleDotAuthPage.login();
 
   await navigateToKafkaList(page);
 
@@ -77,9 +79,8 @@ test.beforeEach(async ({ page }) => {
     await createKafkaTopic(page, testTopicName, true);
   }
 
-  await navigateToSAList(page);
-  await expect(page.getByText('Create service account')).toHaveCount(1);
-  credentials = await createServiceAccount(page, testServiceAccountName);
+  await serviceAccountPage.gotoThroughMenu();
+  credentials = await serviceAccountPage.createServiceAccount(testServiceAccountName);
   bootstrap = await getBootstrapUrl(page, testInstanceName);
 
   await navigateToAccess(page, testInstanceName);
@@ -96,11 +97,13 @@ test.beforeEach(async ({ page }) => {
 });
 
 test.afterEach(async ({ page }) => {
-  await deleteAllServiceAccounts(page);
+  const serviceAccountPage = new ServiceAccountPage(page);
+  await serviceAccountPage.deleteAllServiceAccounts();
 });
 
 test.afterAll(async ({ page }) => {
-  await deleteAllServiceAccounts(page);
+  const serviceAccountPage = new ServiceAccountPage(page);
+  await serviceAccountPage.deleteAllServiceAccounts();
   await deleteAllKafkas(page);
 });
 
@@ -239,7 +242,4 @@ test('create consumer group and check dashboard', async ({ page }) => {
   // Open Consumer Groups Tab to check dashboard
   await navigateToConsumerGroups(page);
   await expect(page.getByText(consumerGroupId)).toHaveCount(1);
-
-  await navigateToSAList(page);
-  await deleteServiceAccount(page, testServiceAccountName);
 });

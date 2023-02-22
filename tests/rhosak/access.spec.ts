@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import login, { logout } from '@lib/auth';
+import { ConsoleDotAuthPage } from '@lib/pom/auth';
 import { config } from '@lib/config';
 import {
   deleteKafkaInstance,
@@ -9,13 +9,14 @@ import {
   findAccessRow,
   revokeAccess,
   waitForKafkaReady
-} from '@lib/kafka';
-import { navigateToKafkaList } from '@lib/navigation';
+} from '@lib/pom/streams/kafkaInstances';
+import { navigateToKafkaList } from '@lib/pom/navigation';
 
 const testInstanceName = config.instanceName;
 
 test.beforeEach(async ({ page }) => {
-  await login(page);
+  const consoleDotAuthPage = new ConsoleDotAuthPage(page);
+  await consoleDotAuthPage.login();
 
   await navigateToKafkaList(page);
 
@@ -55,6 +56,8 @@ test.afterAll(async ({ page }) => {
 
 // This test needs to run as an org admin until the new UI with refactored access dialog is released.
 test('test kafka manage access permission', async ({ page }) => {
+  const consoleDotAuthPage = new ConsoleDotAuthPage(page);
+
   test.skip(
     config.username_2 == undefined || config.password_2 == undefined,
     'Secondary user has to be defined for this test.'
@@ -66,8 +69,8 @@ test('test kafka manage access permission', async ({ page }) => {
   const row = await findAccessRow(page, config.username_2, '', 'Kafka Instance');
   await expect(row).toHaveCount(1);
 
-  await logout(page);
-  await login(page, config.username_2, config.password_2);
+  await consoleDotAuthPage.logout();
+  await consoleDotAuthPage.login(config.username_2, config.password_2);
 
   await navigateToAccess(page, testInstanceName);
   await grantManageAccess(page, 'All accounts');

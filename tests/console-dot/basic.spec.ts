@@ -1,9 +1,9 @@
 import { test, expect } from '@playwright/test';
-import { ConsoleDotAuthPage } from '@lib/auth';
+import { ConsoleDotAuthPage } from '@lib/pom/auth';
 
 // test_1auth.py test_auth_logged_in
 test('perform login', async ({ page }) => {
-  const consoleDotAuthPage = new ConsoleDotAuthPage(page)
+  const consoleDotAuthPage = new ConsoleDotAuthPage(page);
   await consoleDotAuthPage.login();
 
   // navigate to Kafka
@@ -22,7 +22,7 @@ test('perform login', async ({ page }) => {
 
 // test_1auth.py test_auth_log_out
 test('perform login and logout', async ({ page }) => {
-  const consoleDotAuthPage = new ConsoleDotAuthPage(page)
+  const consoleDotAuthPage = new ConsoleDotAuthPage(page);
   await consoleDotAuthPage.login();
 
   await consoleDotAuthPage.logout();

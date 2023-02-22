@@ -1,13 +1,7 @@
 import { test, expect } from '@playwright/test';
-import login from '@lib/auth';
+import { ConsoleDotAuthPage } from '@lib/pom/auth';
 import { config } from '@lib/config';
-import {
-  deleteServiceRegistryInstance,
-  createServiceRegistryInstance,
-  waitForServiceRegistryReady,
-  deleteAllServiceRegistries
-} from '@lib/service_registry';
-import { navigateToServiceRegistryList } from '@lib/navigation';
+import { ServiceRegistryPage } from '@lib/pom/serviceRegistry/serviceRegistry';
 
 // Define name of Service Registry instance for this set of tests
 const testInstanceName = config.instanceName;
@@ -15,9 +9,11 @@ const testInstanceName = config.instanceName;
 // Actions run before every test
 test.beforeEach(async ({ page }) => {
   // Login to console
-  await login(page);
+  const consoleDotAuthPage = new ConsoleDotAuthPage(page);
+  const serviceRegistryPage = new ServiceRegistryPage(page);
+  await consoleDotAuthPage.login();
   // Go to list of Service Registry instances
-  await navigateToServiceRegistryList(page);
+  await serviceRegistryPage.gotoThroughMenu();
   // Wait for dismiss of loading spinner
   await page.waitForSelector('[role=progressbar]', {
     state: 'detached',
@@ -30,14 +26,15 @@ test.beforeEach(async ({ page }) => {
     // Get name of existing instance
     const name = await el.textContent();
     // Delete instance
-    await deleteServiceRegistryInstance(page, name);
+    await serviceRegistryPage.deleteServiceRegistryInstance(name);
   }
 });
 
 // Actions run after all tests
 test.afterAll(async ({ page }) => {
   // Delete all Service Registry instances created during tests
-  await deleteAllServiceRegistries(page);
+  const serviceRegistryPage = new ServiceRegistryPage(page);
+  await serviceRegistryPage.deleteAllServiceRegistries();
 });
 
 // Checks that list of Service Registry instances is empty
@@ -49,17 +46,19 @@ test('check there are no Service Registry instances', async ({ page }) => {
 // Create and delete Service Registry instance without waiting for its readiness
 test('create and delete a Service Registry instance', async ({ page }) => {
   // Create instance
-  await createServiceRegistryInstance(page, testInstanceName);
+  const serviceRegistryPage = new ServiceRegistryPage(page);
+  await serviceRegistryPage.createServiceRegistryInstance(testInstanceName);
   // Delete instance without waiting for its readiness
-  await deleteServiceRegistryInstance(page, testInstanceName);
+  await serviceRegistryPage.deleteServiceRegistryInstance(testInstanceName);
 });
 
 // Create and delete Service Registry instance with waiting for its readiness
 test('create, wait for ready and delete a Service Registry instance', async ({ page }) => {
   // Create instance
-  await createServiceRegistryInstance(page, testInstanceName);
+  const serviceRegistryPage = new ServiceRegistryPage(page);
+  await serviceRegistryPage.createServiceRegistryInstance(testInstanceName);
   // Wait for instance readiness
-  await waitForServiceRegistryReady(page, testInstanceName);
+  await serviceRegistryPage.waitForServiceRegistryReady(testInstanceName);
   // Delete instance
-  await deleteServiceRegistryInstance(page, testInstanceName);
+  await serviceRegistryPage.deleteServiceRegistryInstance(testInstanceName);
 });

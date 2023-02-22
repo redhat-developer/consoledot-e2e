@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import login from '@lib/auth';
+import { ConsoleDotAuthPage } from '@lib/pom/auth';
 import { config } from '@lib/config';
 import {
   deleteKafkaInstance,
@@ -9,16 +9,17 @@ import {
   navigateToAccess,
   navigateToConsumerGroups,
   deleteAllKafkas
-} from '@lib/kafka';
-import { navigateToKafkaTopicsList, createKafkaTopic, deleteKafkaTopic, navigateToProperties } from '@lib/topic';
-import { navigateToKafkaList } from '@lib/navigation';
-import { deleteAllServiceAccounts } from '@lib/sa';
+} from '@lib/pom/streams/kafkaInstances';
+import { navigateToKafkaTopicsList, createKafkaTopic, deleteKafkaTopic, navigateToProperties } from '@lib/pom/topic';
+import { navigateToKafkaList } from '@lib/pom/navigation';
+import { ServiceAccountPage } from '@lib/pom/serviceAccounts/sa';
 
 const testInstanceName = config.instanceName;
 const testTopicName = `test-topic-${config.sessionID}`;
 
 test.beforeEach(async ({ page }) => {
-  await login(page);
+  const consoleDotAuthPage = new ConsoleDotAuthPage(page);
+  await consoleDotAuthPage.login();
 
   await navigateToKafkaList(page);
 
@@ -60,7 +61,8 @@ test.afterEach(async ({ page }) => {
 });
 
 test.afterAll(async ({ page }) => {
-  await deleteAllServiceAccounts(page);
+  const serviceAccountPage = new ServiceAccountPage(page);
+  await serviceAccountPage.deleteAllServiceAccounts();
   await deleteAllKafkas(page);
 });
 

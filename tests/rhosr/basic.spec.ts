@@ -1,22 +1,12 @@
 import { test, expect } from '@playwright/test';
-import login from '@lib/auth';
+import { ConsoleDotAuthPage } from '@lib/pom/auth';
+import { ServiceRegistryPage } from '@lib/pom/serviceRegistry/serviceRegistry';
 
 test('perform login', async ({ page }) => {
-  await login(page);
+  const consoleDotAuthPage = new ConsoleDotAuthPage(page);
+  const serviceRegistryPage = new ServiceRegistryPage(page);
+  await consoleDotAuthPage.login();
 
   // navigate to Service Registry
-  await page.locator('#chr-c-sidebar').getByText('Application and Data Services').click();
-  await page
-    .getByRole('heading', {
-      name: 'Red Hat OpenShift Service Registry'
-    })
-    .click();
-  await page.getByRole('button', { name: 'Service Registry' }).click();
-  await page
-    .getByRole('region', { name: 'Service Registry' })
-    .getByRole('link', { name: 'Service Registry Instances' })
-    .click();
-
-  await expect(page).toHaveTitle(/Service Registry | Red Hat OpenShift Application Services/);
-  await expect(page.getByRole('heading', { name: /Service Registry Instances/ })).toBeVisible();
+  await serviceRegistryPage.gotoThroughMenu();
 });

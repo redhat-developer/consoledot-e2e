@@ -1,7 +1,6 @@
 import { expect, Locator, Page } from '@playwright/test';
-import blockAnalyticsDomains from './blocker';
-import { config } from './config';
-import { addConsoleLogListeners } from './console_err_listener';
+import blockAnalyticsDomains from '@lib/utils/blocker';
+import { config } from '@lib/config';
 
 export class ConsoleDotAuthPage {
   readonly page: Page;
@@ -32,25 +31,22 @@ export class ConsoleDotAuthPage {
   // Got to starting page
   async goto() {
     await this.page.goto(config.startingPage);
-     // Expect a title "to contain" a substring.
-     await expect(this.page).toHaveTitle(/Log In | Red Hat IDP/);
+    // Expect a title "to contain" a substring.
+    await expect(this.page).toHaveTitle(/Log In | Red Hat IDP/);
   }
 
-  async login(
-    username: string = config.adminUsername,
-    password: string = config.adminPassword
-  ) {
+  async login(username: string = config.adminUsername, password: string = config.adminPassword) {
     await blockAnalyticsDomains(this.page);
-  
+
     // Go to starting Page
-    this.goto()
-    
+    this.goto();
+
     // do login
     await this.usernameField.fill(username);
     await this.nextButton.click();
     await this.passwordField.fill(password);
     await this.submitButton.click();
-  
+
     // check we landed on the right page
     await expect(this.page).toHaveTitle(/Home/, { timeout: 10000 });
     await expect(this.welcomePage).toBeTruthy();

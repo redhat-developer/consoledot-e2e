@@ -1,9 +1,9 @@
-import login from '@lib/auth';
-import { BillingOptions } from '@lib/billing';
+import { ConsoleDotAuthPage } from '@lib/pom/auth';
+import { BillingOptions } from '@lib/enums/billing';
 import { config } from '@lib/config';
-import { createKafkaInstance, deleteKafkaInstance, showKafkaDetails } from '@lib/kafka';
+import { createKafkaInstance, deleteKafkaInstance, showKafkaDetails } from '@lib/pom/streams/kafkaInstances';
 import test, { Page, expect } from '@playwright/test';
-import { navigateToKafkaList } from '@lib/navigation';
+import { navigateToKafkaList } from '@lib/pom/navigation';
 
 const testInstanceName = 'mk-ui-playwright-tests';
 let currentUsername = config.stratosphere1username;
@@ -44,8 +44,10 @@ test.describe('Billing test cases', () => {
   let index = 0;
   for (const user of users) {
     test(`Billing check of user - ${index}#${user}`, async ({ page }) => {
+      const consoleDotAuthPage = new ConsoleDotAuthPage(page);
       currentUsername = user;
-      await login(page, user, config.stratospherePassword);
+
+      await consoleDotAuthPage.login(user, config.stratospherePassword);
 
       await setupKafkaFreshInstance(page, BillingOptions.PREPAID);
       await showKafkaDetails(page, testInstanceName);
@@ -57,8 +59,9 @@ test.describe('Billing test cases', () => {
   const billingOptions = [BillingOptions.AWS_MARKETPLACE, BillingOptions.RH_MARKETPLACE, BillingOptions.PREPAID];
   for (const billingOption of billingOptions) {
     test(`Billing option for ${config.stratosphere3username} - ${billingOption}`, async ({ page }) => {
+      const consoleDotAuthPage = new ConsoleDotAuthPage(page);
       currentUsername = config.stratosphere3username;
-      await login(page, currentUsername, config.stratospherePassword);
+      await consoleDotAuthPage.login(currentUsername, config.stratospherePassword);
       await performBillingTest(page, billingOption);
     });
   }

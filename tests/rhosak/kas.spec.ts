@@ -1,15 +1,16 @@
 import { test, expect } from '@playwright/test';
-import login from '@lib/auth';
+import { ConsoleDotAuthPage } from '@lib/pom/auth';
 import { config } from '@lib/config';
-import { deleteKafkaInstance, createKafkaInstance, waitForKafkaReady, deleteAllKafkas } from '@lib/kafka';
-import { CloudProviders } from '@lib/cloudproviders';
-import { navigateToKafkaList } from '@lib/navigation';
-import { deleteAllServiceAccounts } from '@lib/sa';
+import { deleteKafkaInstance, createKafkaInstance, waitForKafkaReady, deleteAllKafkas } from '@lib/pom/streams/kafkaInstances';
+import { CloudProviders } from '@lib/enums/cloudproviders';
+import { navigateToKafkaList } from '@lib/pom/navigation';
+import { ServiceAccountPage } from '@lib/pom/serviceAccounts/sa';
 
 const testInstanceName = config.instanceName;
 
 test.beforeEach(async ({ page }) => {
-  await login(page);
+  const consoleDotAuthPage = new ConsoleDotAuthPage(page);
+  await consoleDotAuthPage.login();
 
   await navigateToKafkaList(page);
 
@@ -22,7 +23,8 @@ test.beforeEach(async ({ page }) => {
 });
 
 test.afterAll(async ({ page }) => {
-  await deleteAllServiceAccounts(page);
+  const serviceAccountPage = new ServiceAccountPage(page);
+  await serviceAccountPage.deleteAllServiceAccounts();
   await deleteAllKafkas(page);
 });
 
