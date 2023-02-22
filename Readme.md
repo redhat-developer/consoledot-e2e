@@ -60,7 +60,12 @@ PWDEBUG=1 npx playwright test --project chromium --debug
 
 For enabling slow mode 1s for debugging use
 ```bash
-SLOW_MODE=1000 playwright test
+SLOW_MODE=1000 npx playwright test
+```
+
+For enabling error logging use
+```bash
+ENABLE_ERR_LOGGING=1 npx playwright test
 ```
 
 ### Setup

@@ -6,3 +6,4 @@ node_modules/
 .*_env
 .DS_Store
 .idea
+results.xml
