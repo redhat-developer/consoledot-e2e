@@ -71,7 +71,7 @@ test.afterEach(async ({ page }) => {
   // If there is at least one artifact present
   if (!(await page.getByText('No artifacts found').isVisible())) {
     // If there is at least one artifact in current test group
-    if (!(await page.getByText(testArtifactGroupName).toHaveCount(0))) {
+    if (!(await expect(page.getByText(testArtifactGroupName)).toHaveCount(0))) {
       // Click first occurrence of group to filter artifacts by this group
       await page.getByText(testArtifactGroupName).first().click();
       // Go through all artifacts in group
