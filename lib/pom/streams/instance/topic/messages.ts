@@ -1,42 +1,36 @@
 import { expect, Locator, Page } from '@playwright/test';
-import { config } from '@lib/config';
-import { KafkaInstancePage } from '@lib/pom/streams/kafkaInstance';
 import { TopicPage } from '../topics';
 
 export class MessagesPage extends TopicPage {
+  readonly topicName: string;
+  readonly messageMenuButton: Locator;
+  readonly messageTable: Locator;
+  readonly checkForNewDataButton: Locator;
 
-  constructor(page: Page, name: string) {
-    super(page, name);
+  constructor(page: Page, instanceName: string, topicName: string) {
+    super(page, instanceName);
+    this.topicName = topicName;
+    this.messageMenuButton = page.locator('button', { hasText: 'Messages' });
+    this.messageTable = page.locator('table[aria-label="Messages table"]');
+    this.checkForNewDataButton = page.locator('button', { hasText: 'Check for new data' });
   }
 
-  // Got to starting page
   async goto() {
-    await this.page.goto(config.startingPage + this.urlPath);
-    // Expect see button to create topic
-    await expect(this.createTopicButton).toHaveCount(1);
-  }
-
-  async gotoThroughMenu() {
-    await expect(await this.topicsMenuButton).toHaveCount(1);
-    // data-testid=pageKafka-tabTopics
-    await this.topicsMenuButton.click();
-  }
-
-  export const navigateToMessages = async function (page: Page, kafkaName: string, topicName: string) {
-    await navigateToKafkaList(page);
-    await navigateToKafkaTopicsList(page, kafkaName);
-    await expect(await page.locator('a', { hasText: topicName })).toHaveCount(1);
-    await page.locator('a', { hasText: topicName }).click();
-    await expect(await page.locator('button', { hasText: 'Messages' })).toHaveCount(1);
-    await page.locator('button', { hasText: 'Messages' }).click();
-  };
-   
-  export const refreshMessages = async function (page: Page) {
+    await expect(this.messageMenuButton).toHaveCount(1);
+    await this.messageMenuButton.click();
     try {
-      await expect(page.locator('table[aria-label="Messages table"]')).toHaveCount(1);
+      await expect(this.checkForNewDataButton).toHaveCount(1);
     } catch (e) {
-      await page.locator('button', { hasText: 'Check for new data' }).click({ timeout: 5000 });
-      await refreshMessages(page);
+      await expect(this.messageTable).toHaveCount(1);
     }
-  };
+  }
+
+  async refreshMessages() {
+    try {
+      await expect(this.messageTable).toHaveCount(1);
+    } catch (e) {
+      await this.checkForNewDataButton.click({ timeout: 5000 });
+      await this.refreshMessages();
+    }
+  }
 }

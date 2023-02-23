@@ -1,34 +1,28 @@
 import { test, expect } from '@playwright/test';
 import { ConsoleDotAuthPage } from '@lib/pom/auth';
 import { config } from '@lib/config';
-import {
-  deleteKafkaInstance,
-  createKafkaInstance,
-  waitForKafkaReady,
-  showElementActions,
-  navigateToAccess,
-  navigateToConsumerGroups,
-  deleteAllKafkas
-} from '@lib/pom/streams/kafkaInstances';
-import { navigateToKafkaTopicsList, createKafkaTopic, deleteKafkaTopic, navigateToProperties } from '@lib/pom/topic';
-import { navigateToKafkaList } from '@lib/pom/navigation';
+import { KafkaInstancesPage } from '@lib/pom/streams/kafkaInstances';
+import { TopicPage } from '@lib/pom/streams/instance/topics';
 import { ServiceAccountPage } from '@lib/pom/serviceAccounts/sa';
+import { AccessPage } from '@lib/pom/streams/instance/access';
+import { AbstractPage } from '@lib/pom/abstractPage';
+import { ConsumerGroupsPage } from '@lib/pom/streams/instance/consumerGroups';
+import { PropertiesPage } from '@lib/pom/streams/instance/topic/properties';
 
 const testInstanceName = config.instanceName;
 const testTopicName = `test-topic-${config.sessionID}`;
 
 test.beforeEach(async ({ page }) => {
   const consoleDotAuthPage = new ConsoleDotAuthPage(page);
+  const kafkaInstancesPage = new KafkaInstancesPage(page);
+
   await consoleDotAuthPage.login();
-
-  await navigateToKafkaList(page);
-
-  await expect(page.getByRole('button', { name: 'Create Kafka instance' })).toBeVisible();
+  await kafkaInstancesPage.gotoThroughMenu();
 
   if ((await page.getByText(testInstanceName).count()) > 0 && (await page.locator('tr').count()) === 2) {
     // Test instance present, nothing to do!
   } else {
-    await page.waitForSelector('[role=progressbar]', {
+    await page.waitForSelector(AbstractPage.progressBarLocatorString, {
       state: 'detached',
       timeout: config.kafkaInstanceCreationTimeout
     });
@@ -37,45 +31,55 @@ test.beforeEach(async ({ page }) => {
       const name = await el.textContent();
 
       if (name !== testInstanceName) {
-        await deleteKafkaInstance(page, name);
+        await kafkaInstancesPage.deleteKafkaInstance(name);
       }
     }
 
     if ((await page.getByText(testInstanceName).count()) === 0) {
-      await createKafkaInstance(page, testInstanceName);
-      await waitForKafkaReady(page, testInstanceName);
+      await kafkaInstancesPage.createKafkaInstance(testInstanceName);
+      await kafkaInstancesPage.waitForKafkaReady(testInstanceName);
     }
   }
 });
 
 test.afterEach(async ({ page }) => {
-  await navigateToKafkaList(page);
-  await navigateToKafkaTopicsList(page, testInstanceName);
-  await page.waitForSelector('[role=progressbar]', {
+  const kafkaInstancesPage = new KafkaInstancesPage(page);
+  const topicPage = new TopicPage(page, testInstanceName);
+
+  await kafkaInstancesPage.gotoThroughMenu();
+  await topicPage.gotoThroughMenu();
+
+  await page.waitForSelector(AbstractPage.progressBarLocatorString, {
     state: 'detached'
   });
   for (const el of await page.locator(`tr >> a`).elementHandles()) {
     const name = await el.textContent();
-    await deleteKafkaTopic(page, name);
+    await topicPage.deleteKafkaTopic(name);
   }
 });
 
 test.afterAll(async ({ page }) => {
   const serviceAccountPage = new ServiceAccountPage(page);
+  const kafkaInstancesPage = new KafkaInstancesPage(page);
+
   await serviceAccountPage.deleteAllServiceAccounts();
-  await deleteAllKafkas(page);
+  await kafkaInstancesPage.deleteAllKafkas();
 });
 
 // test_3kas.py test_number_of_shown_kafka_instances
 // & test_4kafka.py test_kafka_consumer_groups_empty & test_kafka_access_default
 test('test shown Kafka instances and check access and consumer groups default', async ({ page }) => {
-  await expect(page.locator('tr')).toHaveCount(2); // title and 1 instance
+  const kafkaInstancesPage = new KafkaInstancesPage(page);
+  const consumerGroupsPage = new ConsumerGroupsPage(page, testInstanceName);
+  const accessPage = new AccessPage(page, testInstanceName);
 
-  await page.locator('a', { hasText: `${testInstanceName}` }).click();
-  await navigateToConsumerGroups(page);
+  await kafkaInstancesPage.goto();
+  await consumerGroupsPage.gotoThroughMenu();
+
   await expect(page.locator('h2', { hasText: 'No consumer groups' })).toHaveCount(1);
 
-  await navigateToAccess(page, testInstanceName);
+  await kafkaInstancesPage.goto();
+  await accessPage.gotoThroughMenu();
   await expect(page.locator('th', { hasText: 'Account' })).toHaveCount(1);
   await expect(page.locator('th', { hasText: 'Permission' })).toHaveCount(1);
   await expect(page.locator('th', { hasText: 'Resource' })).toHaveCount(1);
@@ -83,6 +87,10 @@ test('test shown Kafka instances and check access and consumer groups default', 
 
 // test_3kas.py test_try_to_create_second_kafka_instance
 test('test fail to create a second Kafka instance', async ({ page }) => {
+  const kafkaInstancesPage = new KafkaInstancesPage(page);
+  await kafkaInstancesPage.goto();
+
+  // TODO poladit do POM
   await page.getByText('Create Kafka instance').click();
   await expect(page.getByText('Create a Kafka instance')).toHaveCount(1);
 
@@ -90,6 +98,7 @@ test('test fail to create a second Kafka instance', async ({ page }) => {
   await page.locator('#modalCreateKafka > button').click();
 });
 
+// TODO dat do POM
 const filterByName = async function (page, name, skipClick = false) {
   if ((await page.getByRole('button', { name: 'Clear all filters' }).count()) > 0) {
     await page.getByRole('button', { name: 'Clear all filters' }).click();
@@ -108,6 +117,9 @@ const filterByName = async function (page, name, skipClick = false) {
 
 // test_3kas.py test_kas_kafka_filter_by_name
 test('test instances can be filtered by name', async ({ page }) => {
+  const kafkaInstancesPage = new KafkaInstancesPage(page);
+  await kafkaInstancesPage.goto();
+
   await filterByName(page, 'test');
   await expect(page.getByText(testInstanceName)).toBeTruthy();
 
@@ -120,7 +132,11 @@ test('test instances can be filtered by name', async ({ page }) => {
   ).toHaveCount(1);
 });
 
+// TODO dat do POM
 const filterByOwner = async function (page, name, skipClick = false) {
+  const kafkaInstancesPage = new KafkaInstancesPage(page);
+  await kafkaInstancesPage.goto();
+
   if ((await page.getByRole('button', { name: 'Clear all filters' }).count()) > 0) {
     await page.getByRole('button', { name: 'Clear all filters' }).click();
   }
@@ -138,6 +154,9 @@ const filterByOwner = async function (page, name, skipClick = false) {
 
 // test_3kas.py test_kas_kafka_filter_by_owner
 test('test instances can be filtered by owner', async ({ page }) => {
+  const kafkaInstancesPage = new KafkaInstancesPage(page);
+  await kafkaInstancesPage.goto();
+
   await filterByOwner(page, config.adminUsername.substring(0, 5));
   await expect(page.getByText(testInstanceName)).toBeTruthy();
 
@@ -153,6 +172,9 @@ test('test instances can be filtered by owner', async ({ page }) => {
 // test_3kas.py test_kas_kafka_filter_by_region
 // TODO: region can only be ordered, not filtered ???
 test('test instances can be filtered by region', async ({ page }) => {
+  const kafkaInstancesPage = new KafkaInstancesPage(page);
+  await kafkaInstancesPage.goto();
+
   await page.locator('button', { hasText: 'Region' }).click();
   await expect(page.getByText(testInstanceName)).toBeTruthy();
 });
@@ -160,12 +182,18 @@ test('test instances can be filtered by region', async ({ page }) => {
 // test_3kas.py test_kas_kafka_filter_by_cloud_provider
 // TODO: cloud provider can only be ordered, not filtered ???
 test('test instances can be filtered by cloud provider', async ({ page }) => {
+  const kafkaInstancesPage = new KafkaInstancesPage(page);
+  await kafkaInstancesPage.goto();
+
   await page.locator('button', { hasText: 'Cloud provider' }).click();
   await expect(page.getByText(testInstanceName)).toBeTruthy();
 });
 
 // test_3kas.py test_kas_kafka_view_details_by_row_click_panel_opened
 test('test instance details on row click', async ({ page }) => {
+  const kafkaInstancesPage = new KafkaInstancesPage(page);
+  await kafkaInstancesPage.goto();
+
   await page.getByRole('gridcell', { name: `${config.adminUsername}` }).click();
 
   await expect(page.locator('h1', { hasText: `${testInstanceName}` })).toHaveCount(1);
@@ -173,7 +201,10 @@ test('test instance details on row click', async ({ page }) => {
 
 // test_3kas.py test_kas_kafka_view_details_by_menu_click_panel_opened
 test('test instance details on menu click', async ({ page }) => {
-  await showElementActions(page, testInstanceName);
+  const kafkaInstancesPage = new KafkaInstancesPage(page);
+  await kafkaInstancesPage.goto();
+  await kafkaInstancesPage.showElementActions(testInstanceName);
+
   await page.locator('button', { hasText: 'Details' }).click();
 
   await expect(page.locator('h1', { hasText: `${testInstanceName}` })).toHaveCount(1);
@@ -185,14 +216,17 @@ test('test instance details on menu click', async ({ page }) => {
 // test_3kas.py test_kas_kafka_view_details_by_connection_menu_click_panel_opened
 // ... and more ...
 test('test instance quick options', async ({ page }) => {
-  await showElementActions(page, testInstanceName);
+  const kafkaInstancesPage = new KafkaInstancesPage(page);
+  await kafkaInstancesPage.goto();
+  await kafkaInstancesPage.showElementActions(testInstanceName);
+
   await page.locator('button', { hasText: 'Connection' }).click();
 
   await expect(page.getByRole('textbox', { name: 'Bootstrap server' })).toHaveCount(1);
 
   await page.locator('button[aria-label="Close drawer panel"]').click();
 
-  await showElementActions(page, testInstanceName);
+  await kafkaInstancesPage.showElementActions(testInstanceName);
   await page.getByRole('menuitem', { name: 'Change owner' }).click();
 
   await expect(page.getByText('Current owner')).toHaveCount(1);
@@ -203,6 +237,9 @@ test('test instance quick options', async ({ page }) => {
 
 // test_4kas.py test_kafka_dashboard_opened & test_kafka_dashboard_default
 test('test instance dashboard on instance name click', async ({ page }) => {
+  const kafkaInstancesPage = new KafkaInstancesPage(page);
+  await kafkaInstancesPage.goto();
+
   await page.locator('a', { hasText: `${testInstanceName}` }).click();
 
   await expect(page.locator('h1', { hasText: `${testInstanceName}` })).toHaveCount(1);
@@ -215,6 +252,10 @@ test('test instance dashboard on instance name click', async ({ page }) => {
 
 // test_4kafka.py test_kafka_topic_check_does_not_exist & test_kafka_topics_opened & test_kafka_topic_create
 test('check Topic does not exist and create and delete', async ({ page }) => {
+  const kafkaInstancesPage = new KafkaInstancesPage(page);
+  const topicPage = new TopicPage(page, testInstanceName);
+  await kafkaInstancesPage.goto();
+
   await page.locator('a', { hasText: `${testInstanceName}` }).click();
   await expect(page.locator('h1', { hasText: `${testInstanceName}` })).toHaveCount(1);
   await page.locator('button[aria-label="Topics"]').click();
@@ -223,15 +264,21 @@ test('check Topic does not exist and create and delete', async ({ page }) => {
   // expecting not to find topic row
   await expect(page.locator('td', { hasText: `${testTopicName}` })).toHaveCount(0);
 
-  await createKafkaTopic(page, testTopicName, true);
-  await deleteKafkaTopic(page, testTopicName);
+  await topicPage.gotoThroughMenu();
+  await topicPage.createKafkaTopic(testTopicName, true);
+  await topicPage.deleteKafkaTopic(testTopicName);
 });
 
 // test_4kafka.py test_kafka_try_create_topic_with_same_name
 test('test kafka try create topic with same name', async ({ page }) => {
+  const kafkaInstancesPage = new KafkaInstancesPage(page);
+  const topicPage = new TopicPage(page, testInstanceName);
+  await kafkaInstancesPage.goto();
+
   await page.locator('a', { hasText: `${testInstanceName}` }).click();
-  await page.locator('button[aria-label="Topics"]').click();
-  await createKafkaTopic(page, testTopicName, true);
+
+  await topicPage.gotoThroughMenu();
+  await topicPage.createKafkaTopic(testTopicName, true);
   await expect(page.locator('tr', { hasText: `${testTopicName}` })).toHaveCount(1);
   await page.locator('button', { hasText: 'Create topic' }).click();
   await page.getByPlaceholder('Enter topic name').fill(testTopicName);
@@ -241,13 +288,17 @@ test('test kafka try create topic with same name', async ({ page }) => {
 
 test('create Topic with properties different than default', async ({ page }) => {
   test.fixme(true, 'Test is extremely flaky.');
-  await navigateToKafkaTopicsList(page, testInstanceName);
-  await createKafkaTopic(page, testTopicName, false);
+  const kafkaInstancesPage = new KafkaInstancesPage(page);
+  const topicPage = new TopicPage(page, testInstanceName);
+  const propertiesPage = new PropertiesPage(page, testInstanceName, testTopicName);
+  await kafkaInstancesPage.goto();
+  await topicPage.gotoThroughMenu();
 
+  await topicPage.createKafkaTopic(testTopicName, false);
+
+  await propertiesPage.gotoThroughMenu();
   // Checking phase
-  await navigateToProperties(page, testInstanceName, testTopicName);
-
-  await expect(page.getByLabel('Partitions').getAttribute('value')).not.toBe(1);
+  await expect(await page.getByLabel('Partitions').getAttribute('value')).not.toBe(1);
 
   const rt = await page
     .locator(
@@ -275,8 +326,13 @@ test('edit topic properties after creation', async ({ page }) => {
     true,
     'Test is extremely flaky. Topics are not cleared and we need to wait properly on loading instead of just cliking without it.'
   );
-  await navigateToKafkaTopicsList(page, testInstanceName);
-  await createKafkaTopic(page, testTopicName, true);
+  const kafkaInstancesPage = new KafkaInstancesPage(page);
+  const topicPage = new TopicPage(page, testInstanceName);
+  const propertiesPage = new PropertiesPage(page, testInstanceName, testTopicName);
+  await kafkaInstancesPage.goto();
+  await topicPage.gotoThroughMenu();
+
+  await topicPage.createKafkaTopic(testTopicName, true);
 
   const row = page.locator('tr', { hasText: testTopicName });
   await row.locator('[aria-label="Actions"]').click();
@@ -340,7 +396,7 @@ test('edit topic properties after creation', async ({ page }) => {
   await expect(page.locator('h2', { hasText: 'No consumer groups' })).toHaveCount(1);
 
   // Here we begin the comparison
-  await navigateToProperties(page, testInstanceName, testTopicName);
+  await propertiesPage.gotoThroughMenu();
 
   const numPartitionsAfter: string = await page.getByLabel('Partitions').getAttribute('value');
   console.log('numPartitionsAfter: ' + numPartitionsAfter);

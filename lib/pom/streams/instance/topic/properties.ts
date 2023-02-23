@@ -1,33 +1,21 @@
 import { expect, Locator, Page } from '@playwright/test';
-import { config } from '@lib/config';
-import { KafkaInstancePage } from '@lib/pom/streams/kafkaInstance';
-import { TopicPage } from '../topics';
+import { TopicPage } from '@lib/pom/streams/instance/topics';
 
 export class PropertiesPage extends TopicPage {
+  readonly topicName: string;
+  readonly propertiesMenuButton: Locator;
+  readonly editPropertiesButton: Locator;
 
-  constructor(page: Page, name: string) {
-    super(page, name);
+  constructor(page: Page, instanceName: string, topicName: string) {
+    super(page, instanceName);
+    this.topicName = topicName;
+    this.propertiesMenuButton = page.locator('button', { hasText: 'Properties' });
+    this.editPropertiesButton = page.locator('button', { hasText: 'Edit properties' });
   }
 
-  // Got to starting page
   async goto() {
-    await this.page.goto(config.startingPage + this.urlPath);
-    // Expect see button to create topic
-    await expect(this.createTopicButton).toHaveCount(1);
+    await expect(this.propertiesMenuButton).toHaveCount(1);
+    await this.propertiesMenuButton.click();
+    await expect(this.editPropertiesButton).toHaveCount(1);
   }
-
-  async gotoThroughMenu() {
-    await expect(await this.topicsMenuButton).toHaveCount(1);
-    // data-testid=pageKafka-tabTopics
-    await this.topicsMenuButton.click();
-  }
-
-  export const navigateToProperties = async function (page: Page, kafkaName: string, topicName: string) {
-    await navigateToKafkaList(page);
-    await navigateToKafkaTopicsList(page, kafkaName);
-    await expect(await page.locator('a', { hasText: `${topicName}` })).toHaveCount(1);
-    await page.locator('a', { hasText: `${topicName}` }).click();
-    await expect(page.locator('h1:has-text("' + `${topicName}` + '")')).toHaveCount(1);
-    await page.getByTestId('pageTopic-tabProperties').click();
-  };
 }

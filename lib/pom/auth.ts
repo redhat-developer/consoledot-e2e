@@ -1,8 +1,9 @@
 import { expect, Locator, Page } from '@playwright/test';
 import blockAnalyticsDomains from '@lib/utils/blocker';
 import { config } from '@lib/config';
+import { AbstractPage } from '@lib/pom/abstractPage';
 
-export class ConsoleDotAuthPage {
+export class ConsoleDotAuthPage extends AbstractPage {
   readonly page: Page;
   readonly usernameField: Locator;
   readonly passwordField: Locator;
@@ -13,7 +14,7 @@ export class ConsoleDotAuthPage {
   readonly logoutButton: Locator;
 
   constructor(page: Page) {
-    this.page = page;
+    super(page);
     this.usernameField = page.locator('#username-verification');
     this.passwordField = page.locator('#password');
     this.nextButton = page.locator('button', { hasText: 'Next' });

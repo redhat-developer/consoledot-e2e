@@ -20,9 +20,9 @@ export class TopicPage extends KafkaInstancePage {
   readonly showAllOptions: Locator;
   readonly retentionOptionField: Locator;
 
-  constructor(page: Page, name: string) {
-    super(page, name);
-    this.urlPath = this.urlPath + '/' + name + '/topics';
+  constructor(page: Page, instanceName: string) {
+    super(page, instanceName);
+    this.urlPath = this.urlPath + '/' + instanceName + '/topics';
     this.topicsMenuButton = page.locator('button[aria-label="Topics"]');
     this.createTopicButton = page.locator('button', { hasText: 'Create topic' });
     this.createTopicHeading = page.locator('h2', { hasText: 'Topic name' });

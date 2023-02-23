@@ -3,21 +3,23 @@ import { config } from '@lib/config';
 import { KafkaInstancePage } from '@lib/pom/streams/kafkaInstance';
 
 export class ConsumerGroupsPage extends KafkaInstancePage {
+  readonly consumerGroupsMenuButton: Locator;
 
-  constructor(page: Page, name: string) {
-    super(page, name);
+  constructor(page: Page, instanceName: string) {
+    super(page, instanceName);
+    this.urlPath = this.urlPath + '/' + instanceName + '/consumer-groups';
+    this.consumerGroupsMenuButton = page.locator('button[aria-label="Consumer groups"]');
   }
 
   // Got to starting page
   async goto() {
     await this.page.goto(config.startingPage + this.urlPath);
-    // Expect see button to create topic
-    await expect(this.createTopicButton).toHaveCount(1);
+    // TODO - Expect see bsomething ???
+    // await expect(this.consumerGroupsMenuButton).toHaveCount(1);
   }
 
   async gotoThroughMenu() {
-    await expect(await this.topicsMenuButton).toHaveCount(1);
-    // data-testid=pageKafka-tabTopics
-    await this.topicsMenuButton.click();
+    await expect(this.consumerGroupsMenuButton).toHaveCount(1);
+    await this.consumerGroupsMenuButton.click();
   }
 }

@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test } from '@playwright/test';
 import { ConsoleDotAuthPage } from '@lib/pom/auth';
 import { ServiceRegistryPage } from '@lib/pom/serviceRegistry/serviceRegistry';
 

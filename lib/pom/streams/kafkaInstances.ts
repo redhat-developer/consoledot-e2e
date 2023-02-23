@@ -3,11 +3,10 @@ import { config } from '@lib/config';
 import { BillingOptions } from '@lib/enums/billing';
 import { CloudProviders } from '@lib/enums/cloudproviders';
 import { resourceStore } from '@lib/resource_store';
-import { closePopUp } from '@lib/utils/popup';
-import { AbstractPage } from '../AbstractPage';
+import { AbstractPage } from '@lib/pom/abstractPage';
 
 export class KafkaInstancesPage extends AbstractPage {
-  urlPath: string = '/application-services/streams/kafkas';
+  urlPath = '/application-services/streams/kafkas';
   readonly productName: string = 'Streams or Apache Kafka';
   readonly productList: string = 'Kafka Instances';
   readonly createKafkaInstanceButton: Locator;
@@ -19,7 +18,7 @@ export class KafkaInstancesPage extends AbstractPage {
   readonly closeDrawerButton: Locator;
 
   constructor(page: Page) {
-    super(page)
+    super(page);
     this.createKafkaInstanceButton = page.locator('button', { hasText: 'Create Kafka instance' });
     this.createKafkaInstanceHeading = page.getByText('Create a Kafka instance');
     this.kafkaInstanceTable = page.locator('[data-ouia-component-id=table-kafka-instances]');
@@ -48,7 +47,7 @@ export class KafkaInstancesPage extends AbstractPage {
   ) {
     await this.createKafkaInstanceButton.click();
     await expect(this.createKafkaInstanceHeading).toHaveCount(1);
-    await this.page.waitForSelector(this.progressBarLocatorString, { state: 'detached' });
+    await this.page.waitForSelector(AbstractPage.progressBarLocatorString, { state: 'detached' });
 
     resourceStore.addKafka(name);
 
@@ -112,11 +111,11 @@ export class KafkaInstancesPage extends AbstractPage {
     } catch (err) {
       // Do Nothing as instance is not connected to this acocunt
     }
-  };
+  }
 
   async waitForKafkaReady(name: string) {
     // no loading in progress
-    await this.page.waitForSelector(this.progressBarLocatorString, {
+    await this.page.waitForSelector(AbstractPage.progressBarLocatorString, {
       state: 'detached',
       timeout: config.kafkaInstanceCreationTimeout
     });
@@ -126,10 +125,10 @@ export class KafkaInstancesPage extends AbstractPage {
     await expect(row.getByText('Ready', { exact: true })).toHaveCount(1, {
       timeout: config.kafkaInstanceCreationTimeout
     });
-  };
+  }
 
   async getBootstrapUrl(name: string) {
-    await this.gotoThroughMenu()
+    await this.gotoThroughMenu();
     await this.showElementActions(name);
 
     await this.connectionButton.click();
@@ -139,144 +138,23 @@ export class KafkaInstancesPage extends AbstractPage {
     await this.closeDrawerButton.click();
 
     return bootstrap;
-  };
+  }
 
-  // TODO - we shouldn't use just prefix for topic/group but also complete name
-  // TODO - we should click on topic name/prefix when it popups when filling the prefix/name
-  grantProducerAccess = async function (page: Page, saId: string, topicName: string) {
-    await page.getByTestId('actionManagePermissions').click();
-    await page.getByRole('button', { name: 'Options menu' }).click();
-    await page.getByRole('option').filter({ hasText: saId }).click();
-    await page.getByRole('button', { name: 'Next' }).click();
-    await page.getByTestId('permissions-dropdown-toggle').click();
-    // TODO - This is another option which should be tested
-    // await page.getByRole('button', { name: 'Add permission' }).click();
-
-    await page.locator('button', { hasText: 'Produce to a topic' }).click();
-
-    await page.getByPlaceholder('Enter prefix').click();
-    await page.getByPlaceholder('Enter prefix').fill(topicName);
-    // TODO - This is just a workaround - `save` button is disabled even if the prefix is written but not confirmed by another action
-    await page.getByPlaceholder('Enter prefix').click();
-
-    await page.getByRole('button').filter({ hasText: 'Save' }).click();
-  };
-
-  // TODO - we shouldn't use just prefix for topic/group but also complete name
-  // TODO - we should click on topic name/prefix when it popups when filling the prefix/name
-  grantConsumerAccess = async function (page: Page, saId: string, topicName: string, consumerGroup: string) {
-    await page.getByTestId('actionManagePermissions').click();
-    await page.getByRole('button', { name: 'Options menu' }).click();
-    await page.getByRole('option').filter({ hasText: saId }).click();
-    await page.getByRole('button', { name: 'Next' }).click();
-    await page.getByTestId('permissions-dropdown-toggle').click();
-
-    await page.locator('button', { hasText: 'Consume from a topic' }).click();
-
-    await page
-      .getByRole('row', {
-        name: 'T Topic Options menu permission.manage_permissions_dialog.assign_permissions.resource_name_aria Options menu Label group category'
-      })
-      .getByPlaceholder('Enter prefix')
-      .click();
-
-    await page
-      .getByRole('row', {
-        name: 'T Topic Options menu permission.manage_permissions_dialog.assign_permissions.resource_name_aria Options menu Label group category'
-      })
-      .getByPlaceholder('Enter prefix')
-      .fill(topicName);
-
-    await page
-      .getByRole('gridcell', {
-        name: 'permission.manage_permissions_dialog.assign_permissions.resource_name_aria Options menu'
-      })
-      .getByPlaceholder('Enter prefix')
-      .click();
-
-    await page
-      .getByRole('gridcell', {
-        name: 'permission.manage_permissions_dialog.assign_permissions.resource_name_aria Options menu'
-      })
-      .getByPlaceholder('Enter prefix')
-      .fill(consumerGroup);
-
-    await page.getByRole('button').filter({ hasText: 'Save' }).click();
-  };
-
-  grantManageAccess = async function (page: Page, saId: string) {
-    await page.getByTestId('actionManagePermissions').click();
-    await page.getByRole('button', { name: 'Options menu' }).click();
-    await page.getByRole('option').filter({ hasText: saId }).click();
-    await page.getByRole('button', { name: 'Next' }).click();
-    await page.getByTestId('permissions-dropdown-toggle').click();
-
-    await page
-      .getByRole('menuitem', {
-        name: 'Manage access Provides access to add and remove permissions on this Kafka instance'
-      })
-      .click();
-
-    await page.getByRole('button').filter({ hasText: 'Save' }).click();
-  };
-
-  findAccessRow = async function (page: Page, account: string, permission: string, resource: string) {
-    return page
-      .locator('tr')
-      .filter({ has: page.getByText(account) })
-      .filter({ has: page.getByText(permission) })
-      .filter({ has: page.getByText(resource) });
-  };
-
-  revokeAccess = async function (
-    page: Page,
-    account: string,
-    permission: string,
-    resource: string,
-    awaitDeletion: boolean
-  ) {
-    const row = await findAccessRow(page, account, permission, resource);
-    if ((await row.count()) == 1) {
-      // GetByRole sometimes works, sometimes it does not.
-      // await row.getByRole('button', { name: 'Actions' }).click();
-      await row.locator('button').click();
-      await page.locator('button', { hasText: 'Delete' }).click();
-
-      // await for the permission to be revoked
-      if (awaitDeletion) {
-        await expect(row).toHaveCount(0);
-      }
-    }
-  };
-
-  navigateToAccess = async function (page: Page, kafkaName: string) {
-    await navigateToKafkaList(page);
-    // Close pop-up notifications if present
-    await closePopUp(page);
-    await expect(page.getByText(kafkaName)).toHaveCount(1);
-    await page.getByText(kafkaName).click();
-    await page.getByTestId('pageKafka-tabPermissions').click();
-  };
-
-  navigateToConsumerGroups = async function (page: Page) {
-    await page.click('text=Consumer groups');
-  };
-
-  showKafkaDetails = async function (page: Page, instanceName: string) {
+  async showKafkaDetails(instanceName: string) {
     await this.showElementActions(instanceName);
     await this.details.click();
-  };
+  }
 
-  deleteAllKafkas = async function (page: Page) {
+  async deleteAllKafkas() {
     const kafkaList = resourceStore.getKafkaList;
-    await navigateToKafkaList(page);
+    await this.gotoThroughMenu();
     for (const kafkaName of kafkaList) {
       try {
-        await deleteKafkaInstance(page, kafkaName);
+        await this.deleteKafkaInstance(kafkaName);
       } catch (error) {
         //Ignore exception
       }
     }
     resourceStore.clearKafkaList();
-  };
+  }
 }

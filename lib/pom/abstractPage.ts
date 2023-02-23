@@ -1,19 +1,20 @@
-import { closePopUp } from "@lib/utils/popup";
-import { Locator, Page, expect } from "@playwright/test";
+import { closePopUp } from '@lib/utils/popup';
+import { Locator, Page, expect } from '@playwright/test';
 
 export abstract class AbstractPage {
-    readonly page: Page;
-    readonly nameForm: Locator;
-    readonly details: Locator;
-    readonly deleteNameInput: Locator;
-    readonly deleteButton: Locator;
-    readonly nextButton: Locator;
-    readonly finishButton: Locator;
-    readonly appDataServicesLink: Locator;
-    readonly menuLocator: string = '[data-testid=router-link]';
-    readonly actionsLocatorString: string = '[aria-label="Actions"]';
-    readonly progressBarLocatorString: string = '[role=progressbar]';
-    readonly confirmDeleteField: Locator;
+  readonly page: Page;
+  readonly nameForm: Locator;
+  readonly details: Locator;
+  readonly deleteNameInput: Locator;
+  readonly deleteButton: Locator;
+  readonly nextButton: Locator;
+  readonly finishButton: Locator;
+  readonly appDataServicesLink: Locator;
+  static readonly menuLocator: string = '[data-testid=router-link]';
+  static readonly actionsLocatorString: string = '[aria-label="Actions"]';
+  static readonly progressBarLocatorString: string = '[role=progressbar]';
+  readonly confirmDeleteField: Locator;
+  readonly saveButton: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -25,14 +26,15 @@ export abstract class AbstractPage {
     this.nextButton = page.locator('button', { hasText: 'Next' });
     this.finishButton = page.locator('button', { hasText: 'Finish' });
     this.confirmDeleteField = page.getByLabel('Type DELETE to confirm:');
+    this.saveButton = page.getByRole('button').filter({ hasText: 'Save' });
   }
 
   async showElementActions(selectorName: string) {
     const selectorLink = this.page.getByText(selectorName);
     const row = this.page.locator('tr', { has: selectorLink });
 
-    await row.locator(this.actionsLocatorString).click();
-  };
+    await row.locator(AbstractPage.actionsLocatorString).click();
+  }
 
   // Navigates to Application and Data Services overview page when category of tested product is not present in navigation
   async navigateToApplicationAndDataServices(product: string) {
@@ -48,7 +50,7 @@ export abstract class AbstractPage {
     // Navigate to prerequisite page first
     await this.navigateToApplicationAndDataServices(product);
     // If link to list of tested product instances is not present in navigation
-    if (!(await this.page.locator(this.menuLocator, { hasText: productList }).isVisible())) {
+    if (!(await this.page.locator(AbstractPage.menuLocator, { hasText: productList }).isVisible())) {
       // Open category of tested product in navigation
       await this.page.locator('button', { hasText: product }).click();
     }
@@ -61,7 +63,7 @@ export abstract class AbstractPage {
     // Close pop-up notifications if present
     await closePopUp(this.page);
     // Open link to list of tested product instances
-    await this.page.locator(this.menuLocator, { hasText: productList }).click();
+    await this.page.locator(AbstractPage.menuLocator, { hasText: productList }).click();
     // Check that page with list of tested product instances is opened
     await expect(this.page.locator('h1', { hasText: productList })).toHaveCount(1);
   }

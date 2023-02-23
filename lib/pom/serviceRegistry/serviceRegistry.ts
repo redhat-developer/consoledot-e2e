@@ -2,7 +2,7 @@ import { expect, Locator, Page } from '@playwright/test';
 import { config } from '@lib/config';
 import { resourceStore } from '@lib/resource_store';
 import { Locators } from '@lib/enums/locators';
-import { AbstractPage } from '../AbstractPage';
+import { AbstractPage } from '@lib/pom/abstractPage';
 
 export class ServiceRegistryPage extends AbstractPage {
   readonly page: Page;

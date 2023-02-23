@@ -2,6 +2,7 @@ import { test, expect } from '@playwright/test';
 import { ConsoleDotAuthPage } from '@lib/pom/auth';
 import { config } from '@lib/config';
 import { ServiceAccountPage } from '@lib/pom/serviceAccounts/sa';
+import { AbstractPage } from '@lib/pom/abstractPage';
 
 const testServiceAccountPrefix = 'test-service-account-';
 const testServiceAccountName = `${testServiceAccountPrefix}${config.sessionID}`;
@@ -13,7 +14,7 @@ test.beforeEach(async ({ page }) => {
   const serviceAccountPage = new ServiceAccountPage(page);
   await serviceAccountPage.gotoThroughMenu();
 
-  await page.waitForSelector('[role=progressbar]', {
+  await page.waitForSelector(AbstractPage.progressBarLocatorString, {
     state: 'detached',
     timeout: config.serviceAccountCreationTimeout
   });

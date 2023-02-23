@@ -6,6 +6,7 @@ test('perform login', async ({ page }) => {
   const consoleDotAuthPage = new ConsoleDotAuthPage(page);
   await consoleDotAuthPage.login();
 
+  // TODO pouzit z KafkaInstances?
   // navigate to Kafka
   await page.locator('#chr-c-sidebar').getByText('Application and Data Services').click();
   await page

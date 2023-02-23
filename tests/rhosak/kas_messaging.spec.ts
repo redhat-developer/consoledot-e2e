@@ -1,18 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { ConsoleDotAuthPage } from '@lib/pom/auth';
 import { config } from '@lib/config';
-import {
-  deleteKafkaInstance,
-  createKafkaInstance,
-  getBootstrapUrl,
-  navigateToAccess,
-  navigateToConsumerGroups,
-  grantProducerAccess,
-  grantConsumerAccess,
-  waitForKafkaReady,
-  deleteAllKafkas
-} from '@lib/pom/streams/kafkaInstances';
-import { navigateToKafkaTopicsList, createKafkaTopic, navigateToMessages, refreshMessages } from '@lib/pom/topic';
+import { KafkaInstancesPage } from '@lib/pom/streams/kafkaInstances';
 import { KafkaConsumer, KafkaProducer } from '@lib/utils/clients';
 import { ServiceAccountPage } from '@lib/pom/serviceAccounts/sa';
 import { retry } from '@lib/utils/common';
@@ -27,7 +16,10 @@ import {
   setEpoch,
   setLimit
 } from '@lib/pom/messages';
-import { navigateToKafkaList } from '@lib/pom/navigation';
+import { TopicPage } from '@lib/pom/streams/instance/topics';
+import { AccessPage } from '@lib/pom/streams/instance/access';
+import { ConsumerGroupsPage } from '@lib/pom/streams/instance/consumerGroups';
+import { MessagesPage } from '@lib/pom/streams/instance/topic/messages';
 
 const testInstanceName = config.instanceName;
 const testTopicName = `test-topic-name-${config.sessionID}`;
@@ -43,11 +35,12 @@ let bootstrap: string;
 test.beforeEach(async ({ page }) => {
   const consoleDotAuthPage = new ConsoleDotAuthPage(page);
   const serviceAccountPage = new ServiceAccountPage(page);
+  const kafkaInstancesPage = new KafkaInstancesPage(page);
+  const topicPage = new TopicPage(page, testInstanceName);
+  const accessPage = new AccessPage(page, testInstanceName);
+
   await consoleDotAuthPage.login();
-
-  await navigateToKafkaList(page);
-
-  await expect(page.getByRole('button', { name: 'Create Kafka instance' })).toBeVisible();
+  await kafkaInstancesPage.gotoThroughMenu();
 
   if ((await page.getByText(testInstanceName).count()) > 0 && (await page.locator('tr').count()) === 2) {
     // Test instance present, nothing to do!
@@ -61,30 +54,32 @@ test.beforeEach(async ({ page }) => {
       const name = await el.textContent();
 
       if (name !== testInstanceName) {
-        await deleteKafkaInstance(page, name);
+        await kafkaInstancesPage.deleteKafkaInstance(name);
       }
     }
 
     if ((await page.getByText(testInstanceName).count()) === 0) {
-      await createKafkaInstance(page, testInstanceName);
-      await waitForKafkaReady(page, testInstanceName);
+      await kafkaInstancesPage.createKafkaInstance(testInstanceName);
+      await kafkaInstancesPage.waitForKafkaReady(testInstanceName);
     }
   }
 
-  await navigateToKafkaTopicsList(page, testInstanceName);
+  await topicPage.gotoThroughMenu();
   // Do not create topic if it already exists
+  // TODO poresit
   await expect(page.getByText('Create topic')).toHaveCount(1);
   await expect(page.getByText('Loading content')).toHaveCount(0);
   if ((await page.locator('a', { hasText: testTopicName }).count()) === 0) {
-    await createKafkaTopic(page, testTopicName, true);
+    await topicPage.createKafkaTopic(testTopicName, true);
   }
 
   await serviceAccountPage.gotoThroughMenu();
   credentials = await serviceAccountPage.createServiceAccount(testServiceAccountName);
-  bootstrap = await getBootstrapUrl(page, testInstanceName);
+  await kafkaInstancesPage.gotoThroughMenu();
+  bootstrap = await kafkaInstancesPage.getBootstrapUrl(testInstanceName);
 
-  await navigateToAccess(page, testInstanceName);
-  await grantProducerAccess(page, credentials.clientID, testTopicName);
+  await accessPage.gotoThroughMenu();
+  await accessPage.grantProducerAccess(credentials.clientID, testTopicName);
 
   // Producer 100 messages
   const producer = new KafkaProducer(bootstrap, credentials.clientID, credentials.clientSecret);
@@ -103,14 +98,20 @@ test.afterEach(async ({ page }) => {
 
 test.afterAll(async ({ page }) => {
   const serviceAccountPage = new ServiceAccountPage(page);
+  const kafkaInstancesPage = new KafkaInstancesPage(page);
   await serviceAccountPage.deleteAllServiceAccounts();
-  await deleteAllKafkas(page);
+  await kafkaInstancesPage.deleteAllKafkas();
 });
 
 // test_6messages.py generate_messages_to_topic
 test('Consume messages from topic', async ({ page }) => {
-  await navigateToAccess(page, testInstanceName);
-  await grantConsumerAccess(page, credentials.clientID, testTopicName, consumerGroupId);
+  const kafkaInstancesPage = new KafkaInstancesPage(page);
+  const consumerGroupsPage = new ConsumerGroupsPage(page, testInstanceName);
+  const accessPage = new AccessPage(page, testInstanceName);
+
+  await kafkaInstancesPage.gotoThroughMenu();
+  await accessPage.gotoThroughMenu();
+  await accessPage.grantConsumerAccess(credentials.clientID, testTopicName, consumerGroupId);
 
   // Consume 100 messages
   const consumer = new KafkaConsumer(bootstrap, consumerGroupId, credentials.clientID, credentials.clientSecret);
@@ -122,15 +123,22 @@ test('Consume messages from topic', async ({ page }) => {
   expect(consumerResponse).toEqual(expectedMessageCount);
 
   // Open Consumer Groups Tab to check dashboard
-  await navigateToConsumerGroups(page);
+  await kafkaInstancesPage.goto();
+  await consumerGroupsPage.gotoThroughMenu();
   await expect(await page.getByText(consumerGroupId)).toHaveCount(1);
 });
 
 // test_6messages.py browse_messages
 test('Browse messages', async ({ page }) => {
-  await navigateToMessages(page, testInstanceName, testTopicName);
+  const kafkaInstancesPage = new KafkaInstancesPage(page);
+  const messagesPage = new MessagesPage(page, testInstanceName, testTopicName);
+  const topicPage = new TopicPage(page, testInstanceName);
 
-  await refreshMessages(page);
+  await kafkaInstancesPage.goto();
+  await topicPage.gotoThroughMenu();
+  await messagesPage.gotoThroughMenu();
+
+  await messagesPage.refreshMessages();
 
   await expect(page.locator('table[aria-label="Messages table"]')).toContainText('value-' + testMessageKey);
   await expect(page.locator('table[aria-label="Messages table"]')).toContainText('key-' + testMessageKey);
@@ -148,9 +156,15 @@ for (const filter of filters) {
     const tomorrow = new Date();
     tomorrow.setDate(today.getDate() + 1);
 
-    await navigateToMessages(page, testInstanceName, testTopicName);
+    const kafkaInstancesPage = new KafkaInstancesPage(page);
+    const messagesPage = new MessagesPage(page, testInstanceName, testTopicName);
+    const topicPage = new TopicPage(page, testInstanceName);
 
-    await refreshMessages(page);
+    await kafkaInstancesPage.goto();
+    await topicPage.gotoThroughMenu();
+    await messagesPage.gotoThroughMenu();
+
+    await messagesPage.refreshMessages();
     const messageTable = page.locator('table[aria-label="Messages table"] >> tbody >> tr');
 
     switch (filter) {
@@ -218,19 +232,18 @@ for (const filter of filters) {
 }
 // test_6acl.py test_kafka_create_consumer_group_and_check_dashboard
 test('create consumer group and check dashboard', async ({ page }) => {
-  const instanceLinkSelector = page.getByText(testInstanceName);
-  const row = page.locator('tr', { has: instanceLinkSelector });
+  const kafkaInstancesPage = new KafkaInstancesPage(page);
+  const consumerGroupsPage = new ConsumerGroupsPage(page, testInstanceName);
+  const accessPage = new AccessPage(page, testInstanceName);
 
-  await navigateToKafkaList(page);
-  await row.locator('[aria-label="Actions"]').click();
-  await page.getByText('Connection').click();
-
-  const bootstrapUrl = await getBootstrapUrl(page, testInstanceName);
+  await kafkaInstancesPage.goto();
+  const bootstrapUrl = await kafkaInstancesPage.getBootstrapUrl(testInstanceName);
   console.log('bootstrapUrl: ' + bootstrapUrl);
 
   // Consumer
-  await navigateToAccess(page, testInstanceName);
-  await grantConsumerAccess(page, credentials.clientID, testTopicName, consumerGroupId);
+  await accessPage.gotoThroughMenu();
+  await accessPage.grantConsumerAccess(credentials.clientID, testTopicName, consumerGroupId);
+
   const consumer = new KafkaConsumer(bootstrapUrl, consumerGroupId, credentials.clientID, credentials.clientSecret);
   const consumerResponse = await retry(
     () => consumer.consumeMessages(testTopicName, expectedMessageCount),
@@ -240,6 +253,7 @@ test('create consumer group and check dashboard', async ({ page }) => {
   expect(consumerResponse).toEqual(expectedMessageCount);
 
   // Open Consumer Groups Tab to check dashboard
-  await navigateToConsumerGroups(page);
+  await kafkaInstancesPage.goto();
+  await consumerGroupsPage.gotoThroughMenu();
   await expect(page.getByText(consumerGroupId)).toHaveCount(1);
 });
