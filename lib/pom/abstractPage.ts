@@ -6,9 +6,11 @@ export abstract class AbstractPage {
   readonly nameForm: Locator;
   readonly details: Locator;
   readonly deleteNameInput: Locator;
-  readonly deleteButton: Locator;
+  readonly actionsDeleteButton: Locator;
+  readonly closeButton: Locator;
   readonly nextButton: Locator;
   readonly finishButton: Locator;
+  readonly deleteButton: Locator;
   readonly appDataServicesLink: Locator;
   static readonly menuLocator: string = '[data-testid=router-link]';
   static readonly actionsLocatorString: string = '[aria-label="Actions"]';
@@ -21,10 +23,12 @@ export abstract class AbstractPage {
     this.nameForm = page.getByLabel('Name *');
     this.details = page.locator('button', { hasText: 'Details' });
     this.deleteNameInput = page.locator('input[name="mas-name-input"]');
-    this.deleteButton = page.locator('button', { hasText: 'Delete' });
+    this.actionsDeleteButton = page.locator('button', { hasText: 'Delete' });
+    this.closeButton = page.locator('button', { hasText: 'Close' });
     this.appDataServicesLink = page.getByRole('link', { name: 'Application and Data Services' });
     this.nextButton = page.locator('button', { hasText: 'Next' });
     this.finishButton = page.locator('button', { hasText: 'Finish' });
+    this.deleteButton = page.locator('button', { hasText: 'Delete' });
     this.confirmDeleteField = page.getByLabel('Type DELETE to confirm:');
     this.saveButton = page.getByRole('button').filter({ hasText: 'Save' });
   }
@@ -39,9 +43,11 @@ export abstract class AbstractPage {
   // Navigates to Application and Data Services overview page when category of tested product is not present in navigation
   async navigateToApplicationAndDataServices(product: string) {
     // If category of tested product is not present in navigation
-    if (!(await this.page.locator('button:text-is("' + product + '")').isVisible())) {
+    try {
       // Open link to Application and Data Services overview page
-      await this.appDataServicesLink.click();
+      await this.appDataServicesLink.click({ timeout: 2000 });
+    } catch (e) {
+      // Do nothing
     }
   }
 
@@ -50,16 +56,19 @@ export abstract class AbstractPage {
     // Navigate to prerequisite page first
     await this.navigateToApplicationAndDataServices(product);
     // If link to list of tested product instances is not present in navigation
-    if (!(await this.page.locator(AbstractPage.menuLocator, { hasText: productList }).isVisible())) {
-      // Open category of tested product in navigation
-      await this.page.locator('button', { hasText: product }).click();
+    try {
+      await this.page.locator('button', { hasText: product }).click({ timeout: 2000 });
+    } catch (e) {
+      // Do nothing
     }
   }
 
   // Navigates to list of tested product instances
   async navigateToProductList(product: string, productList: string) {
     // Navigate to prerequisite page first
-    await this.navigateToProduct(product, productList);
+    if (!(await this.page.locator(AbstractPage.menuLocator, { hasText: productList }).isVisible())) {
+      await this.navigateToProduct(product, productList);
+    }
     // Close pop-up notifications if present
     await closePopUp(this.page);
     // Open link to list of tested product instances

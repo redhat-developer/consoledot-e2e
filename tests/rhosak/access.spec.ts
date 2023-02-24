@@ -4,6 +4,7 @@ import { config } from '@lib/config';
 import { KafkaInstancesPage } from '@lib/pom/streams/kafkaInstances';
 import { AbstractPage } from '@lib/pom/abstractPage';
 import { AccessPage } from '@lib/pom/streams/instance/access';
+import { KafkaInstancePage } from '@lib/pom/streams/kafkaInstance';
 
 const testInstanceName = config.instanceName;
 
@@ -33,6 +34,7 @@ test.beforeEach(async ({ page }) => {
 
     if ((await page.getByText(testInstanceName).count()) === 0) {
       await kafkaInstancesPage.createKafkaInstance(testInstanceName);
+      await kafkaInstancesPage.waitForKafkaReady(testInstanceName);
     }
   }
 });
@@ -52,6 +54,7 @@ test.afterAll(async ({ page }) => {
 test('test kafka manage access permission', async ({ page }) => {
   const consoleDotAuthPage = new ConsoleDotAuthPage(page);
   const kafkaInstancesPage = new KafkaInstancesPage(page);
+  const kafkaInstancePage = new KafkaInstancePage(page, testInstanceName);
   const kafkaAccessPage = new AccessPage(page, testInstanceName);
 
   test.skip(
@@ -61,6 +64,7 @@ test('test kafka manage access permission', async ({ page }) => {
   // TODO - too neni nutne ne?
   // await kafkaInstancesPage.waitForKafkaReady(testInstanceName);
   await kafkaInstancesPage.gotoThroughMenu();
+  await kafkaInstancePage.gotoThroughMenu();
   await kafkaAccessPage.gotoThroughMenu();
   await kafkaAccessPage.grantManageAccess(config.username_2);
 
@@ -71,6 +75,7 @@ test('test kafka manage access permission', async ({ page }) => {
   await consoleDotAuthPage.login(config.username_2, config.password_2);
 
   await kafkaInstancesPage.gotoThroughMenu();
+  await kafkaInstancePage.gotoThroughMenu();
   await kafkaAccessPage.gotoThroughMenu();
   await kafkaAccessPage.grantManageAccess('All accounts');
 

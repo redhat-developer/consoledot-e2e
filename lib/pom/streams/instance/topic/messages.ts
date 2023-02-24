@@ -1,7 +1,7 @@
 import { expect, Locator, Page } from '@playwright/test';
-import { TopicPage } from '../topics';
+import { TopicsPage } from '../topics';
 
-export class MessagesPage extends TopicPage {
+export class MessagesPage extends TopicsPage {
   readonly topicName: string;
   readonly messageMenuButton: Locator;
   readonly messageTable: Locator;
@@ -16,6 +16,10 @@ export class MessagesPage extends TopicPage {
   }
 
   async goto() {
+    super.goto();
+  }
+
+  async gotoThroughMenu() {
     await expect(this.messageMenuButton).toHaveCount(1);
     await this.messageMenuButton.click();
     try {

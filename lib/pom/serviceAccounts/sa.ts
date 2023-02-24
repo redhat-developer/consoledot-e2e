@@ -2,10 +2,9 @@ import { expect, Locator, Page } from '@playwright/test';
 import { config } from '@lib/config';
 import { closePopUp } from '@lib/utils/popup';
 import { resourceStore } from '@lib/resource_store';
-import { AbstractPage } from '../AbstractPage';
+import { AbstractPage } from '@lib/pom/abstractPage';
 
 export class ServiceAccountPage extends AbstractPage {
-  readonly page: Page;
   readonly urlPath: string = '/application-services/service-accounts';
   readonly serviceAccountHeading: Locator;
   readonly appDataServiceMenuLink: Locator;
@@ -15,10 +14,8 @@ export class ServiceAccountPage extends AbstractPage {
   readonly createButton: Locator;
   readonly clientId: Locator;
   readonly clientSecret: Locator;
-  readonly closeButton: Locator;
   readonly serviceAccountTable: Locator;
   readonly deleteServiceAccountButton: Locator;
-  readonly deleteButton: Locator;
   readonly resetCredentialsButton: Locator;
   readonly resetButton: Locator;
 
@@ -27,16 +24,13 @@ export class ServiceAccountPage extends AbstractPage {
     this.serviceAccountHeading = page.locator('h1', { hasText: 'Service Accounts' });
     this.appDataServiceMenuLink = page.getByRole('link', { name: 'Application and Data Services' });
     this.serviceAccountMenuLink = page.locator('li >> a:text("Service Accounts")');
-
     this.createServiceAccountButton = page.locator('button', { hasText: 'Create service account' });
     this.serviceAccountDescription = page.getByLabel('Short description *');
     this.createButton = page.locator('button:text-is("Create")');
     this.clientId = page.locator('[aria-label="Client ID"]');
     this.clientSecret = page.locator('[aria-label="Client secret"]');
-    this.clientSecret = page.locator('button', { hasText: 'Close' });
     this.serviceAccountTable = page.locator('[aria-label="Service account list"]');
     this.deleteServiceAccountButton = page.locator('button', { hasText: 'Delete service account' });
-    this.deleteButton = page.locator('button', { hasText: 'Delete' });
     this.resetCredentialsButton = page.locator('button', { hasText: 'Reset credentials' });
     this.resetButton = page.locator('button', { hasText: 'Reset' });
   }
@@ -51,15 +45,15 @@ export class ServiceAccountPage extends AbstractPage {
   // Go to page with Service Accounts through menu
   async gotoThroughMenu() {
     try {
-      await expect(this.appDataServiceMenuLink).toHaveCount(1);
+      await expect(this.appDataServiceMenuLink).toHaveCount(1, { timeout: 2000 });
       await this.appDataServiceMenuLink.click();
     } catch (e) {
       // ignore
     }
     await closePopUp(this.page);
 
-    await expect(this.appDataServiceMenuLink).toHaveCount(1);
-    await this.appDataServiceMenuLink.click();
+    await expect(this.serviceAccountMenuLink).toHaveCount(1, { timeout: 2000 });
+    await this.serviceAccountMenuLink.click();
     await expect(this.serviceAccountHeading).toHaveCount(1);
   }
 
@@ -100,11 +94,11 @@ export class ServiceAccountPage extends AbstractPage {
     const saLinkSelector = this.page.locator('td', { hasText: name });
     const row = this.page.locator('tr', { has: saLinkSelector.nth(0) });
 
-    await row.locator('[aria-label="Actions"]').nth(0).click();
+    await row.locator(AbstractPage.actionsLocatorString).nth(0).click();
 
     await expect(this.deleteServiceAccountButton).toBeEnabled();
     await this.deleteServiceAccountButton.click();
-    await this.deleteButton.click();
+    await this.actionsDeleteButton.click();
 
     await expect(this.page.locator('td', { hasText: name })).toHaveCount(0, {
       timeout: config.serviceAccountDeletionTimeout

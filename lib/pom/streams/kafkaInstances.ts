@@ -7,9 +7,10 @@ import { AbstractPage } from '@lib/pom/abstractPage';
 
 export class KafkaInstancesPage extends AbstractPage {
   urlPath = '/application-services/streams/kafkas';
-  readonly productName: string = 'Streams or Apache Kafka';
+  readonly productName: string = 'Streams for Apache Kafka';
   readonly productList: string = 'Kafka Instances';
   readonly createKafkaInstanceButton: Locator;
+  readonly createKafkaInstanceFormButton: Locator;
   readonly createKafkaInstanceHeading: Locator;
   readonly kafkaInstanceTable: Locator;
   readonly deleteInstanceButton: Locator;
@@ -20,6 +21,7 @@ export class KafkaInstancesPage extends AbstractPage {
   constructor(page: Page) {
     super(page);
     this.createKafkaInstanceButton = page.locator('button', { hasText: 'Create Kafka instance' });
+    this.createKafkaInstanceFormButton = page.locator('button', { hasText: 'Create instance' });
     this.createKafkaInstanceHeading = page.getByText('Create a Kafka instance');
     this.kafkaInstanceTable = page.locator('[data-ouia-component-id=table-kafka-instances]');
     this.deleteInstanceButton = page.locator('button', { hasText: 'Delete instance' });
@@ -73,7 +75,7 @@ export class KafkaInstancesPage extends AbstractPage {
     }
 
     // data-testid=modalCreateKafka-buttonSubmit
-    await this.createKafkaInstanceButton.click();
+    await this.createKafkaInstanceFormButton.click();
 
     if (check) {
       // check for the instance to have been created
@@ -100,7 +102,7 @@ export class KafkaInstancesPage extends AbstractPage {
         // ignore
       }
       // data-testid=modalDeleteKafka-buttonDelete
-      await this.deleteButton.click();
+      await this.actionsDeleteButton.click();
       // await for the instance to be deleted
       if (awaitDeletion) {
         await expect(this.page.getByText(`${name}`, { exact: true })).toHaveCount(0, {

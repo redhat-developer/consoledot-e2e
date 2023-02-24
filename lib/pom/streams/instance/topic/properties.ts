@@ -1,7 +1,7 @@
 import { expect, Locator, Page } from '@playwright/test';
-import { TopicPage } from '@lib/pom/streams/instance/topics';
+import { TopicsPage } from '@lib/pom/streams/instance/topics';
 
-export class PropertiesPage extends TopicPage {
+export class PropertiesPage extends TopicsPage {
   readonly topicName: string;
   readonly propertiesMenuButton: Locator;
   readonly editPropertiesButton: Locator;
@@ -13,7 +13,7 @@ export class PropertiesPage extends TopicPage {
     this.editPropertiesButton = page.locator('button', { hasText: 'Edit properties' });
   }
 
-  async goto() {
+  async gotoThroughMenu() {
     await expect(this.propertiesMenuButton).toHaveCount(1);
     await this.propertiesMenuButton.click();
     await expect(this.editPropertiesButton).toHaveCount(1);

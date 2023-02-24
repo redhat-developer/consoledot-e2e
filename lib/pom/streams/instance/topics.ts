@@ -2,10 +2,11 @@ import { expect, Locator, Page } from '@playwright/test';
 import { config } from '@lib/config';
 import { KafkaInstancePage } from '@lib/pom/streams/kafkaInstance';
 
-export class TopicPage extends KafkaInstancePage {
+export class TopicsPage extends KafkaInstancePage {
   readonly topicsMenuButton: Locator;
   readonly createTopicButton: Locator;
   readonly createTopicHeading: Locator;
+  readonly deleteTopicButton: Locator;
   readonly topicNameField: Locator;
   readonly numPartitionsButton: Locator;
   readonly numPartitionsInput: Locator;
@@ -25,6 +26,7 @@ export class TopicPage extends KafkaInstancePage {
     this.urlPath = this.urlPath + '/' + instanceName + '/topics';
     this.topicsMenuButton = page.locator('button[aria-label="Topics"]');
     this.createTopicButton = page.locator('button', { hasText: 'Create topic' });
+    this.deleteTopicButton = page.locator('button', { hasText: 'Delete topic' });
     this.createTopicHeading = page.locator('h2', { hasText: 'Topic name' });
     this.topicNameField = page.getByPlaceholder('Enter topic name');
     this.numPartitionsButton = page.locator('button[name="num-partitions"]');
@@ -49,14 +51,14 @@ export class TopicPage extends KafkaInstancePage {
   }
 
   async gotoThroughMenu() {
-    await expect(await this.topicsMenuButton).toHaveCount(1);
+    await expect(this.topicsMenuButton).toHaveCount(1);
     // data-testid=pageKafka-tabTopics
     await this.topicsMenuButton.click();
   }
 
   async createKafkaTopic(name: string, defaultProperties: boolean) {
     await this.createTopicButton.click();
-    await expect(this.createTopicHeading).toHaveCount(2);
+    await expect(this.createTopicHeading).toHaveCount(1);
     await this.topicNameField.fill(name);
     if (defaultProperties) {
       // This is default properties values Topic creation
@@ -94,7 +96,7 @@ export class TopicPage extends KafkaInstancePage {
       await this.kibibytesButton.click();
 
       // Choosing different CleanUp policy
-      await this.deleteButton.click();
+      await this.actionsDeleteButton.click();
       await this.compactButton.first().click();
       await this.compactButton.click();
 
@@ -106,7 +108,7 @@ export class TopicPage extends KafkaInstancePage {
   async deleteKafkaTopic(name: string) {
     await this.showElementActions(name);
     // data-testid=tableTopics-actionDelete
-    await this.deleteButton.click();
+    await this.deleteTopicButton.click();
     await this.confirmDeleteField.click();
     await this.confirmDeleteField.fill('DELETE');
     // data-testid=modalDeleteTopic-buttonDelete

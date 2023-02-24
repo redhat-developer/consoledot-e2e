@@ -1,7 +1,7 @@
 import { expect, Locator, Page } from '@playwright/test';
-import { TopicPage } from '@lib/pom/streams/instance/topics';
+import { TopicsPage } from '@lib/pom/streams/instance/topics';
 
-export class ConsumerGroupsPage extends TopicPage {
+export class ConsumerGroupsPage extends TopicsPage {
   readonly topicName: string;
   readonly consumerGroupsMenuButton: Locator;
 
@@ -11,7 +11,7 @@ export class ConsumerGroupsPage extends TopicPage {
     this.consumerGroupsMenuButton = page.locator('button', { hasText: 'Consumer groups' });
   }
 
-  async goto() {
+  async gotoThroughMenu() {
     await expect(this.consumerGroupsMenuButton).toHaveCount(1);
     await this.consumerGroupsMenuButton.click();
   }

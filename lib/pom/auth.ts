@@ -4,7 +4,6 @@ import { config } from '@lib/config';
 import { AbstractPage } from '@lib/pom/abstractPage';
 
 export class ConsoleDotAuthPage extends AbstractPage {
-  readonly page: Page;
   readonly usernameField: Locator;
   readonly passwordField: Locator;
   readonly nextButton: Locator;

@@ -1,6 +1,7 @@
 import { expect, Locator, Page } from '@playwright/test';
 import { config } from '@lib/config';
 import { KafkaInstancePage } from '@lib/pom/streams/kafkaInstance';
+import { AbstractPage } from '@lib/pom/abstractPage';
 
 export class AccessPage extends KafkaInstancePage {
   readonly accessMenuButton: Locator;
@@ -132,7 +133,7 @@ export class AccessPage extends KafkaInstancePage {
     if ((await row.count()) == 1) {
       // GetByRole sometimes works, sometimes it does not.
       // await row.getByRole('button', { name: 'Actions' }).click();
-      await row.locator('button').click();
+      await row.locator(AbstractPage.actionsLocatorString).click();
       await this.deleteButton.click();
 
       // await for the permission to be revoked

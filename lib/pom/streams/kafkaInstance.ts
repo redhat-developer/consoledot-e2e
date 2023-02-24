@@ -7,7 +7,7 @@ export class KafkaInstancePage extends KafkaInstancesPage {
   readonly instanceName: string;
   readonly connectionButton: Locator;
   readonly detailsButton: Locator;
-  readonly deleteButton: Locator;
+  readonly actionsDeleteButton: Locator;
   readonly instanceLink: Locator;
 
   constructor(page: Page, instanceName: string) {
@@ -16,7 +16,7 @@ export class KafkaInstancePage extends KafkaInstancesPage {
     this.instanceName = instanceName;
     this.connectionButton = page.locator('a', { hasText: 'Connection' });
     this.detailsButton = page.locator('a', { hasText: 'Details' });
-    this.deleteButton = page.locator('a', { hasText: 'Delete' });
+    this.actionsDeleteButton = page.locator('a', { hasText: 'Delete' });
     this.instanceLink = page.locator('a', { hasText: this.instanceName });
   }
 
@@ -46,7 +46,7 @@ export class KafkaInstancePage extends KafkaInstancesPage {
 
   async deleteInstance(name: string) {
     await this.showInstanceActions();
-    await this.deleteButton.click();
+    await this.actionsDeleteButton.click();
 
     // Duplicity from parent class, how to solve that because previous part is different
     try {
@@ -63,7 +63,7 @@ export class KafkaInstancePage extends KafkaInstancesPage {
       // ignore
     }
     // data-testid=modalDeleteKafka-buttonDelete
-    await this.deleteButton.click();
+    await this.actionsDeleteButton.click();
   }
 
   async closeModalWithInfo() {

@@ -2,6 +2,7 @@ import { test, expect } from '@playwright/test';
 import { ConsoleDotAuthPage } from '@lib/pom/auth';
 import { config } from '@lib/config';
 import { ServiceRegistryPage } from '@lib/pom/serviceRegistry/serviceRegistry';
+import { AbstractPage } from '@lib/pom/abstractPage';
 
 // Define name of Service Registry instance for this set of tests
 const testInstanceName = config.instanceName;
@@ -15,7 +16,7 @@ test.beforeEach(async ({ page }) => {
   // Go to list of Service Registry instances
   await serviceRegistryPage.gotoThroughMenu();
   // Wait for dismiss of loading spinner
-  await page.waitForSelector('[role=progressbar]', {
+  await page.waitForSelector(AbstractPage.progressBarLocatorString, {
     state: 'detached',
     timeout: config.serviceRegistryInstanceCreationTimeout
   });

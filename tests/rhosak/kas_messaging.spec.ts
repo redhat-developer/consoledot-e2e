@@ -16,10 +16,12 @@ import {
   setEpoch,
   setLimit
 } from '@lib/pom/messages';
-import { TopicPage } from '@lib/pom/streams/instance/topics';
+import { TopicsPage } from '@lib/pom/streams/instance/topics';
 import { AccessPage } from '@lib/pom/streams/instance/access';
 import { ConsumerGroupsPage } from '@lib/pom/streams/instance/consumerGroups';
 import { MessagesPage } from '@lib/pom/streams/instance/topic/messages';
+import { KafkaInstancePage } from '@lib/pom/streams/kafkaInstance';
+import { TopicPage } from '@lib/pom/streams/instance/topic';
 
 const testInstanceName = config.instanceName;
 const testTopicName = `test-topic-name-${config.sessionID}`;
@@ -36,7 +38,8 @@ test.beforeEach(async ({ page }) => {
   const consoleDotAuthPage = new ConsoleDotAuthPage(page);
   const serviceAccountPage = new ServiceAccountPage(page);
   const kafkaInstancesPage = new KafkaInstancesPage(page);
-  const topicPage = new TopicPage(page, testInstanceName);
+  const kafkaInstancePage = new KafkaInstancePage(page, testInstanceName);
+  const topicPage = new TopicsPage(page, testInstanceName);
   const accessPage = new AccessPage(page, testInstanceName);
 
   await consoleDotAuthPage.login();
@@ -64,6 +67,7 @@ test.beforeEach(async ({ page }) => {
     }
   }
 
+  await kafkaInstancePage.gotoThroughMenu();
   await topicPage.gotoThroughMenu();
   // Do not create topic if it already exists
   // TODO poresit
@@ -78,6 +82,7 @@ test.beforeEach(async ({ page }) => {
   await kafkaInstancesPage.gotoThroughMenu();
   bootstrap = await kafkaInstancesPage.getBootstrapUrl(testInstanceName);
 
+  await kafkaInstancePage.gotoThroughMenu();
   await accessPage.gotoThroughMenu();
   await accessPage.grantProducerAccess(credentials.clientID, testTopicName);
 
@@ -106,10 +111,12 @@ test.afterAll(async ({ page }) => {
 // test_6messages.py generate_messages_to_topic
 test('Consume messages from topic', async ({ page }) => {
   const kafkaInstancesPage = new KafkaInstancesPage(page);
+  const kafkaInstancePage = new KafkaInstancePage(page, testInstanceName);
   const consumerGroupsPage = new ConsumerGroupsPage(page, testInstanceName);
   const accessPage = new AccessPage(page, testInstanceName);
 
   await kafkaInstancesPage.gotoThroughMenu();
+  await kafkaInstancePage.gotoThroughMenu();
   await accessPage.gotoThroughMenu();
   await accessPage.grantConsumerAccess(credentials.clientID, testTopicName, consumerGroupId);
 
@@ -123,7 +130,8 @@ test('Consume messages from topic', async ({ page }) => {
   expect(consumerResponse).toEqual(expectedMessageCount);
 
   // Open Consumer Groups Tab to check dashboard
-  await kafkaInstancesPage.goto();
+  await kafkaInstancesPage.gotoThroughMenu();
+  await kafkaInstancePage.gotoThroughMenu();
   await consumerGroupsPage.gotoThroughMenu();
   await expect(await page.getByText(consumerGroupId)).toHaveCount(1);
 });
@@ -131,10 +139,14 @@ test('Consume messages from topic', async ({ page }) => {
 // test_6messages.py browse_messages
 test('Browse messages', async ({ page }) => {
   const kafkaInstancesPage = new KafkaInstancesPage(page);
+  const kafkaInstancePage = new KafkaInstancePage(page, testInstanceName);
+  const topicsPage = new TopicsPage(page, testInstanceName);
+  const topicPage = new TopicPage(page, testInstanceName, testTopicName);
   const messagesPage = new MessagesPage(page, testInstanceName, testTopicName);
-  const topicPage = new TopicPage(page, testInstanceName);
 
-  await kafkaInstancesPage.goto();
+  await kafkaInstancesPage.gotoThroughMenu();
+  await kafkaInstancePage.gotoThroughMenu();
+  await topicsPage.gotoThroughMenu();
   await topicPage.gotoThroughMenu();
   await messagesPage.gotoThroughMenu();
 
@@ -157,10 +169,14 @@ for (const filter of filters) {
     tomorrow.setDate(today.getDate() + 1);
 
     const kafkaInstancesPage = new KafkaInstancesPage(page);
+    const kafkaInstancePage = new KafkaInstancePage(page, testInstanceName);
+    const topicsPage = new TopicsPage(page, testInstanceName);
+    const topicPage = new TopicPage(page, testInstanceName, testTopicName);
     const messagesPage = new MessagesPage(page, testInstanceName, testTopicName);
-    const topicPage = new TopicPage(page, testInstanceName);
 
-    await kafkaInstancesPage.goto();
+    await kafkaInstancesPage.gotoThroughMenu();
+    await kafkaInstancePage.gotoThroughMenu();
+    await topicsPage.gotoThroughMenu();
     await topicPage.gotoThroughMenu();
     await messagesPage.gotoThroughMenu();
 
@@ -233,14 +249,16 @@ for (const filter of filters) {
 // test_6acl.py test_kafka_create_consumer_group_and_check_dashboard
 test('create consumer group and check dashboard', async ({ page }) => {
   const kafkaInstancesPage = new KafkaInstancesPage(page);
+  const kafkaInstancePage = new KafkaInstancePage(page, testInstanceName);
   const consumerGroupsPage = new ConsumerGroupsPage(page, testInstanceName);
   const accessPage = new AccessPage(page, testInstanceName);
 
-  await kafkaInstancesPage.goto();
+  await kafkaInstancesPage.gotoThroughMenu();
   const bootstrapUrl = await kafkaInstancesPage.getBootstrapUrl(testInstanceName);
   console.log('bootstrapUrl: ' + bootstrapUrl);
 
   // Consumer
+  await kafkaInstancePage.gotoThroughMenu();
   await accessPage.gotoThroughMenu();
   await accessPage.grantConsumerAccess(credentials.clientID, testTopicName, consumerGroupId);
 
@@ -253,7 +271,8 @@ test('create consumer group and check dashboard', async ({ page }) => {
   expect(consumerResponse).toEqual(expectedMessageCount);
 
   // Open Consumer Groups Tab to check dashboard
-  await kafkaInstancesPage.goto();
+  await kafkaInstancesPage.gotoThroughMenu();
+  await kafkaInstancePage.gotoThroughMenu();
   await consumerGroupsPage.gotoThroughMenu();
   await expect(page.getByText(consumerGroupId)).toHaveCount(1);
 });

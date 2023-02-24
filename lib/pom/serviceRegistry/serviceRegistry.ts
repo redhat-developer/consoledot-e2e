@@ -1,11 +1,9 @@
 import { expect, Locator, Page } from '@playwright/test';
 import { config } from '@lib/config';
 import { resourceStore } from '@lib/resource_store';
-import { Locators } from '@lib/enums/locators';
 import { AbstractPage } from '@lib/pom/abstractPage';
 
 export class ServiceRegistryPage extends AbstractPage {
-  readonly page: Page;
   readonly urlPath: string = '/application-services/service-registry';
   readonly productName: string = 'Service Registry';
   readonly productList: string = 'Service Registry Instances';
@@ -46,7 +44,7 @@ export class ServiceRegistryPage extends AbstractPage {
     // Get row of instance
     const row = this.page.locator('tr', { has: instanceLinkSelector });
     // Click on three-dots menu of instance
-    await row.locator(Locators.ACTIONS).click();
+    await row.locator(AbstractPage.actionsLocatorString).click();
   }
 
   // Creates Service Registry instance defined by name,
@@ -82,7 +80,7 @@ export class ServiceRegistryPage extends AbstractPage {
       // Open three-dots menu of instance
       await this.showElementActions(name);
       // Click on delete button
-      await this.deleteButton.click();
+      await this.actionsDeleteButton.click();
 
       try {
         // Wait for presence of name input
@@ -98,7 +96,7 @@ export class ServiceRegistryPage extends AbstractPage {
       }
 
       // Click on delete button
-      await this.deleteButton.click();
+      await this.actionsDeleteButton.click();
       // If deletion wait is required
       if (awaitDeletion) {
         // Wait for absence of instance name for defined timeout
@@ -130,7 +128,7 @@ export class ServiceRegistryPage extends AbstractPage {
     // Get list of instance names present in resource store
     const serviceRegistryList = resourceStore.getServiceRegistryList;
     // Go to Service Registry instances list page
-    this.gotoThroughMenu();
+    await this.gotoThroughMenu();
     // For every instance name in list
     for (const serviceRegistryName of serviceRegistryList) {
       try {
