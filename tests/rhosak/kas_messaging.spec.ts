@@ -5,23 +5,13 @@ import { KafkaInstancesPage } from '@lib/pom/streams/kafkaInstances';
 import { KafkaConsumer, KafkaProducer } from '@lib/utils/clients';
 import { ServiceAccountPage } from '@lib/pom/serviceAccounts/sa';
 import { retry } from '@lib/utils/common';
-import {
-  Limit,
-  filterMessagesByOffset,
-  FilterGroup,
-  pickFilterOption,
-  applyFilter,
-  setPartition,
-  setTimestamp,
-  setEpoch,
-  setLimit
-} from '@lib/pom/messages';
 import { TopicsPage } from '@lib/pom/streams/instance/topics';
 import { AccessPage } from '@lib/pom/streams/instance/access';
 import { ConsumerGroupsPage } from '@lib/pom/streams/instance/consumerGroups';
 import { MessagesPage } from '@lib/pom/streams/instance/topic/messages';
 import { KafkaInstancePage } from '@lib/pom/streams/kafkaInstance';
 import { TopicPage } from '@lib/pom/streams/instance/topic';
+import { FilterGroup, Limit } from '@lib/enums/messages';
 
 const testInstanceName = config.instanceName;
 const testTopicName = `test-topic-name-${config.sessionID}`;
@@ -133,7 +123,7 @@ test('Consume messages from topic', async ({ page }) => {
   await kafkaInstancesPage.gotoThroughMenu();
   await kafkaInstancePage.gotoThroughMenu();
   await consumerGroupsPage.gotoThroughMenu();
-  await expect(await page.getByText(consumerGroupId)).toHaveCount(1);
+  await expect(page.getByText(consumerGroupId)).toHaveCount(1);
 });
 
 // test_6messages.py browse_messages
@@ -185,8 +175,8 @@ for (const filter of filters) {
 
     switch (filter) {
       case FilterGroup.offset: {
-        await pickFilterOption(page, FilterGroup.offset);
-        await filterMessagesByOffset(page, '0', '20', Limit.ten);
+        await messagesPage.pickFilterOption(FilterGroup.offset);
+        await messagesPage.filterMessagesByOffset('0', '20', Limit.ten);
 
         // Check that 1st message has offset 20
         await messageTable.nth(0).locator('td[data-label="Offset"]');
@@ -195,7 +185,7 @@ for (const filter of filters) {
         await expect(await messageTable.count()).toBe(Limit.ten);
 
         // Set offset to 13 and limit to 50
-        await filterMessagesByOffset(page, '0', '13', Limit.fifty);
+        await messagesPage.filterMessagesByOffset('0', '13', Limit.fifty);
         // messageTable = await page.locator('table[aria-label="Messages table"] >> tbody >> tr');
 
         // Check that 1st message has offset 13
@@ -206,24 +196,24 @@ for (const filter of filters) {
       case FilterGroup.timestamp: {
         // Skip FilterByTimestamp test meanwhile there is reported Bug https://issues.redhat.com/browse/MGDSTRM-10574
         test.skip();
-        await pickFilterOption(page, FilterGroup.timestamp);
-        await setTimestamp(page, today.toISOString().slice(0, 10));
-        await applyFilter(page);
+        await messagesPage.pickFilterOption(FilterGroup.timestamp);
+        await messagesPage.setTimestamp(today.toISOString().slice(0, 10));
+        await messagesPage.applyFilter();
         // Check that messages are in the table
         await expect(await messageTable.count()).toBeGreaterThan(0);
 
         // Set epoch timestam to tomorrow and check that table is empty
-        await setTimestamp(page, tomorrow.toISOString().slice(0, 10));
-        await applyFilter(page);
+        await messagesPage.setTimestamp(tomorrow.toISOString().slice(0, 10));
+        await messagesPage.applyFilter();
         await expect(await page.getByText('No messages data')).toHaveCount(1);
         // await expectMessageTableIsEmpty(page);
         await expect(messageTable).toHaveCount(1);
         break;
       }
       case FilterGroup.epoch: {
-        await pickFilterOption(page, FilterGroup.epoch);
-        await setEpoch(page, today.getTime());
-        await applyFilter(page);
+        await messagesPage.pickFilterOption(FilterGroup.epoch);
+        await messagesPage.setEpoch(today.getTime());
+        await messagesPage.applyFilter();
         // Check that messages are in the table
         await expect(await messageTable.count()).toBeGreaterThan(0);
 
@@ -236,10 +226,10 @@ for (const filter of filters) {
         break;
       }
       case FilterGroup.latest: {
-        await pickFilterOption(page, FilterGroup.latest);
-        await setPartition(page, '0');
-        await setLimit(page, Limit.twenty);
-        await applyFilter(page);
+        await messagesPage.pickFilterOption(FilterGroup.latest);
+        await messagesPage.setPartition('0');
+        await messagesPage.setLimit(Limit.twenty);
+        await messagesPage.applyFilter();
         await expect(await messageTable.count()).toBeGreaterThan(0);
         break;
       }

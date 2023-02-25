@@ -41,7 +41,7 @@ export abstract class AbstractPage {
   }
 
   // Navigates to Application and Data Services overview page when category of tested product is not present in navigation
-  async navigateToApplicationAndDataServices(product: string) {
+  async navigateToApplicationAndDataServices() {
     // If category of tested product is not present in navigation
     try {
       // Open link to Application and Data Services overview page
@@ -52,9 +52,9 @@ export abstract class AbstractPage {
   }
 
   // Opens category of tested product in navigation when link to list of tested product instances is not present there
-  async navigateToProduct(product: string, productList: string) {
+  async navigateToProduct(product: string) {
     // Navigate to prerequisite page first
-    await this.navigateToApplicationAndDataServices(product);
+    await this.navigateToApplicationAndDataServices();
     // If link to list of tested product instances is not present in navigation
     try {
       await this.page.locator('button', { hasText: product }).click({ timeout: 2000 });
@@ -67,7 +67,7 @@ export abstract class AbstractPage {
   async navigateToProductList(product: string, productList: string) {
     // Navigate to prerequisite page first
     if (!(await this.page.locator(AbstractPage.menuLocator, { hasText: productList }).isVisible())) {
-      await this.navigateToProduct(product, productList);
+      await this.navigateToProduct(product);
     }
     // Close pop-up notifications if present
     await closePopUp(this.page);
