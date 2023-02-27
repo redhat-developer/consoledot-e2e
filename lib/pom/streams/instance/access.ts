@@ -72,7 +72,7 @@ export class AccessPage extends KafkaInstancePage {
 
     await this.consumeFromTopicButton.click();
 
-    // TODO - predelat selektory!
+    // TODO - these selectors should be added to class as well
     await this.page
       .getByRole('row', {
         name: 'T Topic Options menu permission.manage_permissions_dialog.assign_permissions.resource_name_aria Options menu Label group category'

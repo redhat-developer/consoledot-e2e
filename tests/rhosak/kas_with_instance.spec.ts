@@ -96,7 +96,6 @@ test('test fail to create a second Kafka instance', async ({ page }) => {
   const kafkaInstancesPage = new KafkaInstancesPage(page);
   await kafkaInstancesPage.gotoThroughMenu();
 
-  // TODO poladit do POM
   await page.getByText('Create Kafka instance').click();
   await expect(page.getByText('Create a Kafka instance')).toHaveCount(1);
 
@@ -104,7 +103,6 @@ test('test fail to create a second Kafka instance', async ({ page }) => {
   await page.locator('#modalCreateKafka > button').click();
 });
 
-// TODO dat do POM
 const filterByName = async function (page, name, skipClick = false) {
   if ((await page.getByRole('button', { name: 'Clear all filters' }).count()) > 0) {
     await page.getByRole('button', { name: 'Clear all filters' }).click();
@@ -138,7 +136,6 @@ test('test instances can be filtered by name', async ({ page }) => {
   ).toHaveCount(1);
 });
 
-// TODO dat do POM
 const filterByOwner = async function (page, name, skipClick = false) {
   const kafkaInstancesPage = new KafkaInstancesPage(page);
   await kafkaInstancesPage.gotoThroughMenu();
@@ -263,8 +260,8 @@ test('check Topic does not exist and create and delete', async ({ page }) => {
   const topicPage = new TopicsPage(page, testInstanceName);
   await kafkaInstancesPage.gotoThroughMenu();
   await kafkaInstancePage.gotoThroughMenu();
-  // TODO - upravit
-  await page.locator('button[aria-label="Topics"]').click();
+  await topicPage.gotoThroughMenu();
+
   await expect(page.locator('h2', { hasText: 'No topics' })).toBeVisible();
   await expect(page.locator('button', { hasText: 'Create topic' })).toBeVisible();
   // expecting not to find topic row

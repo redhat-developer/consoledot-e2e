@@ -60,7 +60,7 @@ test.beforeEach(async ({ page }) => {
   await kafkaInstancePage.gotoThroughMenu();
   await topicPage.gotoThroughMenu();
   // Do not create topic if it already exists
-  // TODO poresit
+  // TODO - implement this in POM somehow
   await expect(page.getByText('Create topic')).toHaveCount(1);
   await expect(page.getByText('Loading content')).toHaveCount(0);
   if ((await page.locator('a', { hasText: testTopicName }).count()) === 0) {

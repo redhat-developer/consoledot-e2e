@@ -36,17 +36,6 @@ export class ServiceRegistryPage extends AbstractPage {
     await this.navigateToProductList(this.productName, this.productList);
   }
 
-  // TODO - this might be reused as well????
-  // Opens three-dots menu of Service Registry instance defined by name
-  async showElementActions(instanceName: string) {
-    // Get link of instance
-    const instanceLinkSelector = this.page.getByText(instanceName);
-    // Get row of instance
-    const row = this.page.locator('tr', { has: instanceLinkSelector });
-    // Click on three-dots menu of instance
-    await row.locator(AbstractPage.actionsLocatorString).click();
-  }
-
   // Creates Service Registry instance defined by name,
   // checks creation of Service Registry instance when required
   async createServiceRegistryInstance(name: string, check = true) {
@@ -65,9 +54,8 @@ export class ServiceRegistryPage extends AbstractPage {
 
     // If creation check is required
     if (check) {
-      // TODO - Raise?
       // Get table with instances
-      const table = this.serviceRegistryTable;
+      const table = await this.serviceRegistryTable;
       // Check that instance name is present in table
       expect(table.getByText(name)).toBeTruthy();
     }

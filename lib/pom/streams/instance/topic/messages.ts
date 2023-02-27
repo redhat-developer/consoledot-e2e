@@ -22,6 +22,10 @@ export class MessagesPage extends TopicsPage {
     this.checkForNewDataButton = page.locator('button', { hasText: 'Check for new data' });
     this.searchButton = page.locator('button[aria-label="Search"]');
     this.filterGroup = page.locator('[data-testid="filter-group"]');
+    this.specifyPartitionValue = '[aria-label="Specify partition value"]';
+    this.specifyOffset = '[aria-label="Specify offset"]';
+    this.datePicker = '[aria-label="Date picker"]';
+    this.specifyEpochTimestamp = '[aria-label="Specify epoch timestamp"]';
   }
 
   async goto() {

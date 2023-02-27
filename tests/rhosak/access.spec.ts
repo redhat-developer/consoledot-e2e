@@ -15,7 +15,6 @@ test.beforeEach(async ({ page }) => {
   await consoleDotAuthPage.login();
   await kafkaInstancesPage.gotoThroughMenu();
 
-  // TODO - vlozit do kafky primo
   if ((await page.getByText(testInstanceName).count()) > 0 && (await page.locator('tr').count()) === 2) {
     // Test instance present, nothing to do!
   } else {
@@ -61,8 +60,8 @@ test('test kafka manage access permission', async ({ page }) => {
     config.username_2 == undefined || config.password_2 == undefined,
     'Secondary user has to be defined for this test.'
   );
-  // TODO - too neni nutne ne?
-  // await kafkaInstancesPage.waitForKafkaReady(testInstanceName);
+
+  await kafkaInstancesPage.waitForKafkaReady(testInstanceName);
   await kafkaInstancesPage.gotoThroughMenu();
   await kafkaInstancePage.gotoThroughMenu();
   await kafkaAccessPage.gotoThroughMenu();

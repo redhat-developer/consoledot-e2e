@@ -9,6 +9,7 @@ export class KafkaInstancePage extends KafkaInstancesPage {
   readonly detailsButton: Locator;
   readonly actionsDeleteButton: Locator;
   readonly instanceLink: Locator;
+  readonly kafkaInstanceHeading: Locator;
 
   constructor(page: Page, instanceName: string) {
     super(page);
@@ -18,11 +19,12 @@ export class KafkaInstancePage extends KafkaInstancesPage {
     this.detailsButton = page.locator('a', { hasText: 'Details' });
     this.actionsDeleteButton = page.locator('a', { hasText: 'Delete' });
     this.instanceLink = page.locator('a', { hasText: this.instanceName });
+    this.kafkaInstanceHeading = page.locator('h1', { hasText: this.instanceName });
   }
 
   async goto() {
     await this.page.goto(config.startingPage + this.urlPath);
-    // TODO some expect???
+    await expect(this.kafkaInstanceHeading).toHaveCount(1);
   }
 
   async gotoThroughMenu() {

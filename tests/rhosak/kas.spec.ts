@@ -52,7 +52,6 @@ test('create, wait for ready and delete a Kafka instance', async ({ page }) => {
   const kafkaInstancesPage = new KafkaInstancesPage(page);
   await kafkaInstancesPage.gotoThroughMenu();
   await kafkaInstancesPage.createKafkaInstance(testInstanceName, false);
-  // TODO se ceka by default ne?
   await kafkaInstancesPage.waitForKafkaReady(testInstanceName);
   await kafkaInstancesPage.deleteKafkaInstance(testInstanceName);
 });
@@ -70,14 +69,12 @@ test('test Kafka creation units slider', async ({ page }) => {
   await expect(slider.locator('.pf-c-slider__step-label').last()).toHaveText(config.maxKafkaStreamingUnits.toString());
 });
 
-// TODO presunout
 const resetFilter = async function (page) {
   if ((await page.getByText('Clear all filters').count()) > 1) {
     await page.getByText('Clear all filters').nth(1).click();
   }
 };
 
-// TODO presunout
 const filterByStatus = async function (page, status) {
   await resetFilter(page);
   await page.getByTestId('large-viewport-toolbar').locator('[aria-label="Options menu"]').click();
@@ -134,7 +131,6 @@ test('test fail to create Kafka instance with the same name', async ({ page }) =
 
   await kafkaInstancesPage.createKafkaInstance(testInstanceName, false);
 
-  // TODO - udelat lepe
   await page.getByText('Create Kafka instance').click();
   await expect(page.getByText('Create a Kafka instance')).toHaveCount(1);
   await page.getByLabel('Name *').fill(testInstanceName);

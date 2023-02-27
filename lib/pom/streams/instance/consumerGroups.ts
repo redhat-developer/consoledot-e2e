@@ -14,12 +14,12 @@ export class ConsumerGroupsPage extends KafkaInstancePage {
   // Got to starting page
   async goto() {
     await this.page.goto(config.startingPage + this.urlPath);
-    // TODO - Expect see bsomething ???
-    // await expect(this.consumerGroupsMenuButton).toHaveCount(1);
+    await expect(this.kafkaInstanceHeading).toHaveCount(1);
   }
 
   async gotoThroughMenu() {
     await expect(this.consumerGroupsMenuButton).toHaveCount(1);
     await this.consumerGroupsMenuButton.click();
+    await expect(this.kafkaInstanceHeading).toHaveCount(1);
   }
 }
