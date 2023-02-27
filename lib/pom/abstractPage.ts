@@ -1,3 +1,5 @@
+import { config } from '@lib/config';
+import { addConsoleLogListeners } from '@lib/utils/console_err_listener';
 import { closePopUp } from '@lib/utils/popup';
 import { Locator, Page, expect } from '@playwright/test';
 
@@ -31,6 +33,11 @@ export abstract class AbstractPage {
     this.deleteButton = page.locator('button', { hasText: 'Delete' });
     this.confirmDeleteField = page.getByLabel('Type DELETE to confirm:');
     this.saveButton = page.getByRole('button').filter({ hasText: 'Save' });
+
+    // move that into page object model when it will be implemented
+    if (config.enableErrLogging) {
+      addConsoleLogListeners(page);
+    }
   }
 
   async showElementActions(selectorName: string) {
