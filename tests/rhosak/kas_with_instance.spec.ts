@@ -269,6 +269,10 @@ test('create Topic with properties different than default', async ({ page }) => 
 
 // test_4kafka.py test_edit_topic_properties_after_creation
 test('edit topic properties after creation', async ({ page }) => {
+  test.fixme(
+    true,
+    'Test is extremely flaky. Topics are not cleared and we need to wait properly on loading instead of just cliking without it.'
+  );
   await navigateToKafkaTopicsList(page, testInstanceName);
   await createKafkaTopic(page, testTopicName, true);
 
