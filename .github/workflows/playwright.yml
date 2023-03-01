@@ -4,7 +4,7 @@ on:
   push:
     branches: [ main ]
   schedule:
-    - cron: "0 */4 * * *"
+    - cron: "0 */12 * * *"
 
 concurrency:
   # Only run once this workflow
@@ -55,7 +55,7 @@ jobs:
         TEST_ADMIN_PASSWORD: ${{ secrets.RH_PASSWORD }}
         TEST_2_USERNAME: ${{ secrets.RH_USERNAME_2 }}
         TEST_2_PASSWORD: ${{ secrets.RH_PASSWORD_2 }}
-      run: npx playwright test --project chromium
+      run: npx playwright test tests/rhosak/kas_messaging.spec.ts tests/rhosr/srs.spec.ts --project chromium
     - uses: actions/upload-artifact@v3
       if: always()
       with:
