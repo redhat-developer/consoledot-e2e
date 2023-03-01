@@ -1,7 +1,7 @@
 import { expect, Locator, Page } from '@playwright/test';
-import { TopicsPage } from '@lib/pom/streams/instance/topics';
+import { TopicListPage } from '@lib/pom/streams/instance/topicList';
 
-export class PropertiesPage extends TopicsPage {
+export class PropertiesPage extends TopicListPage {
   readonly topicName: string;
   readonly propertiesMenuButton: Locator;
   readonly editPropertiesButton: Locator;

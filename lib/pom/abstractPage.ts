@@ -6,7 +6,7 @@ import { Locator, Page, expect } from '@playwright/test';
 export abstract class AbstractPage {
   readonly page: Page;
   readonly nameForm: Locator;
-  readonly details: Locator;
+  readonly detailsButton: Locator;
   readonly deleteNameInput: Locator;
   readonly actionsDeleteButton: Locator;
   readonly closeButton: Locator;
@@ -23,7 +23,7 @@ export abstract class AbstractPage {
   constructor(page: Page) {
     this.page = page;
     this.nameForm = page.getByLabel('Name *');
-    this.details = page.locator('button', { hasText: 'Details' });
+    this.detailsButton = page.locator('button', { hasText: 'Details' });
     this.deleteNameInput = page.locator('input[name="mas-name-input"]');
     this.actionsDeleteButton = page.locator('button', { hasText: 'Delete' });
     this.closeButton = page.locator('button', { hasText: 'Close' });

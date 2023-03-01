@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { ConsoleDotAuthPage } from '@lib/pom/auth';
 import { config } from '@lib/config';
-import { KafkaInstancesPage } from '@lib/pom/streams/kafkaInstances';
+import { KafkaInstanceListPage } from '@lib/pom/streams/kafkaInstanceList';
 import { CloudProviders } from '@lib/enums/cloudproviders';
 import { ServiceAccountPage } from '@lib/pom/serviceAccounts/sa';
 import { AbstractPage } from '@lib/pom/abstractPage';
@@ -10,7 +10,7 @@ const testInstanceName = config.instanceName;
 
 test.beforeEach(async ({ page }) => {
   const consoleDotAuthPage = new ConsoleDotAuthPage(page);
-  const kafkaInstancesPage = new KafkaInstancesPage(page);
+  const kafkaInstancesPage = new KafkaInstanceListPage(page);
   await consoleDotAuthPage.login();
 
   await kafkaInstancesPage.gotoThroughMenu();
@@ -28,7 +28,7 @@ test.beforeEach(async ({ page }) => {
 
 test.afterAll(async ({ page }) => {
   const serviceAccountPage = new ServiceAccountPage(page);
-  const kafkaInstancesPage = new KafkaInstancesPage(page);
+  const kafkaInstancesPage = new KafkaInstanceListPage(page);
 
   await serviceAccountPage.deleteAllServiceAccounts();
   await kafkaInstancesPage.deleteAllKafkas();
@@ -41,7 +41,7 @@ test('check there are no Kafka instances', async ({ page }) => {
 
 // test_3kas.py test_kas_kafka_create_dont_wait_for_ready_delete_wait_for_delete
 test('create and delete a Kafka instance', async ({ page }) => {
-  const kafkaInstancesPage = new KafkaInstancesPage(page);
+  const kafkaInstancesPage = new KafkaInstanceListPage(page);
   await kafkaInstancesPage.gotoThroughMenu();
   await kafkaInstancesPage.createKafkaInstance(testInstanceName);
   await kafkaInstancesPage.deleteKafkaInstance(testInstanceName);
@@ -49,7 +49,7 @@ test('create and delete a Kafka instance', async ({ page }) => {
 
 // test_3kas.py test_kas_kafka_create_wait_for_ready_delete_wait_for_delete
 test('create, wait for ready and delete a Kafka instance', async ({ page }) => {
-  const kafkaInstancesPage = new KafkaInstancesPage(page);
+  const kafkaInstancesPage = new KafkaInstanceListPage(page);
   await kafkaInstancesPage.gotoThroughMenu();
   await kafkaInstancesPage.createKafkaInstance(testInstanceName, false);
   await kafkaInstancesPage.waitForKafkaReady(testInstanceName);
@@ -89,7 +89,7 @@ const filterByStatus = async function (page, status) {
 
 // test_3kas.py test_kas_kafka_filter_by_status
 test('test Kafka list filtered by status', async ({ page }) => {
-  const kafkaInstancesPage = new KafkaInstancesPage(page);
+  const kafkaInstancesPage = new KafkaInstanceListPage(page);
   await kafkaInstancesPage.gotoThroughMenu();
 
   await kafkaInstancesPage.createKafkaInstance(testInstanceName);
@@ -126,7 +126,7 @@ test('test Kafka list filtered by status', async ({ page }) => {
 test('test fail to create Kafka instance with the same name', async ({ page }) => {
   test.skip(true, 'Need a different account');
 
-  const kafkaInstancesPage = new KafkaInstancesPage(page);
+  const kafkaInstancesPage = new KafkaInstanceListPage(page);
   await kafkaInstancesPage.gotoThroughMenu();
 
   await kafkaInstancesPage.createKafkaInstance(testInstanceName, false);
@@ -142,7 +142,7 @@ test('test fail to create Kafka instance with the same name', async ({ page }) =
 });
 
 test('create GCP Kafka instance', async ({ page }) => {
-  const kafkaInstancesPage = new KafkaInstancesPage(page);
+  const kafkaInstancesPage = new KafkaInstanceListPage(page);
   await kafkaInstancesPage.gotoThroughMenu();
   await kafkaInstancesPage.createKafkaInstance(testInstanceName, false, null, CloudProviders.GCP);
   await kafkaInstancesPage.deleteKafkaInstance(testInstanceName);

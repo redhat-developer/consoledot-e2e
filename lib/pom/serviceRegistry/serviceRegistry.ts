@@ -25,7 +25,7 @@ export class ServiceRegistryPage extends AbstractPage {
   }
 
   // Got to starting page
-  async goto() {
+  async gotoUrl() {
     await this.page.goto(config.startingPage + this.urlPath);
     // Button for creating SR is visible
     await expect(this.createServiceRegistryInstanceButton).toHaveCount(1);

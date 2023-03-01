@@ -36,7 +36,7 @@ export class ServiceAccountPage extends AbstractPage {
   }
 
   // Go to page with Service Accounts
-  async goto() {
+  async gotoUrl() {
     await this.page.goto(config.startingPage + this.urlPath);
     // Expect a title "to contain" a Service Account string.
     await expect(this.createServiceAccountButton).toHaveCount(1);

@@ -1,8 +1,8 @@
 import { expect, Locator, Page } from '@playwright/test';
-import { TopicsPage } from '../topics';
+import { TopicListPage } from '../topicList';
 import { FilterGroup, Limit } from '@lib/enums/messages';
 
-export class MessagesPage extends TopicsPage {
+export class MessagesPage extends TopicListPage {
   readonly topicName: string;
   readonly messageMenuButton: Locator;
   readonly messageTable: Locator;
@@ -26,10 +26,6 @@ export class MessagesPage extends TopicsPage {
     this.specifyOffset = '[aria-label="Specify offset"]';
     this.datePicker = '[aria-label="Date picker"]';
     this.specifyEpochTimestamp = '[aria-label="Specify epoch timestamp"]';
-  }
-
-  async goto() {
-    super.goto();
   }
 
   async gotoThroughMenu() {

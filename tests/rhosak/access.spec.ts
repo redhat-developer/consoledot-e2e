@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { ConsoleDotAuthPage } from '@lib/pom/auth';
 import { config } from '@lib/config';
-import { KafkaInstancesPage } from '@lib/pom/streams/kafkaInstances';
+import { KafkaInstanceListPage } from '@lib/pom/streams/kafkaInstanceList';
 import { AbstractPage } from '@lib/pom/abstractPage';
 import { AccessPage } from '@lib/pom/streams/instance/access';
 import { KafkaInstancePage } from '@lib/pom/streams/kafkaInstance';
@@ -10,7 +10,7 @@ const testInstanceName = config.instanceName;
 
 test.beforeEach(async ({ page }) => {
   const consoleDotAuthPage = new ConsoleDotAuthPage(page);
-  const kafkaInstancesPage = new KafkaInstancesPage(page);
+  const kafkaInstancesPage = new KafkaInstanceListPage(page);
 
   await consoleDotAuthPage.login();
   await kafkaInstancesPage.gotoThroughMenu();
@@ -39,7 +39,7 @@ test.beforeEach(async ({ page }) => {
 });
 
 test.afterAll(async ({ page }) => {
-  const kafkaInstancesPage = new KafkaInstancesPage(page);
+  const kafkaInstancesPage = new KafkaInstanceListPage(page);
   await kafkaInstancesPage.gotoThroughMenu();
 
   try {
@@ -52,7 +52,7 @@ test.afterAll(async ({ page }) => {
 // This test needs to run as an org admin until the new UI with refactored access dialog is released.
 test('test kafka manage access permission', async ({ page }) => {
   const consoleDotAuthPage = new ConsoleDotAuthPage(page);
-  const kafkaInstancesPage = new KafkaInstancesPage(page);
+  const kafkaInstancesPage = new KafkaInstanceListPage(page);
   const kafkaInstancePage = new KafkaInstancePage(page, testInstanceName);
   const kafkaAccessPage = new AccessPage(page, testInstanceName);
 

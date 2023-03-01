@@ -1,9 +1,8 @@
 import { expect, Locator, Page } from '@playwright/test';
-import { KafkaInstancesPage } from '@lib/pom/streams/kafkaInstances';
-import { config } from '@lib/config';
+import { KafkaInstanceListPage } from '@lib/pom/streams/kafkaInstanceList';
 import { AbstractPage } from '@lib/pom/abstractPage';
 
-export class KafkaInstancePage extends KafkaInstancesPage {
+export class KafkaInstancePage extends KafkaInstanceListPage {
   readonly instanceName: string;
   readonly connectionButton: Locator;
   readonly detailsButton: Locator;
@@ -13,18 +12,12 @@ export class KafkaInstancePage extends KafkaInstancesPage {
 
   constructor(page: Page, instanceName: string) {
     super(page);
-    this.urlPath = this.urlPath + '/' + instanceName + '/topics';
     this.instanceName = instanceName;
     this.connectionButton = page.locator('a', { hasText: 'Connection' });
     this.detailsButton = page.locator('a', { hasText: 'Details' });
     this.actionsDeleteButton = page.locator('a', { hasText: 'Delete' });
     this.instanceLink = page.locator('a', { hasText: this.instanceName });
     this.kafkaInstanceHeading = page.locator('h1', { hasText: this.instanceName });
-  }
-
-  async goto() {
-    await this.page.goto(config.startingPage + this.urlPath);
-    await expect(this.kafkaInstanceHeading).toHaveCount(1);
   }
 
   async gotoThroughMenu() {

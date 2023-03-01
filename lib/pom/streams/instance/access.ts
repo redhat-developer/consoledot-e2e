@@ -1,5 +1,4 @@
 import { expect, Locator, Page } from '@playwright/test';
-import { config } from '@lib/config';
 import { KafkaInstancePage } from '@lib/pom/streams/kafkaInstance';
 import { AbstractPage } from '@lib/pom/abstractPage';
 
@@ -16,7 +15,6 @@ export class AccessPage extends KafkaInstancePage {
 
   constructor(page: Page, instanceName: string) {
     super(page, instanceName);
-    this.urlPath = this.urlPath + '/' + instanceName + '/acls';
     this.accessMenuButton = page.locator('button[aria-label="Access"]');
     this.manageAccessButton = page.locator('button', { hasText: 'Manage access' });
     this.optionsMenuButton = page.getByRole('button', { name: 'Options menu' });
@@ -26,12 +24,6 @@ export class AccessPage extends KafkaInstancePage {
     this.produceToTopicButton = page.locator('button', { hasText: 'Produce to a topic' });
     this.enterPrefixField = page.getByPlaceholder('Enter prefix');
     this.consumeFromTopicButton = page.locator('button', { hasText: 'Consume from a topic' });
-  }
-
-  // Got to starting page
-  async goto() {
-    await this.page.goto(config.startingPage + this.urlPath);
-    await expect(this.manageAccessButton).toHaveCount(1);
   }
 
   async gotoThroughMenu() {

@@ -1,7 +1,7 @@
 import { ConsoleDotAuthPage } from '@lib/pom/auth';
 import { BillingOptions } from '@lib/enums/billing';
 import { config } from '@lib/config';
-import { KafkaInstancesPage } from '@lib/pom/streams/kafkaInstances';
+import { KafkaInstanceListPage } from '@lib/pom/streams/kafkaInstanceList';
 import test, { Page, expect } from '@playwright/test';
 
 const testInstanceName = 'mk-ui-playwright-tests';
@@ -18,13 +18,13 @@ test.describe('Billing test cases', () => {
   );
 
   test.afterEach(async ({ page }) => {
-    const kafkaInstancesPage = new KafkaInstancesPage(page);
+    const kafkaInstancesPage = new KafkaInstanceListPage(page);
     await kafkaInstancesPage.gotoThroughMenu();
     await kafkaInstancesPage.deleteKafkaInstance(testInstanceName);
   });
 
   async function setupKafkaFreshInstance(page: Page, billingOption: BillingOptions) {
-    const kafkaInstancesPage = new KafkaInstancesPage(page);
+    const kafkaInstancesPage = new KafkaInstanceListPage(page);
     await kafkaInstancesPage.gotoThroughMenu();
 
     if ((await page.getByText(testInstanceName).count()) == 1) {
@@ -34,7 +34,7 @@ test.describe('Billing test cases', () => {
   }
 
   async function performBillingTest(page: Page, billingOption: BillingOptions) {
-    const kafkaInstancesPage = new KafkaInstancesPage(page);
+    const kafkaInstancesPage = new KafkaInstanceListPage(page);
     await setupKafkaFreshInstance(page, billingOption);
     await kafkaInstancesPage.showKafkaDetails(testInstanceName);
     await expect(await page.locator('dd:has-text("' + billingOption + '")')).toHaveCount(1);
@@ -47,7 +47,7 @@ test.describe('Billing test cases', () => {
   for (const user of users) {
     test(`Billing check of user - ${index}#${user}`, async ({ page }) => {
       const consoleDotAuthPage = new ConsoleDotAuthPage(page);
-      const kafkaInstancesPage = new KafkaInstancesPage(page);
+      const kafkaInstancesPage = new KafkaInstanceListPage(page);
       currentUsername = user;
 
       await consoleDotAuthPage.login(user, config.stratospherePassword);

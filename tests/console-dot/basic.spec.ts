@@ -1,11 +1,11 @@
 import { test, expect } from '@playwright/test';
 import { ConsoleDotAuthPage } from '@lib/pom/auth';
-import { KafkaInstancesPage } from '@lib/pom/streams/kafkaInstances';
+import { KafkaInstanceListPage } from '@lib/pom/streams/kafkaInstanceList';
 
 // test_1auth.py test_auth_logged_in
 test('perform login', async ({ page }) => {
   const consoleDotAuthPage = new ConsoleDotAuthPage(page);
-  const kafkaInstacesPage = new KafkaInstancesPage(page);
+  const kafkaInstacesPage = new KafkaInstanceListPage(page);
   await consoleDotAuthPage.login();
   await kafkaInstacesPage.gotoThroughMenu();
 

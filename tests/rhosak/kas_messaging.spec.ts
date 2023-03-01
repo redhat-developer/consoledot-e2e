@@ -1,11 +1,11 @@
 import { test, expect } from '@playwright/test';
 import { ConsoleDotAuthPage } from '@lib/pom/auth';
 import { config } from '@lib/config';
-import { KafkaInstancesPage } from '@lib/pom/streams/kafkaInstances';
+import { KafkaInstanceListPage } from '@lib/pom/streams/kafkaInstanceList';
 import { KafkaConsumer, KafkaProducer } from '@lib/utils/clients';
 import { ServiceAccountPage } from '@lib/pom/serviceAccounts/sa';
 import { retry } from '@lib/utils/common';
-import { TopicsPage } from '@lib/pom/streams/instance/topics';
+import { TopicListPage } from '@lib/pom/streams/instance/topicList';
 import { AccessPage } from '@lib/pom/streams/instance/access';
 import { ConsumerGroupsPage } from '@lib/pom/streams/instance/consumerGroups';
 import { MessagesPage } from '@lib/pom/streams/instance/topic/messages';
@@ -27,9 +27,9 @@ let bootstrap: string;
 test.beforeEach(async ({ page }) => {
   const consoleDotAuthPage = new ConsoleDotAuthPage(page);
   const serviceAccountPage = new ServiceAccountPage(page);
-  const kafkaInstancesPage = new KafkaInstancesPage(page);
+  const kafkaInstancesPage = new KafkaInstanceListPage(page);
   const kafkaInstancePage = new KafkaInstancePage(page, testInstanceName);
-  const topicPage = new TopicsPage(page, testInstanceName);
+  const topicPage = new TopicListPage(page, testInstanceName);
   const accessPage = new AccessPage(page, testInstanceName);
 
   await consoleDotAuthPage.login();
@@ -93,14 +93,14 @@ test.afterEach(async ({ page }) => {
 
 test.afterAll(async ({ page }) => {
   const serviceAccountPage = new ServiceAccountPage(page);
-  const kafkaInstancesPage = new KafkaInstancesPage(page);
+  const kafkaInstancesPage = new KafkaInstanceListPage(page);
   await serviceAccountPage.deleteAllServiceAccounts();
   await kafkaInstancesPage.deleteAllKafkas();
 });
 
 // test_6messages.py generate_messages_to_topic
 test('Consume messages from topic', async ({ page }) => {
-  const kafkaInstancesPage = new KafkaInstancesPage(page);
+  const kafkaInstancesPage = new KafkaInstanceListPage(page);
   const kafkaInstancePage = new KafkaInstancePage(page, testInstanceName);
   const consumerGroupsPage = new ConsumerGroupsPage(page, testInstanceName);
   const accessPage = new AccessPage(page, testInstanceName);
@@ -128,9 +128,9 @@ test('Consume messages from topic', async ({ page }) => {
 
 // test_6messages.py browse_messages
 test('Browse messages', async ({ page }) => {
-  const kafkaInstancesPage = new KafkaInstancesPage(page);
+  const kafkaInstancesPage = new KafkaInstanceListPage(page);
   const kafkaInstancePage = new KafkaInstancePage(page, testInstanceName);
-  const topicsPage = new TopicsPage(page, testInstanceName);
+  const topicsPage = new TopicListPage(page, testInstanceName);
   const topicPage = new TopicPage(page, testInstanceName, testTopicName);
   const messagesPage = new MessagesPage(page, testInstanceName, testTopicName);
 
@@ -158,9 +158,9 @@ for (const filter of filters) {
     const tomorrow = new Date();
     tomorrow.setDate(today.getDate() + 1);
 
-    const kafkaInstancesPage = new KafkaInstancesPage(page);
+    const kafkaInstancesPage = new KafkaInstanceListPage(page);
     const kafkaInstancePage = new KafkaInstancePage(page, testInstanceName);
-    const topicsPage = new TopicsPage(page, testInstanceName);
+    const topicsPage = new TopicListPage(page, testInstanceName);
     const topicPage = new TopicPage(page, testInstanceName, testTopicName);
     const messagesPage = new MessagesPage(page, testInstanceName, testTopicName);
 
@@ -238,7 +238,7 @@ for (const filter of filters) {
 }
 // test_6acl.py test_kafka_create_consumer_group_and_check_dashboard
 test('create consumer group and check dashboard', async ({ page }) => {
-  const kafkaInstancesPage = new KafkaInstancesPage(page);
+  const kafkaInstancesPage = new KafkaInstanceListPage(page);
   const kafkaInstancePage = new KafkaInstancePage(page, testInstanceName);
   const consumerGroupsPage = new ConsumerGroupsPage(page, testInstanceName);
   const accessPage = new AccessPage(page, testInstanceName);

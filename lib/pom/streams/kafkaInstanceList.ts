@@ -5,7 +5,7 @@ import { CloudProviders } from '@lib/enums/cloudproviders';
 import { resourceStore } from '@lib/resource_store';
 import { AbstractPage } from '@lib/pom/abstractPage';
 
-export class KafkaInstancesPage extends AbstractPage {
+export class KafkaInstanceListPage extends AbstractPage {
   urlPath = '/application-services/streams/kafkas';
   readonly productName: string = 'Streams for Apache Kafka';
   readonly productList: string = 'Kafka Instances';
@@ -30,7 +30,7 @@ export class KafkaInstancesPage extends AbstractPage {
     this.closeDrawerButton = page.locator('[aria-label="Close drawer panel"]');
   }
 
-  async goto() {
+  async gotoUrl() {
     await this.page.goto(config.startingPage + this.urlPath);
     // Button for creating Kafka Instance is visible
     await expect(this.createKafkaInstanceButton).toHaveCount(1);
@@ -144,7 +144,7 @@ export class KafkaInstancesPage extends AbstractPage {
 
   async showKafkaDetails(instanceName: string) {
     await this.showElementActions(instanceName);
-    await this.details.click();
+    await this.detailsButton.click();
   }
 
   async deleteAllKafkas() {

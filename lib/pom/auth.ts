@@ -6,7 +6,6 @@ import { AbstractPage } from '@lib/pom/abstractPage';
 export class ConsoleDotAuthPage extends AbstractPage {
   readonly usernameField: Locator;
   readonly passwordField: Locator;
-  readonly nextButton: Locator;
   readonly submitButton: Locator;
   readonly welcomePage: Locator;
   readonly userMenu: Locator;
@@ -16,7 +15,6 @@ export class ConsoleDotAuthPage extends AbstractPage {
     super(page);
     this.usernameField = page.locator('#username-verification');
     this.passwordField = page.locator('#password');
-    this.nextButton = page.locator('button', { hasText: 'Next' });
     this.submitButton = page.locator('#rh-password-verification-submit-button');
     this.welcomePage = page.getByText('Gain increased visibility into your hybrid cloud');
     this.userMenu = page.locator('#UserMenu');

@@ -1,8 +1,7 @@
 import { expect, Locator, Page } from '@playwright/test';
-import { config } from '@lib/config';
 import { KafkaInstancePage } from '@lib/pom/streams/kafkaInstance';
 
-export class TopicsPage extends KafkaInstancePage {
+export class TopicListPage extends KafkaInstancePage {
   readonly topicsMenuButton: Locator;
   readonly createTopicButton: Locator;
   readonly createTopicHeading: Locator;
@@ -23,7 +22,6 @@ export class TopicsPage extends KafkaInstancePage {
 
   constructor(page: Page, instanceName: string) {
     super(page, instanceName);
-    this.urlPath = this.urlPath + '/' + instanceName + '/topics';
     this.topicsMenuButton = page.locator('button[aria-label="Topics"]');
     this.createTopicButton = page.locator('button', { hasText: 'Create topic' });
     this.deleteTopicButton = page.locator('button', { hasText: 'Delete topic' });
@@ -41,13 +39,6 @@ export class TopicsPage extends KafkaInstancePage {
     this.bytesRadioButton = page.getByLabel('bytes');
     this.showAllOptions = page.locator('label:has-text("Show all available optionsShow all available options") span');
     this.retentionOptionField = page.locator('label:has-text("days") input[type="number"]');
-  }
-
-  // Got to starting page
-  async goto() {
-    await this.page.goto(config.startingPage + this.urlPath);
-    // Expect see button to create topic
-    await expect(this.createTopicButton).toHaveCount(1);
   }
 
   async gotoThroughMenu() {
