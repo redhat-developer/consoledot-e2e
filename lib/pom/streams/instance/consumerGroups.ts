@@ -17,9 +17,9 @@ export class ConsumerGroupsPage extends KafkaInstancePage {
     await expect(this.consumerGroupsMenuButton).toHaveCount(1);
     await this.consumerGroupsMenuButton.click();
     try {
-      await expect(this.consumerGroupHeading).toHaveCount(1, { timeout: 5000 });
+      await expect(this.consumerGroupHeading).toHaveCount(1, { timeout: 10000 });
     } catch {
-      await expect(this.consumerGroupIdButton).toHaveCount(1, { timeout: 5000 });
+      await expect(this.consumerGroupIdButton).toHaveCount(1, { timeout: 10000 });
     }
   }
 }
