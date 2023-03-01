@@ -80,6 +80,7 @@ test('test shown Kafka instances and check access and consumer groups default', 
   await kafkaInstancesPage.gotoThroughMenu();
   await kafkaInstancePage.gotoThroughMenu();
   await consumerGroupsPage.gotoThroughMenu();
+  await consumerGroupsPage.waitForEmptyConsumerGroupsTable();
 
   await expect(consumerGroupsPage.consumerGroupHeading).toHaveCount(1);
 

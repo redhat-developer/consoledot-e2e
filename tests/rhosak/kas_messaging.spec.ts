@@ -123,6 +123,7 @@ test('Consume messages from topic', async ({ page }) => {
   await kafkaInstancesPage.gotoThroughMenu();
   await kafkaInstancePage.gotoThroughMenu();
   await consumerGroupsPage.gotoThroughMenu();
+  await consumerGroupsPage.waitForFilledConsumerGroupsTable();
   await expect(page.getByText(consumerGroupId)).toHaveCount(1);
 });
 
@@ -264,5 +265,6 @@ test('create consumer group and check dashboard', async ({ page }) => {
   await kafkaInstancesPage.gotoThroughMenu();
   await kafkaInstancePage.gotoThroughMenu();
   await consumerGroupsPage.gotoThroughMenu();
+  await consumerGroupsPage.waitForFilledConsumerGroupsTable();
   await expect(page.getByText(consumerGroupId)).toHaveCount(1);
 });

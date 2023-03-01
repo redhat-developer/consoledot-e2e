@@ -16,10 +16,13 @@ export class ConsumerGroupsPage extends KafkaInstancePage {
   async gotoThroughMenu() {
     await expect(this.consumerGroupsMenuButton).toHaveCount(1);
     await this.consumerGroupsMenuButton.click();
-    try {
-      await expect(this.consumerGroupHeading).toHaveCount(1, { timeout: 10000 });
-    } catch {
-      await expect(this.consumerGroupIdButton).toHaveCount(1, { timeout: 10000 });
-    }
+  }
+
+  async waitForEmptyConsumerGroupsTable() {
+    await expect(this.consumerGroupHeading).toHaveCount(1);
+  }
+
+  async waitForFilledConsumerGroupsTable() {
+    await expect(this.consumerGroupIdButton).toHaveCount(1);
   }
 }
