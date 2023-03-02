@@ -1,4 +1,4 @@
-import { devices } from '@playwright/test';
+import { PlaywrightTestConfig, devices } from '@playwright/test';
 
 /**
  * Read environment variables from file.
@@ -10,7 +10,7 @@ dotenv.config();
 /**
  * See https://playwright.dev/docs/test-configuration.
  */
-const config = {
+const config: PlaywrightTestConfig = {
   testDir: './tests',
   globalSetup: require.resolve('./lib/global_setup'),
   /* Maximum time one test can run for. */
