@@ -1,4 +1,3 @@
-import type { PlaywrightTestConfig } from '@playwright/test';
 import { devices } from '@playwright/test';
 
 /**
@@ -11,8 +10,9 @@ dotenv.config();
 /**
  * See https://playwright.dev/docs/test-configuration.
  */
-const config: PlaywrightTestConfig = {
+const config = {
   testDir: './tests',
+  globalSetup: require.resolve('./lib/global_setup'),
   /* Maximum time one test can run for. */
   timeout: 20 * 60 * 1000, // 20 minutes
   expect: {

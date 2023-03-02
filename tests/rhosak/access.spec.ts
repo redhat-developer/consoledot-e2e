@@ -1,4 +1,5 @@
-import { test, expect } from '@playwright/test';
+import { expect } from '@playwright/test';
+import { test } from '@lib/utils/fixtures';
 import { ConsoleDotAuthPage } from '@lib/pom/auth';
 import { config } from '@lib/config';
 import { KafkaInstanceListPage } from '@lib/pom/streams/kafkaInstanceList';

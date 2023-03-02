@@ -1,5 +1,5 @@
-import { test, expect } from '@playwright/test';
-import { ConsoleDotAuthPage } from '@lib/pom/auth';
+import { expect } from '@playwright/test';
+import { test } from '@lib/utils/fixtures';
 import { config } from '@lib/config';
 import { KafkaInstanceListPage } from '@lib/pom/streams/kafkaInstanceList';
 import { TopicListPage } from '@lib/pom/streams/instance/topicList';
@@ -13,11 +13,12 @@ import { KafkaInstancePage } from '@lib/pom/streams/kafkaInstance';
 const testInstanceName = config.instanceName;
 const testTopicName = `test-topic-${config.sessionID}`;
 
+// Use admin user context
+test.use({ storageState: config.adminAuthFile });
+
 test.beforeEach(async ({ page }) => {
-  const consoleDotAuthPage = new ConsoleDotAuthPage(page);
   const kafkaInstancesPage = new KafkaInstanceListPage(page);
 
-  await consoleDotAuthPage.login();
   await kafkaInstancesPage.gotoThroughMenu();
 
   if ((await page.getByText(testInstanceName).count()) > 0 && (await page.locator('tr').count()) === 2) {
