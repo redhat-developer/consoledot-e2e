@@ -12,7 +12,6 @@ dotenv.config();
  */
 const config: PlaywrightTestConfig = {
   testDir: './tests',
-  globalSetup: require.resolve('./lib/global_setup'),
   /* Maximum time one test can run for. */
   timeout: 20 * 60 * 1000, // 20 minutes
   expect: {
@@ -32,7 +31,9 @@ const config: PlaywrightTestConfig = {
   /* Opt out of parallel tests. */
   workers: 1,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
-  reporter: process.env.CI ? [['list', { printSteps: true }], ['github'], ['junit', { outputFile: 'results.xml' }]] : 'html',
+  reporter: process.env.CI
+    ? [['list', { printSteps: true }], ['github'], ['junit', { outputFile: 'results.xml' }]]
+    : 'html',
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Maximum time each action such as `click()` can take. Defaults to 10000 (0 means no limit). */
@@ -47,9 +48,11 @@ const config: PlaywrightTestConfig = {
     ignoreHTTPSErrors: process.env.STARTING_PAGE ? true : false,
     launchOptions: {
       /*Enable slow mode in ms between clicks etc... */
-      slowMo: parseInt(process.env.SLOW_MODE || '0'),
-    },
+      slowMo: parseInt(process.env.SLOW_MODE || '0')
+    }
   },
+  // Configuration to re-use login sessions
+  globalSetup: require.resolve('./lib/global_setup'),
 
   /* Configure projects for major browsers */
   projects: [
@@ -57,17 +60,17 @@ const config: PlaywrightTestConfig = {
       name: 'chromium',
       use: {
         ...devices['Desktop Chrome'],
-        viewport: { width: 1920, height: 1024 },
-      },
+        viewport: { width: 1920, height: 1024 }
+      }
     },
 
     {
       name: 'firefox',
       use: {
         ...devices['Desktop Firefox'],
-        viewport: { width: 1920, height: 1024 },
-      },
-    },
+        viewport: { width: 1920, height: 1024 }
+      }
+    }
 
     // {
     //   name: 'webkit',
@@ -104,7 +107,7 @@ const config: PlaywrightTestConfig = {
     //     channel: 'chrome',
     //   },
     // },
-  ],
+  ]
 
   /* Folder for test artifacts such as screenshots, videos, traces, etc. */
   // outputDir: 'test-results/',
