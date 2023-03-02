@@ -1,6 +1,7 @@
 import { chromium } from '@playwright/test';
 import { config } from './config';
 import { ConsoleDotAuthPage } from '@lib/pom/auth';
+import blockAnalyticsDomains from './utils/blocker';
 
 export default async function globalSetup() {
   const users = [
@@ -47,6 +48,7 @@ export default async function globalSetup() {
       const context = await browser.newContext();
       const page = await context.newPage();
       const consoleDotAuthPage = new ConsoleDotAuthPage(page);
+      await blockAnalyticsDomains(page);
       await consoleDotAuthPage.login(user.name, user.password);
       await page.context().storageState({ path: user.path as string });
       await browser.close();
