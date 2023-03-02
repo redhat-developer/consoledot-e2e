@@ -1,30 +1,24 @@
 import { test, expect } from '@playwright/test';
-import login, { logout } from '@lib/auth';
+import { ConsoleDotAuthPage } from '@lib/pom/auth';
 import { config } from '@lib/config';
-import {
-  deleteKafkaInstance,
-  createKafkaInstance,
-  navigateToAccess,
-  grantManageAccess,
-  findAccessRow,
-  revokeAccess,
-  waitForKafkaReady
-} from '@lib/kafka';
-import { navigateToKafkaList } from '@lib/navigation';
+import { KafkaInstanceListPage } from '@lib/pom/streams/kafkaInstanceList';
+import { AbstractPage } from '@lib/pom/abstractPage';
+import { AccessPage } from '@lib/pom/streams/instance/access';
+import { KafkaInstancePage } from '@lib/pom/streams/kafkaInstance';
 
 const testInstanceName = config.instanceName;
 
 test.beforeEach(async ({ page }) => {
-  await login(page);
+  const consoleDotAuthPage = new ConsoleDotAuthPage(page);
+  const kafkaInstancesPage = new KafkaInstanceListPage(page);
 
-  await navigateToKafkaList(page);
-
-  await expect(page.getByRole('button', { name: 'Create Kafka instance' })).toBeVisible();
+  await consoleDotAuthPage.login();
+  await kafkaInstancesPage.gotoThroughMenu();
 
   if ((await page.getByText(testInstanceName).count()) > 0 && (await page.locator('tr').count()) === 2) {
     // Test instance present, nothing to do!
   } else {
-    await page.waitForSelector('[role=progressbar]', {
+    await page.waitForSelector(AbstractPage.progressBarLocatorString, {
       state: 'detached',
       timeout: config.kafkaInstanceCreationTimeout
     });
@@ -33,21 +27,23 @@ test.beforeEach(async ({ page }) => {
       const name = await el.textContent();
 
       if (name !== testInstanceName) {
-        await deleteKafkaInstance(page, name);
+        await kafkaInstancesPage.deleteKafkaInstance(name);
       }
     }
 
     if ((await page.getByText(testInstanceName).count()) === 0) {
-      await createKafkaInstance(page, testInstanceName);
+      await kafkaInstancesPage.createKafkaInstance(testInstanceName);
+      await kafkaInstancesPage.waitForKafkaReady(testInstanceName);
     }
   }
 });
 
 test.afterAll(async ({ page }) => {
-  await navigateToKafkaList(page);
+  const kafkaInstancesPage = new KafkaInstanceListPage(page);
+  await kafkaInstancesPage.gotoThroughMenu();
 
   try {
-    await deleteKafkaInstance(page, testInstanceName);
+    await kafkaInstancesPage.deleteKafkaInstance(testInstanceName);
   } catch (error) {
     //Ignore exception
   }
@@ -55,26 +51,36 @@ test.afterAll(async ({ page }) => {
 
 // This test needs to run as an org admin until the new UI with refactored access dialog is released.
 test('test kafka manage access permission', async ({ page }) => {
+  const consoleDotAuthPage = new ConsoleDotAuthPage(page);
+  const kafkaInstancesPage = new KafkaInstanceListPage(page);
+  const kafkaInstancePage = new KafkaInstancePage(page, testInstanceName);
+  const kafkaAccessPage = new AccessPage(page, testInstanceName);
+
   test.skip(
     config.username_2 == undefined || config.password_2 == undefined,
     'Secondary user has to be defined for this test.'
   );
-  await waitForKafkaReady(page, testInstanceName);
-  await navigateToAccess(page, testInstanceName);
-  await grantManageAccess(page, config.username_2);
 
-  const row = await findAccessRow(page, config.username_2, '', 'Kafka Instance');
+  await kafkaInstancesPage.waitForKafkaReady(testInstanceName);
+  await kafkaInstancesPage.gotoThroughMenu();
+  await kafkaInstancePage.gotoThroughMenu();
+  await kafkaAccessPage.gotoThroughMenu();
+  await kafkaAccessPage.grantManageAccess(config.username_2);
+
+  const row = await kafkaAccessPage.findAccessRow(config.username_2, '', 'Kafka Instance');
   await expect(row).toHaveCount(1);
 
-  await logout(page);
-  await login(page, config.username_2, config.password_2);
+  await consoleDotAuthPage.logout();
+  await consoleDotAuthPage.login(config.username_2, config.password_2);
 
-  await navigateToAccess(page, testInstanceName);
-  await grantManageAccess(page, 'All accounts');
+  await kafkaInstancesPage.gotoThroughMenu();
+  await kafkaInstancePage.gotoThroughMenu();
+  await kafkaAccessPage.gotoThroughMenu();
+  await kafkaAccessPage.grantManageAccess('All accounts');
 
-  const rowAllAccounts = await findAccessRow(page, 'All Accounts', 'Alter', 'Kafka Instance');
+  const rowAllAccounts = await kafkaAccessPage.findAccessRow('All Accounts', 'Alter', 'Kafka Instance');
   await expect(rowAllAccounts).toHaveCount(1);
 
-  await revokeAccess(page, 'All Accounts', 'Alter', 'Kafka Instance', true);
-  await revokeAccess(page, config.username_2, 'Alter', 'Kafka Instance', true);
+  await kafkaAccessPage.revokeAccess('All Accounts', 'Alter', 'Kafka Instance', true);
+  await kafkaAccessPage.revokeAccess(config.username_2, 'Alter', 'Kafka Instance', true);
 });

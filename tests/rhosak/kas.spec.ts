@@ -1,29 +1,37 @@
 import { test, expect } from '@playwright/test';
-import login from '@lib/auth';
+import { ConsoleDotAuthPage } from '@lib/pom/auth';
 import { config } from '@lib/config';
-import { deleteKafkaInstance, createKafkaInstance, waitForKafkaReady, deleteAllKafkas } from '@lib/kafka';
-import { CloudProviders } from '@lib/cloudproviders';
-import { navigateToKafkaList } from '@lib/navigation';
-import { deleteAllServiceAccounts } from '@lib/sa';
+import { KafkaInstanceListPage } from '@lib/pom/streams/kafkaInstanceList';
+import { CloudProviders } from '@lib/enums/cloudproviders';
+import { ServiceAccountPage } from '@lib/pom/serviceAccounts/sa';
+import { AbstractPage } from '@lib/pom/abstractPage';
 
 const testInstanceName = config.instanceName;
 
 test.beforeEach(async ({ page }) => {
-  await login(page);
+  const consoleDotAuthPage = new ConsoleDotAuthPage(page);
+  const kafkaInstancesPage = new KafkaInstanceListPage(page);
+  await consoleDotAuthPage.login();
 
-  await navigateToKafkaList(page);
+  await kafkaInstancesPage.gotoThroughMenu();
 
-  await page.waitForSelector('[role=progressbar]', { state: 'detached', timeout: config.kafkaInstanceCreationTimeout });
-  await page.waitForSelector('button:has-text("Create Kafka Instance")');
+  await page.waitForSelector(AbstractPage.progressBarLocatorString, {
+    state: 'detached',
+    timeout: config.kafkaInstanceCreationTimeout
+  });
+
   for (const el of await page.locator(`tr >> a`).elementHandles()) {
     const name = await el.textContent();
-    await deleteKafkaInstance(page, name);
+    await kafkaInstancesPage.deleteKafkaInstance(name);
   }
 });
 
 test.afterAll(async ({ page }) => {
-  await deleteAllServiceAccounts(page);
-  await deleteAllKafkas(page);
+  const serviceAccountPage = new ServiceAccountPage(page);
+  const kafkaInstancesPage = new KafkaInstanceListPage(page);
+
+  await serviceAccountPage.deleteAllServiceAccounts();
+  await kafkaInstancesPage.deleteAllKafkas();
 });
 
 // test_3kas.py test_kas_kafka_check_does_not_exist
@@ -33,15 +41,19 @@ test('check there are no Kafka instances', async ({ page }) => {
 
 // test_3kas.py test_kas_kafka_create_dont_wait_for_ready_delete_wait_for_delete
 test('create and delete a Kafka instance', async ({ page }) => {
-  await createKafkaInstance(page, testInstanceName);
-  await deleteKafkaInstance(page, testInstanceName);
+  const kafkaInstancesPage = new KafkaInstanceListPage(page);
+  await kafkaInstancesPage.gotoThroughMenu();
+  await kafkaInstancesPage.createKafkaInstance(testInstanceName);
+  await kafkaInstancesPage.deleteKafkaInstance(testInstanceName);
 });
 
 // test_3kas.py test_kas_kafka_create_wait_for_ready_delete_wait_for_delete
 test('create, wait for ready and delete a Kafka instance', async ({ page }) => {
-  await createKafkaInstance(page, testInstanceName);
-  await waitForKafkaReady(page, testInstanceName);
-  await deleteKafkaInstance(page, testInstanceName);
+  const kafkaInstancesPage = new KafkaInstanceListPage(page);
+  await kafkaInstancesPage.gotoThroughMenu();
+  await kafkaInstancesPage.createKafkaInstance(testInstanceName, false);
+  await kafkaInstancesPage.waitForKafkaReady(testInstanceName);
+  await kafkaInstancesPage.deleteKafkaInstance(testInstanceName);
 });
 
 // test_3kas.py test_kas_kafka_standard_kafka_test_slider
@@ -77,7 +89,10 @@ const filterByStatus = async function (page, status) {
 
 // test_3kas.py test_kas_kafka_filter_by_status
 test('test Kafka list filtered by status', async ({ page }) => {
-  await createKafkaInstance(page, testInstanceName);
+  const kafkaInstancesPage = new KafkaInstanceListPage(page);
+  await kafkaInstancesPage.gotoThroughMenu();
+
+  await kafkaInstancesPage.createKafkaInstance(testInstanceName);
   await expect(page.getByText(testInstanceName)).toBeVisible();
 
   await filterByStatus(page, 'Suspended');
@@ -88,12 +103,12 @@ test('test Kafka list filtered by status', async ({ page }) => {
 
   // Reset the filter
   await resetFilter(page);
-  await waitForKafkaReady(page, testInstanceName);
+  await kafkaInstancesPage.waitForKafkaReady(testInstanceName);
 
   await filterByStatus(page, 'Ready');
   await expect(page.getByText(testInstanceName)).toBeTruthy();
 
-  await deleteKafkaInstance(page, testInstanceName, false);
+  await kafkaInstancesPage.deleteKafkaInstance(testInstanceName, false);
 
   // TODO: Probably race condition when deleting is finished too quickly
   // Currently it just make the test flaky so we should discuss what we will do with it
@@ -111,24 +126,24 @@ test('test Kafka list filtered by status', async ({ page }) => {
 test('test fail to create Kafka instance with the same name', async ({ page }) => {
   test.skip(true, 'Need a different account');
 
-  await createKafkaInstance(page, testInstanceName, false);
+  const kafkaInstancesPage = new KafkaInstanceListPage(page);
+  await kafkaInstancesPage.gotoThroughMenu();
+
+  await kafkaInstancesPage.createKafkaInstance(testInstanceName, false);
 
   await page.getByText('Create Kafka instance').click();
-
   await expect(page.getByText('Create a Kafka instance')).toHaveCount(1);
-
   await page.getByLabel('Name *').fill(testInstanceName);
-
   await page.getByTestId('modalCreateKafka-buttonSubmit').click();
-
   await expect(page.getByText(`${testInstanceName} already exists. Please try a different name.`)).toHaveCount(1);
-
   await page.locator('#modalCreateKafka > button').click();
 
-  await deleteKafkaInstance(page, testInstanceName);
+  await kafkaInstancesPage.deleteKafkaInstance(testInstanceName);
 });
 
 test('create GCP Kafka instance', async ({ page }) => {
-  await createKafkaInstance(page, testInstanceName, false, null, CloudProviders.GCP);
-  await deleteKafkaInstance(page, testInstanceName);
+  const kafkaInstancesPage = new KafkaInstanceListPage(page);
+  await kafkaInstancesPage.gotoThroughMenu();
+  await kafkaInstancesPage.createKafkaInstance(testInstanceName, false, null, CloudProviders.GCP);
+  await kafkaInstancesPage.deleteKafkaInstance(testInstanceName);
 });

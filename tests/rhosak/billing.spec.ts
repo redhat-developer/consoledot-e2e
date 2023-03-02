@@ -1,9 +1,8 @@
-import login from '@lib/auth';
-import { BillingOptions } from '@lib/billing';
+import { ConsoleDotAuthPage } from '@lib/pom/auth';
+import { BillingOptions } from '@lib/enums/billing';
 import { config } from '@lib/config';
-import { createKafkaInstance, deleteKafkaInstance, showKafkaDetails } from '@lib/kafka';
+import { KafkaInstanceListPage } from '@lib/pom/streams/kafkaInstanceList';
 import test, { Page, expect } from '@playwright/test';
-import { navigateToKafkaList } from '@lib/navigation';
 
 const testInstanceName = 'mk-ui-playwright-tests';
 let currentUsername = config.stratosphere1username;
@@ -19,22 +18,25 @@ test.describe('Billing test cases', () => {
   );
 
   test.afterEach(async ({ page }) => {
-    await navigateToKafkaList(page);
-    await deleteKafkaInstance(page, testInstanceName);
+    const kafkaInstancesPage = new KafkaInstanceListPage(page);
+    await kafkaInstancesPage.gotoThroughMenu();
+    await kafkaInstancesPage.deleteKafkaInstance(testInstanceName);
   });
 
   async function setupKafkaFreshInstance(page: Page, billingOption: BillingOptions) {
-    await navigateToKafkaList(page);
-    await expect(page.getByRole('button', { name: 'Create Kafka instance' })).toBeVisible();
+    const kafkaInstancesPage = new KafkaInstanceListPage(page);
+    await kafkaInstancesPage.gotoThroughMenu();
+
     if ((await page.getByText(testInstanceName).count()) == 1) {
-      await deleteKafkaInstance(page, testInstanceName);
+      await kafkaInstancesPage.deleteKafkaInstance(testInstanceName);
     }
-    await createKafkaInstance(page, testInstanceName, false, billingOption);
+    await kafkaInstancesPage.createKafkaInstance(testInstanceName, false, billingOption);
   }
 
   async function performBillingTest(page: Page, billingOption: BillingOptions) {
+    const kafkaInstancesPage = new KafkaInstanceListPage(page);
     await setupKafkaFreshInstance(page, billingOption);
-    await showKafkaDetails(page, testInstanceName);
+    await kafkaInstancesPage.showKafkaDetails(testInstanceName);
     await expect(await page.locator('dd:has-text("' + billingOption + '")')).toHaveCount(1);
   }
 
@@ -44,11 +46,14 @@ test.describe('Billing test cases', () => {
   let index = 0;
   for (const user of users) {
     test(`Billing check of user - ${index}#${user}`, async ({ page }) => {
+      const consoleDotAuthPage = new ConsoleDotAuthPage(page);
+      const kafkaInstancesPage = new KafkaInstanceListPage(page);
       currentUsername = user;
-      await login(page, user, config.stratospherePassword);
+
+      await consoleDotAuthPage.login(user, config.stratospherePassword);
 
       await setupKafkaFreshInstance(page, BillingOptions.PREPAID);
-      await showKafkaDetails(page, testInstanceName);
+      await kafkaInstancesPage.showKafkaDetails(testInstanceName);
     });
     index++;
   }
@@ -57,8 +62,9 @@ test.describe('Billing test cases', () => {
   const billingOptions = [BillingOptions.AWS_MARKETPLACE, BillingOptions.RH_MARKETPLACE, BillingOptions.PREPAID];
   for (const billingOption of billingOptions) {
     test(`Billing option for ${config.stratosphere3username} - ${billingOption}`, async ({ page }) => {
+      const consoleDotAuthPage = new ConsoleDotAuthPage(page);
       currentUsername = config.stratosphere3username;
-      await login(page, currentUsername, config.stratospherePassword);
+      await consoleDotAuthPage.login(currentUsername, config.stratospherePassword);
       await performBillingTest(page, billingOption);
     });
   }
