@@ -45,7 +45,9 @@ export default async function globalSetup() {
   for (const user of users) {
     if (user.name != undefined) {
       const browser = await chromium.launch();
-      const context = await browser.newContext();
+      const context = await browser.newContext({
+        ignoreHTTPSErrors: config.startingPage != config.startingPageDefault ? true : false
+      });
       const page = await context.newPage();
       const consoleDotAuthPage = new ConsoleDotAuthPage(page);
       await blockAnalyticsDomains(page);
