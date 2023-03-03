@@ -50,14 +50,16 @@ test.afterEach(async ({ page }) => {
 
   await kafkaInstancesPage.gotoThroughMenu();
   await kafkaInstancePage.gotoThroughMenu();
-  await topicPage.gotoThroughMenu();
+  if (process.env.ENV_TYPE != 'stage-new-ui') {
+    await topicPage.gotoThroughMenu();
 
-  await page.waitForSelector(AbstractPage.progressBarLocatorString, {
-    state: 'detached'
-  });
-  for (const el of await page.locator(`tr >> a`).elementHandles()) {
-    const name = await el.textContent();
-    await topicPage.deleteKafkaTopic(name);
+    await page.waitForSelector(AbstractPage.progressBarLocatorString, {
+      state: 'detached'
+    });
+    for (const el of await page.locator(`tr >> a`).elementHandles()) {
+      const name = await el.textContent();
+      await topicPage.deleteKafkaTopic(name);
+    }
   }
 });
 
@@ -241,13 +243,15 @@ test('test instance quick options', async ({ page }) => {
 
 // test_4kas.py test_kafka_dashboard_opened & test_kafka_dashboard_default
 test('test instance dashboard on instance name click', async ({ page }) => {
-  const kafkaInstancesPage = new KafkaInstanceListPage(page);
-  await kafkaInstancesPage.gotoThroughMenu();
+  const kafkaInstancesListPage = new KafkaInstanceListPage(page);
+  const kafkaInstancePage = new KafkaInstancePage(page, testInstanceName);
 
-  await page.locator('a', { hasText: `${testInstanceName}` }).click();
+  await kafkaInstancesListPage.gotoThroughMenu();
+  await kafkaInstancePage.gotoThroughMenu();
 
-  await expect(page.locator('h1', { hasText: `${testInstanceName}` })).toHaveCount(1);
-  await expect(page.locator('button').locator('span', { hasText: 'Dashboard' })).toHaveCount(1);
+  await expect(kafkaInstancePage.kafkaInstanceHeading).toHaveCount(1);
+  await expect(kafkaInstancePage.kafkaTabNavDashboard).toHaveCount(1);
+
   await expect(page.locator('h3', { hasText: 'Topics' })).toHaveCount(1);
   await expect(page.locator('h3', { hasText: 'Topic partitions' })).toHaveCount(1);
   await expect(page.locator('h3', { hasText: 'Consumer groups' })).toHaveCount(1);
@@ -256,6 +260,8 @@ test('test instance dashboard on instance name click', async ({ page }) => {
 
 // test_4kafka.py test_kafka_topic_check_does_not_exist & test_kafka_topics_opened & test_kafka_topic_create
 test('check Topic does not exist and create and delete', async ({ page }) => {
+  test.skip(process.env.ENV_TYPE == 'stage-new-ui', 'Feature not implemented in the new codebase yet.');
+
   const kafkaInstancesPage = new KafkaInstanceListPage(page);
   const kafkaInstancePage = new KafkaInstancePage(page, testInstanceName);
   const topicPage = new TopicListPage(page, testInstanceName);
@@ -275,6 +281,8 @@ test('check Topic does not exist and create and delete', async ({ page }) => {
 
 // test_4kafka.py test_kafka_try_create_topic_with_same_name
 test('test kafka try create topic with same name', async ({ page }) => {
+  test.skip(process.env.ENV_TYPE == 'stage-new-ui', 'Feature not implemented in the new codebase yet.');
+
   const kafkaInstancesPage = new KafkaInstanceListPage(page);
   const kafkaInstancePage = new KafkaInstancePage(page, testInstanceName);
   const topicPage = new TopicListPage(page, testInstanceName);
@@ -292,6 +300,8 @@ test('test kafka try create topic with same name', async ({ page }) => {
 
 test('create Topic with properties different than default', async ({ page }) => {
   test.fixme(true, 'Test is extremely flaky.');
+  test.skip(process.env.ENV_TYPE == 'stage-new-ui', 'Feature not implemented in the new codebase yet.');
+
   const kafkaInstancesPage = new KafkaInstanceListPage(page);
   const kafkaInstancePage = new KafkaInstancePage(page, testInstanceName);
   const topicPage = new TopicListPage(page, testInstanceName);
@@ -332,6 +342,8 @@ test('edit topic properties after creation', async ({ page }) => {
     true,
     'Test is extremely flaky. Topics are not cleared and we need to wait properly on loading instead of just cliking without it.'
   );
+  test.skip(process.env.ENV_TYPE == 'stage-new-ui', 'Feature not implemented in the new codebase yet.');
+
   const kafkaInstancesPage = new KafkaInstanceListPage(page);
   const kafkaInstancePage = new KafkaInstancePage(page, testInstanceName);
   const topicPage = new TopicListPage(page, testInstanceName);

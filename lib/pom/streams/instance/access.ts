@@ -3,10 +3,8 @@ import { KafkaInstancePage } from '@lib/pom/streams/kafkaInstance';
 import { AbstractPage } from '@lib/pom/abstractPage';
 
 export class AccessPage extends KafkaInstancePage {
-  readonly accessMenuButton: Locator;
   readonly manageAccessButton: Locator;
   readonly optionsMenuButton: Locator;
-  readonly actionManagePermissionsButton: Locator;
   readonly dropDownMenu: Locator;
   readonly optionField: Locator;
   readonly produceToTopicButton: Locator;
@@ -15,10 +13,8 @@ export class AccessPage extends KafkaInstancePage {
 
   constructor(page: Page, instanceName: string) {
     super(page, instanceName);
-    this.accessMenuButton = page.locator('button[aria-label="Access"]');
     this.manageAccessButton = page.locator('button', { hasText: 'Manage access' });
     this.optionsMenuButton = page.getByRole('button', { name: 'Options menu' });
-    this.actionManagePermissionsButton = page.getByTestId('actionManagePermissions');
     this.dropDownMenu = page.getByTestId('permissions-dropdown-toggle');
     this.optionField = page.getByRole('option');
     this.produceToTopicButton = page.locator('button', { hasText: 'Produce to a topic' });
@@ -27,15 +23,15 @@ export class AccessPage extends KafkaInstancePage {
   }
 
   async gotoThroughMenu() {
-    await expect(this.accessMenuButton).toHaveCount(1);
-    await this.accessMenuButton.click();
+    await expect(this.kafkaTabNavAccess).toHaveCount(1);
+    await this.kafkaTabNavAccess.click();
     await expect(this.manageAccessButton).toHaveCount(1);
   }
 
   // TODO - we shouldn't use just prefix for topic/group but also complete name
   // TODO - we should click on topic name/prefix when it popups when filling the prefix/name
   async grantProducerAccess(saId: string, topicName: string) {
-    await this.actionManagePermissionsButton.click();
+    await this.manageAccessButton.click();
     await this.optionsMenuButton.click();
     await this.optionField.filter({ hasText: saId }).click();
     await this.nextButton.click();
@@ -56,7 +52,7 @@ export class AccessPage extends KafkaInstancePage {
   // TODO - we shouldn't use just prefix for topic/group but also complete name
   // TODO - we should click on topic name/prefix when it popups when filling the prefix/name
   async grantConsumerAccess(saId: string, topicName: string, consumerGroup: string) {
-    await this.actionManagePermissionsButton.click();
+    await this.manageAccessButton.click();
     await this.optionsMenuButton.click();
     await this.optionField.filter({ hasText: saId }).click();
     await this.nextButton.click();
@@ -97,7 +93,7 @@ export class AccessPage extends KafkaInstancePage {
   }
 
   async grantManageAccess(saId: string) {
-    await this.actionManagePermissionsButton.click();
+    await this.manageAccessButton.click();
     await this.optionsMenuButton.click();
     await this.optionField.filter({ hasText: saId }).click();
     await this.nextButton.click();

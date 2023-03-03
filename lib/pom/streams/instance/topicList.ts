@@ -2,7 +2,6 @@ import { expect, Locator, Page } from '@playwright/test';
 import { KafkaInstancePage } from '@lib/pom/streams/kafkaInstance';
 
 export class TopicListPage extends KafkaInstancePage {
-  readonly topicsMenuButton: Locator;
   readonly createTopicButton: Locator;
   readonly createTopicHeading: Locator;
   readonly deleteTopicButton: Locator;
@@ -22,7 +21,6 @@ export class TopicListPage extends KafkaInstancePage {
 
   constructor(page: Page, instanceName: string) {
     super(page, instanceName);
-    this.topicsMenuButton = page.locator('button[aria-label="Topics"]');
     this.createTopicButton = page.locator('button', { hasText: 'Create topic' });
     this.deleteTopicButton = page.locator('button', { hasText: 'Delete topic' });
     this.createTopicHeading = page.locator('h2', { hasText: 'Topic name' });
@@ -42,9 +40,9 @@ export class TopicListPage extends KafkaInstancePage {
   }
 
   async gotoThroughMenu() {
-    await expect(this.topicsMenuButton).toHaveCount(1);
+    await expect(this.kafkaTabNavTopics).toHaveCount(1);
     // data-testid=pageKafka-tabTopics
-    await this.topicsMenuButton.click();
+    await this.kafkaTabNavTopics.click();
   }
 
   async createKafkaTopic(name: string, defaultProperties: boolean) {

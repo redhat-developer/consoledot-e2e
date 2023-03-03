@@ -28,6 +28,10 @@ export class KafkaInstanceListPage extends AbstractPage {
     this.connectionButton = page.locator('button', { hasText: 'Connection' });
     this.bootstrapField = page.locator('[aria-label="Bootstrap server"]');
     this.closeDrawerButton = page.locator('[aria-label="Close drawer panel"]');
+
+    if (process.env.ENV_TYPE == 'stage-new-ui') {
+      this.urlPath = '/application-services/new-streams/kafkas';
+    }
   }
 
   async gotoUrl() {
@@ -37,8 +41,13 @@ export class KafkaInstanceListPage extends AbstractPage {
   }
 
   async gotoThroughMenu() {
-    // Navigates to list of Service Registry instances
-    await this.navigateToProductList(this.productName, this.productList);
+    // Navigates to list of Kafka instances
+    if (process.env.ENV_TYPE == 'stage-new-ui') {
+      await this.gotoUrl();
+      await this.navigateToProduct(this.productName);
+    } else {
+      await this.navigateToProductList(this.productName, this.productList);
+    }
   }
 
   async createKafkaInstance(
