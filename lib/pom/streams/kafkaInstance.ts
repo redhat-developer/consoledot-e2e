@@ -31,7 +31,7 @@ export class KafkaInstancePage extends KafkaInstanceListPage {
     this.kafkaTabNavAccess = page.locator('button[aria-label="Access"]');
     this.kafkaTabNavSettings = page.locator('button[aria-label="Settings"]');
 
-    if (process.env.ENV_TYPE == 'stage-new-ui') {
+    if (config.newUIcodebase) {
       // Alternatively getByRole('link', { name: 'Consumer groups' });
       this.kafkaTabNavDashboard = page.locator('li[data-ouia-component-id="tab-Dashboard"]');
       this.kafkaTabNavTopics = page.locator('li[data-ouia-component-id="tab-Topics"]');

@@ -34,7 +34,7 @@ export abstract class AbstractPage {
     this.confirmDeleteField = page.getByLabel('Type DELETE to confirm:');
     this.saveButton = page.getByRole('button').filter({ hasText: 'Save' });
 
-    if (process.env.ENV_TYPE == 'stage-new-ui') {
+    if (config.newUIcodebase) {
       this.deleteNameInput = page.locator('input[data-ouia-component-id="delete-confirmation"]');
     }
 

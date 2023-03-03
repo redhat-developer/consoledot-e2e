@@ -9,7 +9,7 @@ export class ConsumerGroupsPage extends KafkaInstancePage {
     super(page, instanceName);
     this.consumerGroupIdButton = page.locator('button', { hasText: 'Consumer group ID' });
     this.consumerGroupHeading = page.locator('h2', { hasText: 'No consumer groups' });
-    if (process.env.ENV_TYPE == 'stage-new-ui') {
+    if (config.newUIcodebase) {
       this.consumerGroupHeading = page.locator('h1', { hasText: 'No consumer groups' });
     }
   }

@@ -29,7 +29,7 @@ export class KafkaInstanceListPage extends AbstractPage {
     this.bootstrapField = page.locator('[aria-label="Bootstrap server"]');
     this.closeDrawerButton = page.locator('[aria-label="Close drawer panel"]');
 
-    if (process.env.ENV_TYPE == 'stage-new-ui') {
+    if (config.newUIcodebase) {
       this.urlPath = '/application-services/new-streams/kafkas';
     }
   }
@@ -42,7 +42,7 @@ export class KafkaInstanceListPage extends AbstractPage {
 
   async gotoThroughMenu() {
     // Navigates to list of Kafka instances
-    if (process.env.ENV_TYPE == 'stage-new-ui') {
+    if (config.newUIcodebase) {
       await this.gotoUrl();
       await this.navigateToProduct(this.productName);
     } else {
