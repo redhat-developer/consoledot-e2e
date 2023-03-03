@@ -1,8 +1,8 @@
-import { chromium } from '@playwright/test';
+import { chromium, PlaywrightTestConfig } from '@playwright/test';
 import { config } from './config';
 import { ConsoleDotAuthPage } from '@lib/pom/auth';
 
-export default async function globalSetup() {
+export default async function globalSetup(pwConfig: PlaywrightTestConfig) {
   const users = [
     {
       name: config.adminUsername,
@@ -45,7 +45,7 @@ export default async function globalSetup() {
     if (user.name != undefined) {
       const browser = await chromium.launch();
       const context = await browser.newContext({
-        ignoreHTTPSErrors: config.startingPage != config.startingPageDefault ? true : false
+        ignoreHTTPSErrors: pwConfig.use.ignoreHTTPSErrors
       });
       const page = await context.newPage();
       const consoleDotAuthPage = new ConsoleDotAuthPage(page);
