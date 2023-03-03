@@ -1,43 +1,44 @@
-import { chromium, PlaywrightTestConfig } from '@playwright/test';
-import { config } from './config';
+import { chromium } from '@playwright/test';
+import { config as testConfig } from './config';
 import { ConsoleDotAuthPage } from '@lib/pom/auth';
+import config from '../playwright.config';
 
-export default async function globalSetup(pwConfig: PlaywrightTestConfig) {
+export default async function globalSetup() {
   const users = [
     {
-      name: config.adminUsername,
-      password: config.adminPassword,
-      path: config.adminAuthFile
+      name: testConfig.adminUsername,
+      password: testConfig.adminPassword,
+      path: testConfig.adminAuthFile
     },
     {
-      name: config.username,
-      password: config.password,
-      path: config.user1AuthFile
+      name: testConfig.username,
+      password: testConfig.password,
+      path: testConfig.user1AuthFile
     },
     {
-      name: config.username_2,
-      password: config.password_2,
-      path: config.user2AuthFile
+      name: testConfig.username_2,
+      password: testConfig.password_2,
+      path: testConfig.user2AuthFile
     },
     {
-      name: config.stratosphere1username,
-      password: config.stratospherePassword,
-      path: config.stratosphere1AuthFile
+      name: testConfig.stratosphere1username,
+      password: testConfig.stratospherePassword,
+      path: testConfig.stratosphere1AuthFile
     },
     {
-      name: config.stratosphere2username,
-      password: config.stratospherePassword,
-      path: config.stratosphere2AuthFile
+      name: testConfig.stratosphere2username,
+      password: testConfig.stratospherePassword,
+      path: testConfig.stratosphere2AuthFile
     },
     {
-      name: config.stratosphere3username,
-      password: config.stratospherePassword,
-      path: config.stratosphere3AuthFile
+      name: testConfig.stratosphere3username,
+      password: testConfig.stratospherePassword,
+      path: testConfig.stratosphere3AuthFile
     },
     {
-      name: config.stratosphere4username,
-      password: config.stratospherePassword,
-      path: config.stratosphere4AuthFile
+      name: testConfig.stratosphere4username,
+      password: testConfig.stratospherePassword,
+      path: testConfig.stratosphere4AuthFile
     }
   ];
 
@@ -45,7 +46,7 @@ export default async function globalSetup(pwConfig: PlaywrightTestConfig) {
     if (user.name != undefined) {
       const browser = await chromium.launch();
       const context = await browser.newContext({
-        ignoreHTTPSErrors: pwConfig.use.ignoreHTTPSErrors
+        ignoreHTTPSErrors: config.use.ignoreHTTPSErrors
       });
       const page = await context.newPage();
       const consoleDotAuthPage = new ConsoleDotAuthPage(page);
