@@ -9,6 +9,7 @@ import { AbstractPage } from '@lib/pom/abstractPage';
 import { ConsumerGroupsPage } from '@lib/pom/streams/instance/consumerGroups';
 import { PropertiesPage } from '@lib/pom/streams/instance/topic/properties';
 import { KafkaInstancePage } from '@lib/pom/streams/kafkaInstance';
+import { TopicPage } from '@lib/pom/streams/instance/topic';
 
 const testInstanceName = config.instanceName;
 const testTopicName = `test-topic-${config.sessionID}`;
@@ -299,18 +300,19 @@ test('test kafka try create topic with same name', async ({ page }) => {
 });
 
 test('create Topic with properties different than default', async ({ page }) => {
-  test.fixme(true, 'Test is extremely flaky.');
   test.skip(config.newUIcodebase, 'Feature not implemented in the new codebase yet.');
 
   const kafkaInstancesPage = new KafkaInstanceListPage(page);
   const kafkaInstancePage = new KafkaInstancePage(page, testInstanceName);
-  const topicPage = new TopicListPage(page, testInstanceName);
+  const topicListPage = new TopicListPage(page, testInstanceName);
+  const topicPage = new TopicPage(page, testInstanceName, testTopicName);
   const propertiesPage = new PropertiesPage(page, testInstanceName, testTopicName);
   await kafkaInstancesPage.gotoThroughMenu();
   await kafkaInstancePage.gotoThroughMenu();
-  await topicPage.gotoThroughMenu();
+  await topicListPage.gotoThroughMenu();
 
-  await topicPage.createKafkaTopic(testTopicName, false);
+  await topicListPage.createKafkaTopic(testTopicName, false);
+  await topicPage.gotoThroughMenu();
 
   await propertiesPage.gotoThroughMenu();
   // Checking phase
@@ -338,10 +340,6 @@ test('create Topic with properties different than default', async ({ page }) => 
 
 // test_4kafka.py test_edit_topic_properties_after_creation
 test('edit topic properties after creation', async ({ page }) => {
-  test.fixme(
-    true,
-    'Test is extremely flaky. Topics are not cleared and we need to wait properly on loading instead of just cliking without it.'
-  );
   test.skip(config.newUIcodebase, 'Feature not implemented in the new codebase yet.');
 
   const kafkaInstancesPage = new KafkaInstanceListPage(page);
