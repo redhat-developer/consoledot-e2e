@@ -1,6 +1,7 @@
 import { expect, Locator, Page } from '@playwright/test';
 import { KafkaInstanceListPage } from '@lib/pom/streams/kafkaInstanceList';
 import { AbstractPage } from '@lib/pom/abstractPage';
+import { config } from '@lib/config';
 
 export class KafkaInstancePage extends KafkaInstanceListPage {
   readonly instanceName: string;

@@ -1,5 +1,6 @@
 import { expect, Locator, Page } from '@playwright/test';
 import { KafkaInstancePage } from '@lib/pom/streams/kafkaInstance';
+import { config } from '@lib/config';
 
 export class ConsumerGroupsPage extends KafkaInstancePage {
   readonly consumerGroupIdButton: Locator;
