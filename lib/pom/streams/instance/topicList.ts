@@ -31,7 +31,7 @@ export class TopicListPage extends KafkaInstancePage {
     this.retentionBytesButton = page.locator('button[name="retention-bytes"]');
     this.daysButton = page.locator('button', { hasText: 'days' });
     this.hoursButton = page.locator('button', { hasText: 'hours' });
-    this.compactButton = page.locator('button', { hasText: 'Compact' });
+    this.compactButton = page.locator('a', { hasText: 'Compact' });
     this.bytesButton = page.locator('button', { hasText: 'bytes' });
     this.kibibytesButton = page.locator('button', { hasText: 'kibibytes' });
     this.bytesRadioButton = page.getByLabel('bytes');
@@ -43,6 +43,7 @@ export class TopicListPage extends KafkaInstancePage {
     await expect(this.kafkaTabNavTopics).toHaveCount(1);
     // data-testid=pageKafka-tabTopics
     await this.kafkaTabNavTopics.click();
+    await expect(this.createTopicButton).toHaveCount(1);
   }
 
   async createKafkaTopic(name: string, defaultProperties: boolean) {
@@ -85,9 +86,9 @@ export class TopicListPage extends KafkaInstancePage {
       await this.kibibytesButton.click();
 
       // Choosing different CleanUp policy
-      await this.actionsDeleteButton.click();
+      await this.deleteButton.click();
       await this.compactButton.first().click();
-      await this.compactButton.click();
+      // await this.compactButton.click();
 
       await this.createTopicButton.click();
     }
