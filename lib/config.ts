@@ -32,6 +32,7 @@ class Config {
   readonly startingPageDefault = 'https://console.redhat.com';
 
   readonly enableErrLogging: boolean;
+  readonly newUIcodebase: boolean;
 
   constructor() {
     // Load credentials
@@ -69,6 +70,9 @@ class Config {
 
     //logging
     this.enableErrLogging = !!process.env.ENABLE_ERR_LOGGING;
+
+    // New codebase
+    this.newUIcodebase = process.env.ENV_TYPE == 'stage-new-ui';
   }
 }
 

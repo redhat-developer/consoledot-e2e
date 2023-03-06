@@ -34,6 +34,10 @@ export abstract class AbstractPage {
     this.confirmDeleteField = page.getByLabel('Type DELETE to confirm:');
     this.saveButton = page.getByRole('button').filter({ hasText: 'Save' });
 
+    if (config.newUIcodebase) {
+      this.deleteNameInput = page.locator('input[data-ouia-component-id="delete-confirmation"]');
+    }
+
     // move that into page object model when it will be implemented
     if (config.enableErrLogging) {
       addConsoleLogListeners(page);

@@ -1,21 +1,23 @@
 import { expect, Locator, Page } from '@playwright/test';
 import { KafkaInstancePage } from '@lib/pom/streams/kafkaInstance';
+import { config } from '@lib/config';
 
 export class ConsumerGroupsPage extends KafkaInstancePage {
-  readonly consumerGroupsMenuButton: Locator;
   readonly consumerGroupIdButton: Locator;
   readonly consumerGroupHeading: Locator;
 
   constructor(page: Page, instanceName: string) {
     super(page, instanceName);
-    this.consumerGroupsMenuButton = page.locator('button', { hasText: 'Consumer groups' });
     this.consumerGroupIdButton = page.locator('button', { hasText: 'Consumer group ID' });
     this.consumerGroupHeading = page.locator('h2', { hasText: 'No consumer groups' });
+    if (config.newUIcodebase) {
+      this.consumerGroupHeading = page.locator('h1', { hasText: 'No consumer groups' });
+    }
   }
 
   async gotoThroughMenu() {
-    await expect(this.consumerGroupsMenuButton).toHaveCount(1);
-    await this.consumerGroupsMenuButton.click();
+    await expect(this.kafkaTabNavConsumerGroups).toHaveCount(1);
+    await this.kafkaTabNavConsumerGroups.click();
   }
 
   async waitForEmptyConsumerGroupsTable() {
