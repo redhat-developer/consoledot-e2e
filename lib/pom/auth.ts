@@ -32,7 +32,7 @@ export class ConsoleDotAuthPage extends AbstractPage {
     await blockAnalyticsDomains(this.page);
 
     // Go to starting Page
-    this.goto();
+    await this.goto();
 
     // do login
     await this.usernameField.fill(username);

@@ -34,6 +34,14 @@ class Config {
   readonly enableErrLogging: boolean;
   readonly newUIcodebase: boolean;
 
+  readonly adminAuthFile = 'playwright/.auth/admin.json';
+  readonly user1AuthFile = 'playwright/.auth/user1.json';
+  readonly user2AuthFile = 'playwright/.auth/user2.json';
+  readonly stratosphere1AuthFile = 'playwright/.auth/stratosphere1.json';
+  readonly stratosphere2AuthFile = 'playwright/.auth/stratosphere2.json';
+  readonly stratosphere3AuthFile = 'playwright/.auth/stratosphere3.json';
+  readonly stratosphere4AuthFile = 'playwright/.auth/stratosphere4.json';
+
   constructor() {
     // Load credentials
     this.username = process.env.TEST_USERNAME;

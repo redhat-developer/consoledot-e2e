@@ -2,7 +2,8 @@ import { ConsoleDotAuthPage } from '@lib/pom/auth';
 import { BillingOptions } from '@lib/enums/billing';
 import { config } from '@lib/config';
 import { KafkaInstanceListPage } from '@lib/pom/streams/kafkaInstanceList';
-import test, { Page, expect } from '@playwright/test';
+import { Page, expect } from '@playwright/test';
+import { test } from '@lib/utils/fixtures';
 
 const testInstanceName = 'mk-ui-playwright-tests';
 let currentUsername = config.stratosphere1username;

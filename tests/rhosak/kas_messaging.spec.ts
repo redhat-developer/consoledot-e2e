@@ -1,5 +1,5 @@
-import { test, expect } from '@playwright/test';
-import { ConsoleDotAuthPage } from '@lib/pom/auth';
+import { expect } from '@playwright/test';
+import { test } from '@lib/utils/fixtures';
 import { config } from '@lib/config';
 import { KafkaInstanceListPage } from '@lib/pom/streams/kafkaInstanceList';
 import { KafkaConsumer, KafkaProducer } from '@lib/utils/clients';
@@ -24,15 +24,15 @@ const reconnectDelayMs = 500;
 let credentials;
 let bootstrap: string;
 
+test.use({ storageState: config.adminAuthFile });
+
 test.beforeEach(async ({ page }) => {
-  const consoleDotAuthPage = new ConsoleDotAuthPage(page);
   const serviceAccountPage = new ServiceAccountPage(page);
   const kafkaInstancesPage = new KafkaInstanceListPage(page);
   const kafkaInstancePage = new KafkaInstancePage(page, testInstanceName);
   const topicPage = new TopicListPage(page, testInstanceName);
   const accessPage = new AccessPage(page, testInstanceName);
 
-  await consoleDotAuthPage.login();
   await kafkaInstancesPage.gotoThroughMenu();
 
   if ((await page.getByText(testInstanceName).count()) > 0 && (await page.locator('tr').count()) === 2) {

@@ -1,5 +1,5 @@
-import { test, expect } from '@playwright/test';
-import { ConsoleDotAuthPage } from '@lib/pom/auth';
+import { expect } from '@playwright/test';
+import { test } from '@lib/utils/fixtures';
 import { config } from '@lib/config';
 import { ServiceAccountPage } from '@lib/pom/serviceAccounts/sa';
 import { AbstractPage } from '@lib/pom/abstractPage';
@@ -7,10 +7,10 @@ import { AbstractPage } from '@lib/pom/abstractPage';
 const testServiceAccountPrefix = 'test-service-account-';
 const testServiceAccountName = `${testServiceAccountPrefix}${config.sessionID}`;
 
-test.beforeEach(async ({ page }) => {
-  const consoleDotAuthPage = new ConsoleDotAuthPage(page);
-  await consoleDotAuthPage.login();
+// Use admin user context
+test.use({ storageState: config.adminAuthFile });
 
+test.beforeEach(async ({ page }) => {
   const serviceAccountPage = new ServiceAccountPage(page);
   await serviceAccountPage.gotoThroughMenu();
 

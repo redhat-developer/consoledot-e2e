@@ -1,5 +1,5 @@
-import { test, expect } from '@playwright/test';
-import { ConsoleDotAuthPage } from '@lib/pom/auth';
+import { expect } from '@playwright/test';
+import { test } from '@lib/utils/fixtures';
 import { config } from '@lib/config';
 import { ServiceRegistryPage } from '@lib/pom/serviceRegistry/serviceRegistry';
 import { AbstractPage } from '@lib/pom/abstractPage';
@@ -7,12 +7,13 @@ import { AbstractPage } from '@lib/pom/abstractPage';
 // Define name of Service Registry instance for this set of tests
 const testInstanceName = config.instanceName;
 
+// Use admin user context
+test.use({ storageState: config.adminAuthFile });
+
 // Actions run before every test
 test.beforeEach(async ({ page }) => {
   // Login to console
-  const consoleDotAuthPage = new ConsoleDotAuthPage(page);
   const serviceRegistryPage = new ServiceRegistryPage(page);
-  await consoleDotAuthPage.login();
   // Go to list of Service Registry instances
   await serviceRegistryPage.gotoThroughMenu();
   // Wait for dismiss of loading spinner

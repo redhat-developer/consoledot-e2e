@@ -1,5 +1,5 @@
-import { test, expect } from '@playwright/test';
-import { ConsoleDotAuthPage } from '@lib/pom/auth';
+import { expect } from '@playwright/test';
+import { test } from '@lib/utils/fixtures';
 import { config } from '@lib/config';
 import { KafkaInstanceListPage } from '@lib/pom/streams/kafkaInstanceList';
 import { CloudProviders } from '@lib/enums/cloudproviders';
@@ -8,10 +8,11 @@ import { AbstractPage } from '@lib/pom/abstractPage';
 
 const testInstanceName = config.instanceName;
 
+// Use admin user context
+test.use({ storageState: config.adminAuthFile });
+
 test.beforeEach(async ({ page }) => {
-  const consoleDotAuthPage = new ConsoleDotAuthPage(page);
   const kafkaInstancesPage = new KafkaInstanceListPage(page);
-  await consoleDotAuthPage.login();
 
   await kafkaInstancesPage.gotoThroughMenu();
 
