@@ -27,7 +27,7 @@ export abstract class AbstractPage {
     this.deleteNameInput = page.locator('input[name="mas-name-input"]');
     this.actionsDeleteButton = page.locator('button', { hasText: 'Delete' });
     this.closeButton = page.locator('button', { hasText: 'Close' });
-    this.appDataServicesLink = page.getByRole('link', { name: 'Application and Data Services' });
+    this.appDataServicesLink = page.locator('a', { hasText: 'Application and Data Services' });
     this.nextButton = page.locator('button', { hasText: 'Next' });
     this.finishButton = page.locator('button', { hasText: 'Finish' });
     this.deleteButton = page.locator('button', { hasText: 'Delete' });
@@ -54,32 +54,26 @@ export abstract class AbstractPage {
   // Navigates to Application and Data Services overview page when category of tested product is not present in navigation
   async navigateToApplicationAndDataServices() {
     // If category of tested product is not present in navigation
-    try {
+    if (await this.appDataServicesLink.isVisible()) {
       // Open link to Application and Data Services overview page
-      await this.appDataServicesLink.click({ timeout: 2000 });
-    } catch (e) {
-      // Do nothing
+      await this.appDataServicesLink.click();
     }
   }
 
   // Opens category of tested product in navigation when link to list of tested product instances is not present there
-  async navigateToProduct(product: string) {
+  async navigateToProduct(product: string, productList: string) {
     // Navigate to prerequisite page first
     await this.navigateToApplicationAndDataServices();
     // If link to list of tested product instances is not present in navigation
-    try {
-      await this.page.locator('button', { hasText: product }).click({ timeout: 2000 });
-    } catch (e) {
-      // Do nothing
+    if (!(await this.page.locator(AbstractPage.menuLocator, { hasText: productList }).isVisible())) {
+      await this.page.locator('button', { hasText: product }).click();
     }
   }
 
   // Navigates to list of tested product instances
   async navigateToProductList(product: string, productList: string) {
     // Navigate to prerequisite page first
-    if (!(await this.page.locator(AbstractPage.menuLocator, { hasText: productList }).isVisible())) {
-      await this.navigateToProduct(product);
-    }
+    await this.navigateToProduct(product, productList);
     // Close pop-up notifications if present
     await closePopUp(this.page);
     // Open link to list of tested product instances
