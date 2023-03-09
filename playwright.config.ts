@@ -32,7 +32,7 @@ const config: PlaywrightTestConfig = {
   workers: 1,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: process.env.CI
-    ? [['list', { printSteps: true }], ['github'], ['junit', { outputFile: 'results.xml' }]]
+    ? [['list', { printSteps: true }], ['github'], ['junit', { outputFile: 'results.xml' }], ['html', { open: 'never' }]]
     : 'html',
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
