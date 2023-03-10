@@ -38,12 +38,7 @@ export class KafkaInstanceListPage extends AbstractPage {
 
   async gotoThroughMenu() {
     // Navigates to list of Kafka instances
-    if (config.newUIcodebase) {
-      await this.gotoUrl();
-      await this.navigateToProduct(this.productName, this.productList);
-    } else {
-      await this.navigateToProductList(this.productName, this.productList);
-    }
+    await this.navigateToProductList(this.productName, this.productList);
   }
 
   async createKafkaInstance(
