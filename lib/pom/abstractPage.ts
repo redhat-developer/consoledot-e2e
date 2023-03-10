@@ -1,5 +1,4 @@
 import { config } from '@lib/config';
-import { addConsoleLogListeners } from '@lib/utils/console_err_listener';
 import { closePopUp } from '@lib/utils/popup';
 import { Locator, Page, expect } from '@playwright/test';
 
@@ -36,11 +35,6 @@ export abstract class AbstractPage {
 
     if (config.newUIcodebase) {
       this.deleteNameInput = page.locator('input[data-ouia-component-id="delete-confirmation"]');
-    }
-
-    // move that into page object model when it will be implemented
-    if (config.enableErrLogging) {
-      addConsoleLogListeners(page);
     }
   }
 
