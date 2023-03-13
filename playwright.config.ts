@@ -43,7 +43,10 @@ const config: PlaywrightTestConfig = {
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'retain-on-failure',
-    screenshot: 'on',
+    screenshot: {
+      mode: 'on',
+      fullPage: true,
+    },
     /* ignore https certificate authority if STARTING_PAGE is defined */
     ignoreHTTPSErrors: process.env.STARTING_PAGE ? true : false,
     launchOptions: {
@@ -60,7 +63,10 @@ const config: PlaywrightTestConfig = {
       name: 'chromium',
       use: {
         ...devices['Desktop Chrome'],
-        viewport: { width: 1920, height: 1024 }
+        viewport: { width: 1920, height: 1024 },
+        launchOptions: {
+          args: ["--start-maximized"] 
+        }
       }
     },
 
