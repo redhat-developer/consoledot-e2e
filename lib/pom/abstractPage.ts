@@ -13,6 +13,7 @@ export abstract class AbstractPage {
   readonly finishButton: Locator;
   readonly deleteButton: Locator;
   readonly appDataServicesLink: Locator;
+  readonly appDataServicesText: Locator;
   static readonly menuLocator: string = '[data-testid=router-link]';
   static readonly actionsLocatorString: string = '[aria-label="Actions"]';
   static readonly progressBarLocatorString: string = '[role=progressbar]';
@@ -27,6 +28,7 @@ export abstract class AbstractPage {
     this.actionsDeleteButton = page.locator('button', { hasText: 'Delete' });
     this.closeButton = page.locator('button', { hasText: 'Close' });
     this.appDataServicesLink = page.locator('a', { hasText: 'Application and Data Services' });
+    this.appDataServicesText = page.getByText('Application and Data Services');
     this.nextButton = page.locator('button', { hasText: 'Next' });
     this.finishButton = page.locator('button', { hasText: 'Finish' });
     this.deleteButton = page.locator('button', { hasText: 'Delete' });
@@ -47,6 +49,7 @@ export abstract class AbstractPage {
 
   // Navigates to Application and Data Services overview page when category of tested product is not present in navigation
   async navigateToApplicationAndDataServices() {
+    await expect(this.appDataServicesText).toHaveCount(1);
     // If category of tested product is not present in navigation
     if (await this.appDataServicesLink.isVisible()) {
       // Open link to Application and Data Services overview page
