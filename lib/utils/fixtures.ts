@@ -26,7 +26,7 @@ export const test = base.extend({
     try {
       await expect(page).toHaveTitle(/Log In | Red Hat IDP/);
     } catch {
-      await expect(page.locator('a', { hasText: 'Application and Data Services' })).toHaveCount(1, { timeout: 10000 });
+      await expect(page.getByText('Application and Data Services').first()).toBeVisible({ timeout: 10000 });
     }
     await expect(page.getByText('Gain increased visibility into your hybrid cloud')).toBeTruthy();
     await use(page);
