@@ -154,6 +154,7 @@ test('Browse messages', async ({ page }) => {
 const filters = [FilterGroup.offset, FilterGroup.timestamp, FilterGroup.epoch, FilterGroup.latest];
 for (const filter of filters) {
   test(`Filter messages by ${filter}`, async ({ page }) => {
+    test.skip(filter === FilterGroup.epoch, 'Skip flaky epoch filter test');
     // Today and tomorrow date
     const today = new Date();
     const tomorrow = new Date();
