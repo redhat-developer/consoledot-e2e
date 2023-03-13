@@ -23,7 +23,7 @@ export const test = base.extend({
     }
     await page.goto(config.startingPage);
     // check we landed on the right page`
-    await expect(page).toHaveTitle(/Home/, { timeout: 10000 });
+    await expect(page).toHaveTitle(/(Home.*|console.redhat.com|Hello.*|Log In.*)/, { timeout: 10000 }); //page can be differend depends if test is already logged in
     await expect(page.getByText('Gain increased visibility into your hybrid cloud')).toBeTruthy();
     await use(page);
 
