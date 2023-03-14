@@ -49,7 +49,7 @@ export abstract class AbstractPage {
 
   // Navigates to Application and Data Services overview page when category of tested product is not present in navigation
   async navigateToApplicationAndDataServices() {
-    await expect(this.appDataServicesText).toHaveCount(1);
+    await expect(this.appDataServicesText.first()).toHaveCount(1);
     // If category of tested product is not present in navigation
     if (await this.appDataServicesLink.isVisible()) {
       // Open link to Application and Data Services overview page
