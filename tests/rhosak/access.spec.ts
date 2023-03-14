@@ -3,7 +3,6 @@ import { test } from '@lib/utils/fixtures';
 import { ConsoleDotAuthPage } from '@lib/pom/auth';
 import { config } from '@lib/config';
 import { KafkaInstanceListPage } from '@lib/pom/streams/kafkaInstanceList';
-import { AbstractPage } from '@lib/pom/abstractPage';
 import { AccessPage } from '@lib/pom/streams/instance/access';
 import { KafkaInstancePage } from '@lib/pom/streams/kafkaInstance';
 
@@ -16,23 +15,14 @@ test.beforeEach(async ({ page }) => {
   await consoleDotAuthPage.login();
   await kafkaInstancesPage.gotoThroughMenu();
 
-  if ((await page.getByText(testInstanceName).count()) > 0 && (await page.locator('tr').count()) === 2) {
-    // Test instance present, nothing to do!
+  if ((await kafkaInstancesPage.noKafkaInstancesText.count()) == 1) {
+    await kafkaInstancesPage.createKafkaInstance(testInstanceName);
+    await kafkaInstancesPage.waitForKafkaReady(testInstanceName);
   } else {
-    await page.waitForSelector(AbstractPage.progressBarLocatorString, {
-      state: 'detached',
-      timeout: config.kafkaInstanceCreationTimeout
-    });
-
-    for (const el of await page.locator(`tr >> a`).elementHandles()) {
-      const name = await el.textContent();
-
-      if (name !== testInstanceName) {
-        await kafkaInstancesPage.deleteKafkaInstance(name);
-      }
-    }
-
-    if ((await page.getByText(testInstanceName).count()) === 0) {
+    // Test instance present, nothing to do!
+    try {
+      await expect(page.getByText(testInstanceName)).toHaveCount(1, { timeout: 2000 });
+    } catch (e) {
       await kafkaInstancesPage.createKafkaInstance(testInstanceName);
       await kafkaInstancesPage.waitForKafkaReady(testInstanceName);
     }

@@ -193,7 +193,7 @@ test('test instance details on row click', async ({ page }) => {
   const kafkaInstancesPage = new KafkaInstanceListPage(page);
   await kafkaInstancesPage.gotoThroughMenu();
 
-  await page.getByRole('gridcell', { name: `${config.adminUsername}` }).click();
+  await page.locator('tr', { hasText: `${testInstanceName}` }).click();
 
   await expect(page.locator('h1', { hasText: `${testInstanceName}` })).toHaveCount(1);
 });
