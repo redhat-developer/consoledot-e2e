@@ -24,9 +24,9 @@ export const test = base.extend({
     await page.goto(config.startingPage);
     // check we landed on the right page`
     try {
-      await expect(page).toHaveTitle(/Log In | Red Hat IDP/);
-    } catch {
       await expect(page.getByText('Application and Data Services').first()).toBeVisible({ timeout: 10000 });
+    } catch {
+      await expect(page).toHaveTitle(/Log In | Red Hat IDP/);
     }
     await expect(page.getByText('Gain increased visibility into your hybrid cloud')).toBeTruthy();
     await use(page);
