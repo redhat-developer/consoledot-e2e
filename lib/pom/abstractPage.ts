@@ -19,6 +19,7 @@ export abstract class AbstractPage {
   static readonly progressBarLocatorString: string = '[role=progressbar]';
   readonly confirmDeleteField: Locator;
   readonly saveButton: Locator;
+  readonly cancelButton: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -34,6 +35,7 @@ export abstract class AbstractPage {
     this.deleteButton = page.locator('button', { hasText: 'Delete' });
     this.confirmDeleteField = page.getByLabel('Type DELETE to confirm:');
     this.saveButton = page.getByRole('button').filter({ hasText: 'Save' });
+    this.cancelButton = page.getByRole('button').filter({ hasText: 'Cancel' });
 
     if (config.newUIcodebase) {
       this.deleteNameInput = page.locator('input[data-ouia-component-id="delete-confirmation"]');
@@ -47,9 +49,13 @@ export abstract class AbstractPage {
     await row.locator(AbstractPage.actionsLocatorString).click();
   }
 
+  async checkUiIsVisible() {
+    await expect(this.appDataServicesText.first()).toBeVisible({ timeout: 20000 });
+  }
+
   // Navigates to Application and Data Services overview page when category of tested product is not present in navigation
   async navigateToApplicationAndDataServices() {
-    await expect(this.appDataServicesText.first()).toHaveCount(1);
+    await this.checkUiIsVisible();
     // If category of tested product is not present in navigation
     if (await this.appDataServicesLink.isVisible()) {
       // Open link to Application and Data Services overview page

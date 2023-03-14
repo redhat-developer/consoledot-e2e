@@ -30,7 +30,19 @@ test.beforeEach(async ({ page }) => {
 });
 
 test.afterAll(async ({ page }) => {
+  const consoleDotAuthPage = new ConsoleDotAuthPage(page);
   const kafkaInstancesPage = new KafkaInstanceListPage(page);
+
+  try {
+    if ((await consoleDotAuthPage.cancelButton.first().count()) === 1) {
+      await consoleDotAuthPage.cancelButton.click();
+    }
+    await consoleDotAuthPage.checkUiIsVisible();
+    await consoleDotAuthPage.logout();
+  } catch {
+    // Do nothing
+  }
+  await consoleDotAuthPage.login();
   await kafkaInstancesPage.gotoThroughMenu();
 
   try {

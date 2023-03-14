@@ -21,11 +21,15 @@ export class ConsoleDotAuthPage extends AbstractPage {
     this.logoutButton = page.locator('button', { hasText: 'Log out' });
   }
 
+  async checkLoginPageVisible() {
+    await expect(this.usernameField).toBeVisible({ timeout: 20000 });
+  }
+
   // Got to starting page
   async goto() {
     await this.page.goto(config.startingPage);
     // Expect a title "to contain" a substring.
-    await expect(this.page).toHaveTitle(/Log In | Red Hat IDP/);
+    await this.checkLoginPageVisible();
   }
 
   async login(username: string = config.adminUsername, password: string = config.adminPassword) {
@@ -41,7 +45,7 @@ export class ConsoleDotAuthPage extends AbstractPage {
     await this.submitButton.click();
 
     // check we landed on the right page
-    await expect(this.appDataServicesText.first()).toBeVisible({ timeout: 10000 });
+    await this.checkUiIsVisible();
     await expect(this.welcomePage).toBeTruthy();
   }
 
