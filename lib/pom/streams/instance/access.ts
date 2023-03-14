@@ -1,6 +1,7 @@
 import { expect, Locator, Page } from '@playwright/test';
 import { KafkaInstancePage } from '@lib/pom/streams/kafkaInstance';
 import { AbstractPage } from '@lib/pom/abstractPage';
+import { config } from '@lib/config';
 
 export class AccessPage extends KafkaInstancePage {
   readonly manageAccessButton: Locator;
@@ -9,7 +10,11 @@ export class AccessPage extends KafkaInstancePage {
   readonly optionField: Locator;
   readonly produceToTopicButton: Locator;
   readonly enterPrefixField: Locator;
+  readonly enterNameField: Locator;
   readonly consumeFromTopicButton: Locator;
+  readonly createPrefixTopicConfirmButton: Locator;
+  readonly topicConsumePermissionRow: Locator;
+  readonly consumerGroupConsumePermissionRow: Locator;
 
   constructor(page: Page, instanceName: string) {
     super(page, instanceName);
@@ -19,7 +24,20 @@ export class AccessPage extends KafkaInstancePage {
     this.optionField = page.getByRole('option');
     this.produceToTopicButton = page.locator('button', { hasText: 'Produce to a topic' });
     this.enterPrefixField = page.getByPlaceholder('Enter prefix');
+    this.enterNameField = page.getByPlaceholder('Enter name');
     this.consumeFromTopicButton = page.locator('button', { hasText: 'Consume from a topic' });
+    this.createPrefixTopicConfirmButton = page.locator('button', { hasText: /Create.+/ });
+    if (config.newUIcodebase) {
+      this.topicConsumePermissionRow = page.locator('tr', { hasText: 'Topic' });
+      this.consumerGroupConsumePermissionRow = page.locator('tr', { hasText: 'Consumer group' });
+    } else {
+      this.topicConsumePermissionRow = page.getByRole('row', {
+        name: 'T Topic Options menu permission.manage_permissions_dialog.assign_permissions.resource_name_aria Options menu Label group category'
+      });
+      this.consumerGroupConsumePermissionRow = page.getByRole('gridcell', {
+        name: 'permission.manage_permissions_dialog.assign_permissions.resource_name_aria Options menu'
+      });
+    }
   }
 
   async gotoThroughMenu() {
@@ -41,10 +59,15 @@ export class AccessPage extends KafkaInstancePage {
 
     await this.produceToTopicButton.click();
 
-    await this.enterPrefixField.click();
-    await this.enterPrefixField.fill(topicName);
-    // TODO - This is just a workaround - `save` button is disabled even if the prefix is written but not confirmed by another action
-    await this.enterPrefixField.click();
+    if (config.newUIcodebase) {
+      await this.enterNameField.click();
+      await this.enterNameField.fill(topicName);
+      await this.page.locator('button', { hasText: topicName }).click();
+    } else {
+      await this.enterPrefixField.click();
+      await this.enterPrefixField.fill(topicName);
+      await this.createPrefixTopicConfirmButton.click();
+    }
 
     await this.saveButton.click();
   }
@@ -61,33 +84,28 @@ export class AccessPage extends KafkaInstancePage {
     await this.consumeFromTopicButton.click();
 
     // TODO - these selectors should be added to class as well
-    await this.page
-      .getByRole('row', {
-        name: 'T Topic Options menu permission.manage_permissions_dialog.assign_permissions.resource_name_aria Options menu Label group category'
-      })
-      .getByPlaceholder('Enter prefix')
-      .click();
+    let placeholder = 'Enter prefix';
+    if (config.newUIcodebase) {
+      placeholder = 'Enter name';
+    }
 
-    await this.page
-      .getByRole('row', {
-        name: 'T Topic Options menu permission.manage_permissions_dialog.assign_permissions.resource_name_aria Options menu Label group category'
-      })
-      .getByPlaceholder('Enter prefix')
-      .fill(topicName);
+    await this.topicConsumePermissionRow.getByPlaceholder(placeholder).click();
+    await this.topicConsumePermissionRow.getByPlaceholder(placeholder).fill(topicName);
 
-    await this.page
-      .getByRole('gridcell', {
-        name: 'permission.manage_permissions_dialog.assign_permissions.resource_name_aria Options menu'
-      })
-      .getByPlaceholder('Enter prefix')
-      .click();
+    if (config.newUIcodebase) {
+      await this.page.locator('button', { hasText: topicName }).click();
+    } else {
+      await this.createPrefixTopicConfirmButton.click();
+    }
 
-    await this.page
-      .getByRole('gridcell', {
-        name: 'permission.manage_permissions_dialog.assign_permissions.resource_name_aria Options menu'
-      })
-      .getByPlaceholder('Enter prefix')
-      .fill(consumerGroup);
+    await this.consumerGroupConsumePermissionRow.getByPlaceholder(placeholder).click();
+    await this.consumerGroupConsumePermissionRow.getByPlaceholder(placeholder).fill(consumerGroup);
+
+    if (config.newUIcodebase) {
+      await this.page.locator('button', { hasText: consumerGroup }).click();
+    } else {
+      await this.createPrefixTopicConfirmButton.click();
+    }
 
     await this.saveButton.click();
   }

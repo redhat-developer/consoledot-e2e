@@ -13,6 +13,7 @@ export class ServiceRegistryPage extends AbstractPage {
   readonly submitButton: Locator;
   readonly serviceRegistryTable: Locator;
   readonly deleteCheckbox: Locator;
+  readonly deleteNameInput: Locator;
 
   constructor(page: Page) {
     super(page);
@@ -22,6 +23,7 @@ export class ServiceRegistryPage extends AbstractPage {
     this.submitButton = page.locator('button[type="submit"]');
     this.serviceRegistryTable = page.locator('[aria-label="Service Registry instance list"]');
     this.deleteCheckbox = page.locator('input[type="checkbox"]');
+    this.deleteNameInput = page.locator('input[name="mas-name-input"]');
   }
 
   // Got to starting page
@@ -64,39 +66,32 @@ export class ServiceRegistryPage extends AbstractPage {
   // Deletes Service Registry instance defined by name,
   // waits for deletion of Service Registry instance when required
   async deleteServiceRegistryInstance(name: string, awaitDeletion = true) {
-    try {
-      // Open three-dots menu of instance
-      await this.showElementActions(name);
-      // Click on delete button
-      await this.actionsDeleteButton.click();
-
-      try {
-        // Wait for presence of name input
-        await expect(this.deleteNameInput).toHaveCount(1, { timeout: 5000 });
-        // Click into name input
-        await this.deleteNameInput.click();
-        // Fill name of instance
-        await this.deleteNameInput.fill(name);
-        // Tick checkbox for deletion
-        await this.deleteCheckbox.click();
-      } catch (err) {
-        // Deletion without confirmation - ignore
-      }
-
-      // Click on delete button
-      await this.actionsDeleteButton.click();
-      // If deletion wait is required
-      if (awaitDeletion) {
-        // Wait for absence of instance name for defined timeout
-        await expect(this.page.getByText(`${name}`, { exact: true })).toHaveCount(0, {
-          timeout: config.serviceRegistryInstanceDeletionTimeout
-        });
-      }
-      // Remove instance name from resource store
-      resourceStore.removeServiceRegistry(name);
-    } catch (err) {
-      // Do nothing as instance is not connected to this account
+    // Open three-dots menu of instance
+    await this.showElementActions(name);
+    // Click on delete button in actions menu
+    await this.actionsDeleteButton.click();
+    // Check if confirmation input is visible
+    if (this.deleteNameInput.isVisible) {
+      // Wait for presence of name input
+      await expect(this.deleteNameInput).toHaveCount(1, { timeout: 5000 });
+      // Click into name input
+      await this.deleteNameInput.click();
+      // Fill name of instance
+      await this.deleteNameInput.fill(name);
+      // Tick checkbox for deletion
+      await this.deleteCheckbox.click();
     }
+    // Click on delete button
+    await this.actionsDeleteButton.click();
+    // If deletion wait is required
+    if (awaitDeletion) {
+      // Wait for absence of instance name for defined timeout
+      await expect(this.page.getByText(`${name}`, { exact: true })).toHaveCount(0, {
+        timeout: config.serviceRegistryInstanceDeletionTimeout
+      });
+    }
+    // Remove instance name from resource store
+    resourceStore.removeServiceRegistry(name);
   }
 
   // Waits for readiness of Service Registry instance defined by name

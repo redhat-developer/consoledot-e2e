@@ -1,6 +1,7 @@
 import { expect, Locator, Page } from '@playwright/test';
 import { TopicListPage } from '../topicList';
 import { FilterGroup, Limit } from '@lib/enums/messages';
+import { config } from '@lib/config';
 
 export class MessagesPage extends TopicListPage {
   readonly topicName: string;
@@ -26,6 +27,10 @@ export class MessagesPage extends TopicListPage {
     this.specifyOffset = '[aria-label="Specify offset"]';
     this.datePicker = '[aria-label="Date picker"]';
     this.specifyEpochTimestamp = '[aria-label="Specify epoch timestamp"]';
+
+    if (config.newUIcodebase) {
+      this.messageMenuButton = page.locator('li[data-ouia-component-id="tab-Topics"]');
+    }
   }
 
   async gotoThroughMenu() {

@@ -17,6 +17,7 @@ export class KafkaInstanceListPage extends AbstractPage {
   readonly connectionButton: Locator;
   readonly bootstrapField: Locator;
   readonly closeDrawerButton: Locator;
+  readonly noKafkaInstancesText: Locator;
 
   constructor(page: Page) {
     super(page);
@@ -28,6 +29,7 @@ export class KafkaInstanceListPage extends AbstractPage {
     this.connectionButton = page.locator('button', { hasText: 'Connection' });
     this.bootstrapField = page.locator('[aria-label="Bootstrap server"]');
     this.closeDrawerButton = page.locator('[aria-label="Close drawer panel"]');
+    this.noKafkaInstancesText = page.getByText('No Kafka instances');
   }
 
   async gotoUrl() {
@@ -39,6 +41,7 @@ export class KafkaInstanceListPage extends AbstractPage {
   async gotoThroughMenu() {
     // Navigates to list of Kafka instances
     await this.navigateToProductList(this.productName, this.productList);
+    await expect(this.createKafkaInstanceButton).toHaveCount(1);
   }
 
   async createKafkaInstance(
