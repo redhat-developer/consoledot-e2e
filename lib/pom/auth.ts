@@ -41,7 +41,7 @@ export class ConsoleDotAuthPage extends AbstractPage {
     await this.submitButton.click();
 
     // check we landed on the right page
-    await expect(this.page).toHaveTitle(/Home/, { timeout: 10000 });
+    await expect(this.appDataServicesText.first()).toBeVisible({ timeout: 10000 });
     await expect(this.welcomePage).toBeTruthy();
   }
 
