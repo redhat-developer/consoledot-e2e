@@ -325,13 +325,13 @@ test('create Topic with properties different than default', async ({ page }) => 
     )
     .getByLabel('Retention time')
     .getAttribute('value');
-  expect(rt).not.toMatch('604800000 ms (7 days)');
+  expect(rt).not.toMatch(/604800000 ms \(7 days\)/);
 
   const rs = await page.getByLabel('Retention size').getAttribute('value');
-  expect(rs).not.toMatch('Unlimited');
+  expect(rs).not.toMatch(/Unlimited/);
 
   const cp = await page.getByLabel('Cleanup policy').getAttribute('value');
-  expect(cp).not.toMatch('delete');
+  expect(cp).not.toMatch(/delete/);
 
   // Topic CleanUp
   await page.locator('button', { hasText: 'Delete topic' }).click();
@@ -427,13 +427,13 @@ test('edit topic properties after creation', async ({ page }) => {
     )
     .getByLabel('Retention time')
     .getAttribute('value');
-  expect(rt).toMatch('28800000 ms (8 hours)');
+  expect(rt).toMatch(/28800000 ms \(8 hours\)/);
 
   const rs = await page.getByLabel('Retention size').getAttribute('value');
-  expect(rs).toMatch('2048 bytes (2 kibibytes)');
+  expect(rs).toMatch(/2048 bytes (2 kibibytes)/);
 
   const cp = await page.getByLabel('Cleanup policy').getAttribute('value');
-  expect(cp).not.toMatch('Delete');
+  expect(cp).not.toMatch(/Delete/);
 
   // Topic CleanUp
   await page.locator('button', { hasText: 'Delete topic' }).click();
