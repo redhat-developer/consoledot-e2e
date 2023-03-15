@@ -1,6 +1,5 @@
 import { expect, Locator, Page } from '@playwright/test';
 import { KafkaInstancePage } from '@lib/pom/streams/kafkaInstance';
-import { config } from '@lib/config';
 
 export class ConsumerGroupsPage extends KafkaInstancePage {
   readonly consumerGroupIdButton: Locator;
@@ -9,10 +8,7 @@ export class ConsumerGroupsPage extends KafkaInstancePage {
   constructor(page: Page, instanceName: string) {
     super(page, instanceName);
     this.consumerGroupIdButton = page.locator('button', { hasText: 'Consumer group ID' });
-    this.consumerGroupHeading = page.locator('h2', { hasText: 'No consumer groups' });
-    if (config.newUIcodebase) {
-      this.consumerGroupHeading = page.locator('h1', { hasText: 'No consumer groups' });
-    }
+    this.consumerGroupHeading = page.locator('h1', { hasText: 'No consumer groups' });
   }
 
   async gotoThroughMenu() {

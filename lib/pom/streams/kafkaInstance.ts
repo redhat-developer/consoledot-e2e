@@ -1,7 +1,6 @@
 import { expect, Locator, Page } from '@playwright/test';
 import { KafkaInstanceListPage } from '@lib/pom/streams/kafkaInstanceList';
 import { AbstractPage } from '@lib/pom/abstractPage';
-import { config } from '@lib/config';
 
 export class KafkaInstancePage extends KafkaInstanceListPage {
   readonly instanceName: string;
@@ -25,21 +24,11 @@ export class KafkaInstancePage extends KafkaInstanceListPage {
     this.instanceLink = page.locator('a', { hasText: this.instanceName });
     this.kafkaInstanceHeading = page.locator('h1', { hasText: this.instanceName });
 
-    // Tab navigation menu
-    this.kafkaTabNavDashboard = page.locator('button[aria-label="Dashboard"]');
-    this.kafkaTabNavTopics = page.locator('button[aria-label="Topics"]');
-    this.kafkaTabNavConsumerGroups = page.locator('button[aria-label="Consumer groups"]');
-    this.kafkaTabNavAccess = page.locator('button[aria-label="Access"]');
-    this.kafkaTabNavSettings = page.locator('button[aria-label="Settings"]');
-
-    if (config.newUIcodebase) {
-      // Alternatively getByRole('link', { name: 'Consumer groups' });
-      this.kafkaTabNavDashboard = page.locator('li[data-ouia-component-id="tab-Dashboard"]');
-      this.kafkaTabNavTopics = page.locator('li[data-ouia-component-id="tab-Topics"]');
-      this.kafkaTabNavConsumerGroups = page.locator('li[data-ouia-component-id="tab-Consumers"]');
-      this.kafkaTabNavAccess = page.locator('li[data-ouia-component-id="tab-Permissions"]');
-      this.kafkaTabNavSettings = page.locator('li[data-ouia-component-id="tab-Settings"]');
-    }
+    this.kafkaTabNavDashboard = page.locator('li[data-ouia-component-id="tab-Dashboard"]');
+    this.kafkaTabNavTopics = page.locator('li[data-ouia-component-id="tab-Topics"]');
+    this.kafkaTabNavConsumerGroups = page.locator('li[data-ouia-component-id="tab-Consumers"]');
+    this.kafkaTabNavAccess = page.locator('li[data-ouia-component-id="tab-Permissions"]');
+    this.kafkaTabNavSettings = page.locator('li[data-ouia-component-id="tab-Settings"]');
   }
 
   async gotoThroughMenu() {

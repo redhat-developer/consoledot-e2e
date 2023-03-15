@@ -43,17 +43,6 @@ test.afterEach(async ({ page }) => {
 
   await kafkaInstancesPage.gotoThroughMenu();
   await kafkaInstancePage.gotoThroughMenu();
-  if (!config.newUIcodebase) {
-    await topicPage.gotoThroughMenu();
-
-    await page.waitForSelector(AbstractPage.progressBarLocatorString, {
-      state: 'detached'
-    });
-    for (const el of await page.locator(`tr >> a`).elementHandles()) {
-      const name = await el.textContent();
-      await topicPage.deleteKafkaTopic(name);
-    }
-  }
 });
 
 test.afterAll(async ({ page }) => {
@@ -253,7 +242,7 @@ test('test instance dashboard on instance name click', async ({ page }) => {
 
 // test_4kafka.py test_kafka_topic_check_does_not_exist & test_kafka_topics_opened & test_kafka_topic_create
 test('check Topic does not exist and create and delete', async ({ page }) => {
-  test.skip(config.newUIcodebase, 'Feature not implemented in the new codebase yet.');
+  test.skip(true, 'Feature not implemented in the new codebase yet.');
 
   const kafkaInstancesPage = new KafkaInstanceListPage(page);
   const kafkaInstancePage = new KafkaInstancePage(page, testInstanceName);
@@ -274,7 +263,7 @@ test('check Topic does not exist and create and delete', async ({ page }) => {
 
 // test_4kafka.py test_kafka_try_create_topic_with_same_name
 test('test kafka try create topic with same name', async ({ page }) => {
-  test.skip(config.newUIcodebase, 'Feature not implemented in the new codebase yet.');
+  test.skip(true, 'Feature not implemented in the new codebase yet.');
 
   const kafkaInstancesPage = new KafkaInstanceListPage(page);
   const kafkaInstancePage = new KafkaInstancePage(page, testInstanceName);
@@ -292,7 +281,7 @@ test('test kafka try create topic with same name', async ({ page }) => {
 });
 
 test('create Topic with properties different than default', async ({ page }) => {
-  test.skip(config.newUIcodebase, 'Feature not implemented in the new codebase yet.');
+  test.skip(true, 'Feature not implemented in the new codebase yet.');
 
   const kafkaInstancesPage = new KafkaInstanceListPage(page);
   const kafkaInstancePage = new KafkaInstancePage(page, testInstanceName);
@@ -332,7 +321,7 @@ test('create Topic with properties different than default', async ({ page }) => 
 
 // test_4kafka.py test_edit_topic_properties_after_creation
 test('edit topic properties after creation', async ({ page }) => {
-  test.skip(config.newUIcodebase, 'Feature not implemented in the new codebase yet.');
+  test.skip(true, 'Feature not implemented in the new codebase yet.');
 
   const kafkaInstancesPage = new KafkaInstanceListPage(page);
   const kafkaInstancePage = new KafkaInstancePage(page, testInstanceName);

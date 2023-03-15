@@ -1,7 +1,6 @@
 import { expect, Locator, Page } from '@playwright/test';
 import { TopicListPage } from '../topicList';
 import { FilterGroup, Limit } from '@lib/enums/messages';
-import { config } from '@lib/config';
 
 export class MessagesPage extends TopicListPage {
   readonly topicName: string;
@@ -18,7 +17,7 @@ export class MessagesPage extends TopicListPage {
   constructor(page: Page, instanceName: string, topicName: string) {
     super(page, instanceName);
     this.topicName = topicName;
-    this.messageMenuButton = page.locator('button', { hasText: 'Messages' });
+    this.messageMenuButton = page.locator('li[data-ouia-component-id="tab-Topics"]');
     this.messageTable = page.locator('table[aria-label="Messages table"]');
     this.checkForNewDataButton = page.locator('button', { hasText: 'Check for new data' });
     this.searchButton = page.locator('button[aria-label="Search"]');
@@ -27,10 +26,6 @@ export class MessagesPage extends TopicListPage {
     this.specifyOffset = '[aria-label="Specify offset"]';
     this.datePicker = '[aria-label="Date picker"]';
     this.specifyEpochTimestamp = '[aria-label="Specify epoch timestamp"]';
-
-    if (config.newUIcodebase) {
-      this.messageMenuButton = page.locator('li[data-ouia-component-id="tab-Topics"]');
-    }
   }
 
   async gotoThroughMenu() {

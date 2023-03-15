@@ -1,7 +1,6 @@
 import { expect, Locator, Page } from '@playwright/test';
 import { KafkaInstancePage } from '@lib/pom/streams/kafkaInstance';
 import { AbstractPage } from '@lib/pom/abstractPage';
-import { config } from '@lib/config';
 
 export class AccessPage extends KafkaInstancePage {
   readonly manageAccessButton: Locator;
@@ -27,17 +26,8 @@ export class AccessPage extends KafkaInstancePage {
     this.enterNameField = page.getByPlaceholder('Enter name');
     this.consumeFromTopicButton = page.locator('button', { hasText: 'Consume from a topic' });
     this.createPrefixTopicConfirmButton = page.locator('button', { hasText: /Create.+/ });
-    if (config.newUIcodebase) {
-      this.topicConsumePermissionRow = page.locator('tr', { hasText: 'Topic' });
-      this.consumerGroupConsumePermissionRow = page.locator('tr', { hasText: 'Consumer group' });
-    } else {
-      this.topicConsumePermissionRow = page.getByRole('row', {
-        name: 'T Topic Options menu permission.manage_permissions_dialog.assign_permissions.resource_name_aria Options menu Label group category'
-      });
-      this.consumerGroupConsumePermissionRow = page.getByRole('gridcell', {
-        name: 'permission.manage_permissions_dialog.assign_permissions.resource_name_aria Options menu'
-      });
-    }
+    this.topicConsumePermissionRow = page.locator('tr', { hasText: 'Topic' });
+    this.consumerGroupConsumePermissionRow = page.locator('tr', { hasText: 'Consumer group' });
   }
 
   async gotoThroughMenu() {
@@ -59,15 +49,9 @@ export class AccessPage extends KafkaInstancePage {
 
     await this.produceToTopicButton.click();
 
-    if (config.newUIcodebase) {
-      await this.enterNameField.click();
-      await this.enterNameField.fill(topicName);
-      await this.page.locator('button', { hasText: topicName }).click();
-    } else {
-      await this.enterPrefixField.click();
-      await this.enterPrefixField.fill(topicName);
-      await this.createPrefixTopicConfirmButton.click();
-    }
+    await this.enterNameField.click();
+    await this.enterNameField.fill(topicName);
+    await this.page.locator('button', { hasText: topicName }).click();
 
     await this.saveButton.click();
   }
@@ -84,29 +68,13 @@ export class AccessPage extends KafkaInstancePage {
     await this.consumeFromTopicButton.click();
 
     // TODO - these selectors should be added to class as well
-    let placeholder = 'Enter prefix';
-    if (config.newUIcodebase) {
-      placeholder = 'Enter name';
-    }
-
+    const placeholder = 'Enter name';
     await this.topicConsumePermissionRow.getByPlaceholder(placeholder).click();
     await this.topicConsumePermissionRow.getByPlaceholder(placeholder).fill(topicName);
-
-    if (config.newUIcodebase) {
-      await this.page.locator('button', { hasText: topicName }).click();
-    } else {
-      await this.createPrefixTopicConfirmButton.click();
-    }
-
+    await this.page.locator('button', { hasText: topicName }).click();
     await this.consumerGroupConsumePermissionRow.getByPlaceholder(placeholder).click();
     await this.consumerGroupConsumePermissionRow.getByPlaceholder(placeholder).fill(consumerGroup);
-
-    if (config.newUIcodebase) {
-      await this.page.locator('button', { hasText: consumerGroup }).click();
-    } else {
-      await this.createPrefixTopicConfirmButton.click();
-    }
-
+    await this.page.locator('button', { hasText: consumerGroup }).click();
     await this.saveButton.click();
   }
 
