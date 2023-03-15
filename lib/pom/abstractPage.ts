@@ -1,4 +1,3 @@
-import { config } from '@lib/config';
 import { closePopUp } from '@lib/utils/popup';
 import { Locator, Page, expect } from '@playwright/test';
 
@@ -25,7 +24,7 @@ export abstract class AbstractPage {
     this.page = page;
     this.nameForm = page.getByLabel('Name *');
     this.detailsButton = page.locator('button', { hasText: 'Details' });
-    this.deleteNameInput = page.locator('input[name="mas-name-input"]');
+    this.deleteNameInput = page.locator('input[data-ouia-component-id="delete-confirmation"]');
     this.actionsDeleteButton = page.locator('button', { hasText: 'Delete' });
     this.closeButton = page.locator('button', { hasText: 'Close' });
     this.appDataServicesLink = page.locator('a', { hasText: 'Application and Data Services' });
@@ -36,10 +35,6 @@ export abstract class AbstractPage {
     this.confirmDeleteField = page.getByLabel('Type DELETE to confirm:');
     this.saveButton = page.getByRole('button').filter({ hasText: 'Save' });
     this.cancelButton = page.getByRole('button').filter({ hasText: 'Cancel' });
-
-    if (config.newUIcodebase) {
-      this.deleteNameInput = page.locator('input[data-ouia-component-id="delete-confirmation"]');
-    }
   }
 
   async showElementActions(selectorName: string) {

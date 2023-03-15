@@ -32,7 +32,6 @@ class Config {
   readonly startingPageDefault = 'https://console.redhat.com';
 
   readonly enableErrLogging: boolean;
-  readonly newUIcodebase: boolean;
 
   readonly adminAuthFile = 'playwright/.auth/admin.json';
   readonly user1AuthFile = 'playwright/.auth/user1.json';
@@ -78,9 +77,6 @@ class Config {
 
     //logging
     this.enableErrLogging = !!process.env.ENABLE_ERR_LOGGING;
-
-    // New codebase
-    this.newUIcodebase = process.env.ENV_TYPE != 'production';
   }
 }
 
