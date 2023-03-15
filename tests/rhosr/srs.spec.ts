@@ -1,4 +1,3 @@
-import { expect } from '@playwright/test';
 import { test } from '@lib/utils/fixtures';
 import { config } from '@lib/config';
 import { ServiceRegistryPage } from '@lib/pom/serviceRegistry/serviceRegistry';
