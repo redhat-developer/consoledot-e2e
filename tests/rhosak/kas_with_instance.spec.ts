@@ -39,7 +39,6 @@ test.beforeEach(async ({ page }) => {
 test.afterEach(async ({ page }) => {
   const kafkaInstancesPage = new KafkaInstanceListPage(page);
   const kafkaInstancePage = new KafkaInstancePage(page, testInstanceName);
-  const topicPage = new TopicListPage(page, testInstanceName);
 
   await kafkaInstancesPage.gotoThroughMenu();
   await kafkaInstancePage.gotoThroughMenu();
