@@ -14,6 +14,7 @@ export class ServiceRegistryPage extends AbstractPage {
   readonly serviceRegistryTable: Locator;
   readonly deleteCheckbox: Locator;
   readonly deleteNameInput: Locator;
+  readonly deleteButton: Locator;
 
   constructor(page: Page) {
     super(page);
@@ -24,6 +25,7 @@ export class ServiceRegistryPage extends AbstractPage {
     this.serviceRegistryTable = page.locator('[aria-label="Service Registry instance list"]');
     this.deleteCheckbox = page.locator('input[type="checkbox"]');
     this.deleteNameInput = page.locator('input[name="mas-name-input"]');
+    this.deleteButton = page.getByTestId('modalDeleteRegistry-buttonDelete');
   }
 
   // Got to starting page
@@ -70,6 +72,8 @@ export class ServiceRegistryPage extends AbstractPage {
     await this.showElementActions(name);
     // Click on delete button in actions menu
     await this.actionsDeleteButton.click();
+    // Wait for presence of name input
+    await expect(this.deleteNameInput).toHaveCount(1, { timeout: 1000 });
     // Check if confirmation input is visible
     if (this.deleteNameInput.isVisible) {
       // Wait for presence of name input
@@ -82,7 +86,7 @@ export class ServiceRegistryPage extends AbstractPage {
       await this.deleteCheckbox.click();
     }
     // Click on delete button
-    await this.actionsDeleteButton.click();
+    await this.deleteButton.click();
     // If deletion wait is required
     if (awaitDeletion) {
       // Wait for absence of instance name for defined timeout
