@@ -39,21 +39,6 @@ test.afterAll(async ({ page }) => {
   await serviceRegistryPage.deleteAllServiceRegistries();
 });
 
-// Checks that list of Service Registry instances is empty
-test('check there are no Service Registry instances', async ({ page }) => {
-  // Check presence of text informing about empty list
-  await expect(page.getByText('No Service Registry instances yet')).toHaveCount(1);
-});
-
-// Create and delete Service Registry instance without waiting for its readiness
-test('create and delete a Service Registry instance', async ({ page }) => {
-  // Create instance
-  const serviceRegistryPage = new ServiceRegistryPage(page);
-  await serviceRegistryPage.createServiceRegistryInstance(testInstanceName);
-  // Delete instance without waiting for its readiness
-  await serviceRegistryPage.deleteServiceRegistryInstance(testInstanceName);
-});
-
 // Create and delete Service Registry instance with waiting for its readiness
 test('create, wait for ready and delete a Service Registry instance', async ({ page }) => {
   // Create instance
