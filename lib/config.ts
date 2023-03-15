@@ -80,7 +80,7 @@ class Config {
     this.enableErrLogging = !!process.env.ENABLE_ERR_LOGGING;
 
     // New codebase
-    this.newUIcodebase = process.env.ENV_TYPE == 'stage-new-ui';
+    this.newUIcodebase = process.env.ENV_TYPE != 'production';
   }
 }
 

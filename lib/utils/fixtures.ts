@@ -1,10 +1,13 @@
 import { config } from '@lib/config';
 import { test as base, expect } from '@playwright/test';
 import blockAnalyticsDomains from '@lib/utils/blocker';
+import { ConsoleDotAuthPage } from '@lib/pom/auth';
 
 // Extend Playright page to start always at config.startingPage
 export const test = base.extend({
   page: async ({ page }, use, testInfo) => {
+    const autPage = new ConsoleDotAuthPage(page);
+
     const errLogs = [];
     await blockAnalyticsDomains(page);
 
@@ -24,9 +27,9 @@ export const test = base.extend({
     await page.goto(config.startingPage);
     // check we landed on the right page`
     try {
-      await expect(page.getByText('Application and Data Services').first()).toBeVisible({ timeout: 10000 });
+      await autPage.checkUiIsVisible();
     } catch {
-      await expect(page).toHaveTitle(/Log In | Red Hat IDP/);
+      await autPage.checkLoginPageVisible();
     }
     await expect(page.getByText('Gain increased visibility into your hybrid cloud')).toBeTruthy();
     await use(page);

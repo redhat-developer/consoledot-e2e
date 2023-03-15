@@ -22,23 +22,14 @@ test.beforeEach(async ({ page }) => {
 
   await kafkaInstancesPage.gotoThroughMenu();
 
-  if ((await page.getByText(testInstanceName).count()) > 0 && (await page.locator('tr').count()) === 2) {
-    // Test instance present, nothing to do!
+  if ((await kafkaInstancesPage.noKafkaInstancesText.count()) == 1) {
+    await kafkaInstancesPage.createKafkaInstance(testInstanceName);
+    await kafkaInstancesPage.waitForKafkaReady(testInstanceName);
   } else {
-    await page.waitForSelector(AbstractPage.progressBarLocatorString, {
-      state: 'detached',
-      timeout: config.kafkaInstanceCreationTimeout
-    });
-
-    for (const el of await page.locator(`tr >> a`).elementHandles()) {
-      const name = await el.textContent();
-
-      if (name !== testInstanceName) {
-        await kafkaInstancesPage.deleteKafkaInstance(name);
-      }
-    }
-
-    if ((await page.getByText(testInstanceName).count()) === 0) {
+    // Test instance present, nothing to do!
+    try {
+      await expect(page.getByText(testInstanceName)).toHaveCount(1, { timeout: 2000 });
+    } catch (e) {
       await kafkaInstancesPage.createKafkaInstance(testInstanceName);
       await kafkaInstancesPage.waitForKafkaReady(testInstanceName);
     }
@@ -202,7 +193,7 @@ test('test instance details on row click', async ({ page }) => {
   const kafkaInstancesPage = new KafkaInstanceListPage(page);
   await kafkaInstancesPage.gotoThroughMenu();
 
-  await page.getByRole('gridcell', { name: `${config.adminUsername}` }).click();
+  await page.locator('tr', { hasText: `${testInstanceName}` }).click();
 
   await expect(page.locator('h1', { hasText: `${testInstanceName}` })).toHaveCount(1);
 });
@@ -325,13 +316,13 @@ test('create Topic with properties different than default', async ({ page }) => 
     )
     .getByLabel('Retention time')
     .getAttribute('value');
-  expect(rt).not.toMatch('604800000 ms (7 days)');
+  expect(rt).not.toMatch(/604800000 ms \(7 days\)/);
 
   const rs = await page.getByLabel('Retention size').getAttribute('value');
-  expect(rs).not.toMatch('Unlimited');
+  expect(rs).not.toMatch(/Unlimited/);
 
   const cp = await page.getByLabel('Cleanup policy').getAttribute('value');
-  expect(cp).not.toMatch('delete');
+  expect(cp).not.toMatch(/delete/);
 
   // Topic CleanUp
   await page.locator('button', { hasText: 'Delete topic' }).click();
@@ -427,13 +418,13 @@ test('edit topic properties after creation', async ({ page }) => {
     )
     .getByLabel('Retention time')
     .getAttribute('value');
-  expect(rt).toMatch('28800000 ms (8 hours)');
+  expect(rt).toMatch(/28800000 ms \(8 hours\)/);
 
   const rs = await page.getByLabel('Retention size').getAttribute('value');
-  expect(rs).toMatch('2048 bytes (2 kibibytes)');
+  expect(rs).toMatch(/2048 bytes (2 kibibytes)/);
 
   const cp = await page.getByLabel('Cleanup policy').getAttribute('value');
-  expect(cp).not.toMatch('Delete');
+  expect(cp).not.toMatch(/Delete/);
 
   // Topic CleanUp
   await page.locator('button', { hasText: 'Delete topic' }).click();

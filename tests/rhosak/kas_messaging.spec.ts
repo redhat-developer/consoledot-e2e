@@ -17,7 +17,7 @@ const testInstanceName = config.instanceName;
 const testTopicName = `test-topic-name-${config.sessionID}`;
 const testServiceAccountName = `test-messaging-sa-${config.sessionID}`;
 const testMessageKey = 'key';
-const consumerGroupId = `test-consumer-group-${config.sessionID}`;
+const consumerGroupId = `test-cg-${config.sessionID}`;
 const expectedMessageCount = 100;
 const reconnectCount = 5;
 const reconnectDelayMs = 500;
@@ -35,23 +35,14 @@ test.beforeEach(async ({ page }) => {
 
   await kafkaInstancesPage.gotoThroughMenu();
 
-  if ((await page.getByText(testInstanceName).count()) > 0 && (await page.locator('tr').count()) === 2) {
-    // Test instance present, nothing to do!
+  if ((await kafkaInstancesPage.noKafkaInstancesText.count()) == 1) {
+    await kafkaInstancesPage.createKafkaInstance(testInstanceName);
+    await kafkaInstancesPage.waitForKafkaReady(testInstanceName);
   } else {
-    await page.waitForSelector('[role=progressbar]', {
-      state: 'detached',
-      timeout: config.kafkaInstanceCreationTimeout
-    });
-
-    for (const el of await page.locator(`tr >> a`).elementHandles()) {
-      const name = await el.textContent();
-
-      if (name !== testInstanceName) {
-        await kafkaInstancesPage.deleteKafkaInstance(name);
-      }
-    }
-
-    if ((await page.getByText(testInstanceName).count()) === 0) {
+    // Test instance present, nothing to do!
+    try {
+      await expect(page.getByText(testInstanceName)).toHaveCount(1, { timeout: 2000 });
+    } catch (e) {
       await kafkaInstancesPage.createKafkaInstance(testInstanceName);
       await kafkaInstancesPage.waitForKafkaReady(testInstanceName);
     }
