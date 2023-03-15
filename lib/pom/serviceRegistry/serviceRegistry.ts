@@ -14,7 +14,6 @@ export class ServiceRegistryPage extends AbstractPage {
   readonly serviceRegistryTable: Locator;
   readonly deleteCheckbox: Locator;
   readonly deleteNameInput: Locator;
-  readonly deleteButton: Locator;
 
   constructor(page: Page) {
     super(page);
@@ -25,7 +24,6 @@ export class ServiceRegistryPage extends AbstractPage {
     this.serviceRegistryTable = page.locator('[aria-label="Service Registry instance list"]');
     this.deleteCheckbox = page.locator('input[type="checkbox"]');
     this.deleteNameInput = page.locator('input[name="mas-name-input"]');
-    this.deleteButton = page.getByTestId('modalDeleteRegistry-buttonDelete');
   }
 
   // Got to starting page
