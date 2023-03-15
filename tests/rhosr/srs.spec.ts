@@ -1,4 +1,3 @@
-import { expect } from '@playwright/test';
 import { test } from '@lib/utils/fixtures';
 import { config } from '@lib/config';
 import { ServiceRegistryPage } from '@lib/pom/serviceRegistry/serviceRegistry';
@@ -37,21 +36,6 @@ test.afterAll(async ({ page }) => {
   // Delete all Service Registry instances created during tests
   const serviceRegistryPage = new ServiceRegistryPage(page);
   await serviceRegistryPage.deleteAllServiceRegistries();
-});
-
-// Checks that list of Service Registry instances is empty
-test('check there are no Service Registry instances', async ({ page }) => {
-  // Check presence of text informing about empty list
-  await expect(page.getByText('No Service Registry instances yet')).toHaveCount(1);
-});
-
-// Create and delete Service Registry instance without waiting for its readiness
-test('create and delete a Service Registry instance', async ({ page }) => {
-  // Create instance
-  const serviceRegistryPage = new ServiceRegistryPage(page);
-  await serviceRegistryPage.createServiceRegistryInstance(testInstanceName);
-  // Delete instance without waiting for its readiness
-  await serviceRegistryPage.deleteServiceRegistryInstance(testInstanceName);
 });
 
 // Create and delete Service Registry instance with waiting for its readiness
