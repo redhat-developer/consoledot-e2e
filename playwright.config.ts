@@ -26,8 +26,8 @@ const config: PlaywrightTestConfig = {
   /* Fail the build on CI if you accidentally left test.only in the source code. */
   forbidOnly: !!process.env.CI,
   /* Retry on CI only */
-  /* retries: process.env.CI ? 2 : 0, */
-  retries: 0,
+  retries: process.env.CI ? 1 : 0,
+  // retries: 0,
   /* Opt out of parallel tests. */
   workers: 1,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
@@ -64,7 +64,7 @@ const config: PlaywrightTestConfig = {
         ...devices['Desktop Chrome'],
         viewport: { width: 1920, height: 1024 },
         launchOptions: {
-          args: ["--start-maximized"] 
+          args: ["--start-fullscreen"] 
         }
       }
     },
