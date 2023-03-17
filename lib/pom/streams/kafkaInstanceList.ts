@@ -4,6 +4,7 @@ import { BillingOptions } from '@lib/enums/billing';
 import { CloudProviders } from '@lib/enums/cloudproviders';
 import { resourceStore } from '@lib/resource_store';
 import { AbstractPage } from '@lib/pom/abstractPage';
+import { sleep } from '@lib/utils/sleep';
 
 export class KafkaInstanceListPage extends AbstractPage {
   urlPath = '/application-services/streams/kafkas';
@@ -58,7 +59,7 @@ export class KafkaInstanceListPage extends AbstractPage {
 
     // FIXME: workaround for https://github.com/redhat-developer/app-services-ui-components/issues/590
     // https://github.com/microsoft/playwright/issues/15734#issuecomment-1188245775
-    await new Promise((resolve) => setTimeout(resolve, 500));
+    await sleep(500);
     await this.nameForm.click();
 
     await this.nameForm.fill(name);
@@ -96,7 +97,7 @@ export class KafkaInstanceListPage extends AbstractPage {
 
         // FIXME: workaround for https://github.com/redhat-developer/app-services-ui-components/issues/590
         // https://github.com/microsoft/playwright/issues/15734#issuecomment-1188245775
-        await new Promise((resolve) => setTimeout(resolve, 500));
+        await sleep(500);
         await this.deleteNameInput.click();
 
         await this.deleteNameInput.fill(name);

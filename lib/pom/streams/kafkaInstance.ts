@@ -1,6 +1,7 @@
 import { expect, Locator, Page } from '@playwright/test';
 import { KafkaInstanceListPage } from '@lib/pom/streams/kafkaInstanceList';
 import { AbstractPage } from '@lib/pom/abstractPage';
+import { sleep } from '@lib/utils/sleep';
 
 export class KafkaInstancePage extends KafkaInstanceListPage {
   readonly instanceName: string;
@@ -60,7 +61,7 @@ export class KafkaInstancePage extends KafkaInstanceListPage {
 
       // FIXME: workaround for https://github.com/redhat-developer/app-services-ui-components/issues/590
       // https://github.com/microsoft/playwright/issues/15734#issuecomment-1188245775
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      await sleep(500);
       await this.deleteNameInput.click();
 
       await this.deleteNameInput.fill(name);

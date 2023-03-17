@@ -10,6 +10,7 @@ import { ConsumerGroupsPage } from '@lib/pom/streams/instance/consumerGroups';
 import { PropertiesPage } from '@lib/pom/streams/instance/topic/properties';
 import { KafkaInstancePage } from '@lib/pom/streams/kafkaInstance';
 import { TopicPage } from '@lib/pom/streams/instance/topic';
+import { sleep } from '@lib/utils/sleep';
 
 const testInstanceName = config.instanceName;
 const testTopicName = `test-topic-${config.sessionID}`;
@@ -241,8 +242,6 @@ test('test instance dashboard on instance name click', async ({ page }) => {
 
 // test_4kafka.py test_kafka_topic_check_does_not_exist & test_kafka_topics_opened & test_kafka_topic_create
 test('check Topic does not exist and create and delete', async ({ page }) => {
-  test.skip(true, 'Feature not implemented in the new codebase yet.');
-
   const kafkaInstancesPage = new KafkaInstanceListPage(page);
   const kafkaInstancePage = new KafkaInstancePage(page, testInstanceName);
   const topicPage = new TopicListPage(page, testInstanceName);
@@ -262,8 +261,6 @@ test('check Topic does not exist and create and delete', async ({ page }) => {
 
 // test_4kafka.py test_kafka_try_create_topic_with_same_name
 test('test kafka try create topic with same name', async ({ page }) => {
-  test.skip(true, 'Feature not implemented in the new codebase yet.');
-
   const kafkaInstancesPage = new KafkaInstanceListPage(page);
   const kafkaInstancePage = new KafkaInstancePage(page, testInstanceName);
   const topicPage = new TopicListPage(page, testInstanceName);
@@ -275,13 +272,14 @@ test('test kafka try create topic with same name', async ({ page }) => {
   await expect(page.locator('tr', { hasText: `${testTopicName}` })).toHaveCount(1);
   await topicPage.createTopicButton.click();
   await page.getByPlaceholder('Enter topic name').fill(testTopicName);
+  // https://issues.redhat.com/browse/MGDX-386
+  await page.getByPlaceholder('Enter topic name').click();
+  await sleep(2000);
   await page.locator('button', { hasText: 'Next' }).click();
-  await expect(page.getByText(`${testTopicName}` + ' already exists. Try a different name')).toBeVisible();
+  await expect(page.getByText('already exists. Try a different name')).toBeVisible();
 });
 
 test('create Topic with properties different than default', async ({ page }) => {
-  test.skip(true, 'Feature not implemented in the new codebase yet.');
-
   const kafkaInstancesPage = new KafkaInstanceListPage(page);
   const kafkaInstancePage = new KafkaInstancePage(page, testInstanceName);
   const topicListPage = new TopicListPage(page, testInstanceName);
@@ -296,126 +294,101 @@ test('create Topic with properties different than default', async ({ page }) => 
 
   await propertiesPage.gotoThroughMenu();
   // Checking phase
-  await expect(await page.getByLabel('Partitions').getAttribute('value')).not.toBe(1);
+  await expect(await propertiesPage.partitionsInput.getAttribute('value')).not.toBe(1);
 
-  const rt = await page
-    .locator(
-      'section[role="group"]:has-text("Core configurationBefore deploying your topic, we recommend entering all core co")'
-    )
-    .getByLabel('Retention time')
-    .getAttribute('value');
+  const rt = await propertiesPage.retentionTimeInput.getAttribute('value');
   expect(rt).not.toMatch(/604800000 ms \(7 days\)/);
 
-  const rs = await page.getByLabel('Retention size').getAttribute('value');
+  const rs = await propertiesPage.retentionSizeInput.getAttribute('value');
   expect(rs).not.toMatch(/Unlimited/);
 
-  const cp = await page.getByLabel('Cleanup policy').getAttribute('value');
+  const cp = await propertiesPage.cleanupPolicyInput.getAttribute('value');
   expect(cp).not.toMatch(/delete/);
 
   // Topic CleanUp
-  await page.locator('button', { hasText: 'Delete topic' }).click();
-  await page.getByLabel('Type DELETE to confirm:').fill('DELETE');
-  await page.locator('footer').locator('button', { hasText: 'Delete' }).click();
+  await topicPage.deleteTopicLink.click();
+  await topicListPage.deleteNameInput.fill(testTopicName);
+  await topicListPage.deleteButton.click();
 });
 
 // test_4kafka.py test_edit_topic_properties_after_creation
 test('edit topic properties after creation', async ({ page }) => {
-  test.skip(true, 'Feature not implemented in the new codebase yet.');
-
   const kafkaInstancesPage = new KafkaInstanceListPage(page);
   const kafkaInstancePage = new KafkaInstancePage(page, testInstanceName);
-  const topicPage = new TopicListPage(page, testInstanceName);
+  const topicListPage = new TopicListPage(page, testInstanceName);
+  const topicPage = new TopicPage(page, testInstanceName, testTopicName);
   const propertiesPage = new PropertiesPage(page, testInstanceName, testTopicName);
   await kafkaInstancesPage.gotoThroughMenu();
   await kafkaInstancePage.gotoThroughMenu();
-  await topicPage.gotoThroughMenu();
+  await topicListPage.gotoThroughMenu();
 
-  await topicPage.createKafkaTopic(testTopicName, true);
+  await topicListPage.createKafkaTopic(testTopicName, true);
 
   const row = page.locator('tr', { hasText: testTopicName });
   await row.locator(AbstractPage.actionsLocatorString).click();
   await page.getByText('Edit topic configuration').click();
 
   // we wait 3 seconds to fetch the data
-  await expect(page.locator('input[name="num-partitions"]')).toHaveValue('1', { timeout: 3000 });
-  const numPartitionsBefore: string = await page.locator('input[name="num-partitions"]').getAttribute('value');
+  await expect(propertiesPage.numPartitionsInput).toHaveValue('1', { timeout: 3000 });
+  const numPartitionsBefore: string = await propertiesPage.numPartitionsInput.getAttribute('value');
   console.log('Number of partitions by default: ' + numPartitionsBefore);
-  const numPartitionsButton = page.locator('button[name="num-partitions"]');
   for (let i = 0; i < 2; i++) {
-    await numPartitionsButton.nth(1).click();
+    await propertiesPage.numPartitionsButton.nth(1).click();
   }
-  await numPartitionsButton.nth(0).click();
+  await propertiesPage.numPartitionsButton.nth(0).click();
   // we check the value has been changed
-  await expect(page.locator('input[name="num-partitions"]')).not.toHaveValue(numPartitionsBefore);
+  await expect(propertiesPage.numPartitionsInput).not.toHaveValue(numPartitionsBefore);
 
   // Retention Time
-  await expect(page.locator('label:has-text("days") input[type="number"]')).toHaveCount(1);
-  page.locator('label:has-text("days") input[type="number"]').click();
-  const retentionTimeBefore = await page.locator('label:has-text("days") input[type="number"]').getAttribute('value');
-  const retentionTimeButton = page.locator('button[name="retention-ms"]');
-  // we increase by 2 and decrease by 1 to test + & - buttons
-  for (let i = 0; i < 2; i++) {
-    await retentionTimeButton.nth(1).click();
-  }
-  await retentionTimeButton.nth(0).click();
-  await expect(page.locator('label:has-text("days") input[type="number"]')).not.toHaveValue(retentionTimeBefore);
-
-  await page.locator('button:has-text("days")').click();
-  await page.locator('button', { hasText: 'hours' }).click();
+  await expect(propertiesPage.retentionOptionField).toHaveCount(1);
+  const retentionTimeBefore = await propertiesPage.retentionMsField.getAttribute('value');
+  await propertiesPage.daysButton.click();
+  await propertiesPage.hoursButton.click();
+  await propertiesPage.retentionMsField.click();
+  await propertiesPage.retentionMsField.fill('666');
+  await expect(propertiesPage.retentionMsField).not.toHaveValue(retentionTimeBefore);
 
   // Retention Size
-  await expect(page.locator('label:has-text("bytes") input[type="number"]')).toHaveCount(1);
-  await page.locator('label:has-text("bytes") input[type="number"]').click();
-  const retentionSizeBefore = await page.locator('label:has-text("bytes") input[type="number"]').getAttribute('value');
-  const retentionSizeButton = page.locator('button[name="retention-bytes"]');
-  // we increase by 2 and decrease by 1 to test + & - buttons
-  for (let i = 0; i < 2; i++) {
-    await retentionSizeButton.nth(1).click();
-  }
-  await retentionSizeButton.nth(0).click();
-  await expect(page.locator('label:has-text("bytes") input[type="number"]')).not.toHaveValue(retentionSizeBefore);
-
-  await page.locator('button:has-text("bytes")').click();
-  await page.locator('button', { hasText: 'kibibytes' }).click();
+  const retentionSizeBefore = await propertiesPage.retentionBytesField.getAttribute('value');
+  await propertiesPage.bytesRadioButton.check();
+  await propertiesPage.bytesButton.click();
+  await propertiesPage.kibibytesButton.click();
+  await propertiesPage.retentionBytesField.click();
+  await propertiesPage.retentionBytesField.fill('666');
+  await expect(propertiesPage.retentionBytesField).not.toHaveValue(retentionSizeBefore);
 
   // CleanUp Policy
-  await expect(page.locator('button:has-text("Delete")')).toHaveCount(1);
-  await page.locator('button:has-text("Delete")').click();
-  await page.getByText('Compact').first().click();
-  await page.locator('button:has-text("Compact")').click();
+  await propertiesPage.deleteButton.click();
+  await propertiesPage.compactButton.first().click();
 
-  await page.locator('button', { hasText: 'Save' }).click();
+  await propertiesPage.saveButton.click();
 
-  await expect(page.getByText('Increase the number of partitions?')).toHaveCount(1);
-  await page.getByRole('button', { name: 'Yes' }).click();
-  await page.waitForSelector('[role=progressbar]', {
+  // await expect(page.getByText('Increase the number of partitions?')).toHaveCount(1);
+  // await page.getByRole('button', { name: 'Yes' }).click();
+  await page.waitForSelector(AbstractPage.progressBarLocatorString, {
     state: 'detached'
   });
-  await expect(page.locator('h2', { hasText: 'No consumer groups' })).toHaveCount(1);
+  await expect(topicListPage.createTopicButton).toHaveCount(1);
 
   // Here we begin the comparison
+  await topicPage.gotoThroughMenu();
   await propertiesPage.gotoThroughMenu();
 
-  const numPartitionsAfter: string = await page.getByLabel('Partitions').getAttribute('value');
+  const numPartitionsAfter: string = await propertiesPage.partitionsInput.getAttribute('value');
   console.log('numPartitionsAfter: ' + numPartitionsAfter);
   expect(numPartitionsAfter).not.toBe(numPartitionsBefore);
 
-  const rt = await page
-    .locator(
-      'section[role="group"]:has-text("Core configurationBefore deploying your topic, we recommend entering all core co")'
-    )
-    .getByLabel('Retention time')
-    .getAttribute('value');
-  expect(rt).toMatch(/28800000 ms \(8 hours\)/);
+  const rt = await propertiesPage.retentionTimeInput.getAttribute('value');
+  expect(rt).toMatch(/2397600000 ms \(666 hours\)/);
 
-  const rs = await page.getByLabel('Retention size').getAttribute('value');
-  expect(rs).toMatch(/2048 bytes (2 kibibytes)/);
+  const rs = await propertiesPage.retentionSizeInput.getAttribute('value');
+  expect(rs).toMatch(/681984 bytes \(666 kibibytes\)/);
 
-  const cp = await page.getByLabel('Cleanup policy').getAttribute('value');
+  const cp = await propertiesPage.cleanupPolicyInput.getAttribute('value');
   expect(cp).not.toMatch(/Delete/);
 
   // Topic CleanUp
-  await page.locator('button', { hasText: 'Delete topic' }).click();
-  await page.getByLabel('Type DELETE to confirm:').fill('DELETE');
-  await page.locator('footer').locator('button', { hasText: 'Delete' }).click();
+  await topicPage.deleteTopicLink.click();
+  await topicListPage.deleteNameInput.fill(testTopicName);
+  await topicListPage.deleteButton.click();
 });

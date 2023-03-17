@@ -8,13 +8,13 @@ export class TopicListPage extends KafkaInstancePage {
   readonly topicNameField: Locator;
   readonly numPartitionsButton: Locator;
   readonly numPartitionsInput: Locator;
-  readonly retentionMsButton: Locator;
+  readonly retentionMsField: Locator;
   readonly daysButton: Locator;
   readonly hoursButton: Locator;
   readonly compactButton: Locator;
   readonly bytesButton: Locator;
   readonly kibibytesButton: Locator;
-  readonly retentionBytesButton: Locator;
+  readonly retentionBytesField: Locator;
   readonly bytesRadioButton: Locator;
   readonly showAllOptions: Locator;
   readonly retentionOptionField: Locator;
@@ -27,14 +27,14 @@ export class TopicListPage extends KafkaInstancePage {
     this.topicNameField = page.getByPlaceholder('Enter topic name');
     this.numPartitionsButton = page.locator('button[name="num-partitions"]');
     this.numPartitionsInput = page.locator('input[name="num-partitions"]');
-    this.retentionMsButton = page.locator('button[name="retention-ms"]');
-    this.retentionBytesButton = page.locator('button[name="retention-bytes"]');
+    this.retentionMsField = page.locator('input[aria-label="Retention time"]');
+    this.retentionBytesField = page.locator('input[aria-label="Retention size"]');
     this.daysButton = page.locator('button', { hasText: 'days' });
     this.hoursButton = page.locator('button', { hasText: 'hours' });
     this.compactButton = page.locator('a', { hasText: 'Compact' });
     this.bytesButton = page.locator('button', { hasText: 'bytes' });
     this.kibibytesButton = page.locator('button', { hasText: 'kibibytes' });
-    this.bytesRadioButton = page.getByLabel('bytes');
+    this.bytesRadioButton = page.locator('input[name="custom-retention-size"]');
     this.showAllOptions = page.locator('label:has-text("Show all available optionsShow all available options") span');
     this.retentionOptionField = page.locator('label:has-text("days") input[type="number"]');
   }
@@ -68,22 +68,16 @@ export class TopicListPage extends KafkaInstancePage {
       await this.numPartitionsButton.nth(0).click();
 
       await expect(this.retentionOptionField).toHaveCount(1);
-      // Increasing twice and decreasing once the units for Retention Time to test + & -
-      for (let i = 0; i < 2; i++) {
-        await this.retentionMsButton.nth(1).click();
-      }
-      await this.retentionMsButton.nth(0).click();
       await this.daysButton.click();
       await this.hoursButton.click();
+      await this.retentionMsField.click();
+      await this.retentionMsField.fill('666');
 
       await this.bytesRadioButton.check();
-      // Increasing twice and decreasing once the units for Retention Time to test + & -
-      for (let i = 0; i < 2; i++) {
-        await this.retentionBytesButton.nth(1).click();
-      }
-      await this.retentionBytesButton.nth(0).click();
       await this.bytesButton.click();
       await this.kibibytesButton.click();
+      await this.retentionBytesField.click();
+      await this.retentionBytesField.fill('666');
 
       // Choosing different CleanUp policy
       await this.deleteButton.click();
@@ -99,8 +93,8 @@ export class TopicListPage extends KafkaInstancePage {
     await this.showElementActions(name);
     // data-testid=tableTopics-actionDelete
     await this.deleteTopicButton.click();
-    await this.confirmDeleteField.click();
-    await this.confirmDeleteField.fill('DELETE');
+    await this.deleteNameInput.click();
+    await this.deleteNameInput.fill(name);
     // data-testid=modalDeleteTopic-buttonDelete
     await this.deleteButton.click();
     await expect(this.page.getByText(name)).toHaveCount(0);

@@ -16,7 +16,6 @@ export abstract class AbstractPage {
   static readonly menuLocator: string = '[data-testid=router-link]';
   static readonly actionsLocatorString: string = '[aria-label="Actions"]';
   static readonly progressBarLocatorString: string = '[role=progressbar]';
-  readonly confirmDeleteField: Locator;
   readonly saveButton: Locator;
   readonly cancelButton: Locator;
 
@@ -32,7 +31,6 @@ export abstract class AbstractPage {
     this.nextButton = page.locator('button', { hasText: 'Next' });
     this.finishButton = page.locator('button', { hasText: 'Finish' });
     this.deleteButton = page.locator('button', { hasText: 'Delete' });
-    this.confirmDeleteField = page.getByLabel('Type DELETE to confirm:');
     this.saveButton = page.getByRole('button').filter({ hasText: 'Save' });
     this.cancelButton = page.getByRole('button').filter({ hasText: 'Cancel' });
   }
