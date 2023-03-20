@@ -1,15 +1,19 @@
 import { config } from '@lib/config';
 import { test as base, expect } from '@playwright/test';
-import blockAnalyticsDomains from '@lib/utils/blocker';
 import { ConsoleDotAuthPage } from '@lib/pom/auth';
 
-// Extend Playright page to start always at config.startingPage
+// Extend Playwright page to start always at config.startingPage
 export const test = base.extend({
   page: async ({ page }, use, testInfo) => {
     const autPage = new ConsoleDotAuthPage(page);
 
     const errLogs = [];
-    await blockAnalyticsDomains(page);
+
+    // Disable analytics, segment, pendo and other disruptive popups
+    await page.addInitScript(() => {
+      window.localStorage.setItem('chrome:analytics:disable', String(true));
+      window.localStorage.setItem('chrome:segment:disable', String(true));
+    });
 
     if (config.enableErrLogging) {
       page.on('console', (msg) => {
@@ -32,6 +36,7 @@ export const test = base.extend({
       await autPage.checkLoginPageVisible();
     }
     await expect(page.getByText('Gain increased visibility into your hybrid cloud')).toBeTruthy();
+    await autPage.closeCookieBanner();
     await use(page);
 
     if (testInfo.status == 'failed' || testInfo.status == 'timedOut') {
