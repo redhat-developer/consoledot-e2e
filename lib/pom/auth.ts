@@ -1,5 +1,4 @@
 import { expect, Locator, Page } from '@playwright/test';
-import blockAnalyticsDomains from '@lib/utils/blocker';
 import { config } from '@lib/config';
 import { AbstractPage } from '@lib/pom/abstractPage';
 
@@ -33,8 +32,6 @@ export class ConsoleDotAuthPage extends AbstractPage {
   }
 
   async login(username: string = config.adminUsername, password: string = config.adminPassword) {
-    await blockAnalyticsDomains(this.page);
-
     // Go to starting Page
     await this.goto();
 

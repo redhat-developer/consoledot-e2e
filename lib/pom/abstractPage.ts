@@ -18,6 +18,7 @@ export abstract class AbstractPage {
   static readonly progressBarLocatorString: string = '[role=progressbar]';
   readonly saveButton: Locator;
   readonly cancelButton: Locator;
+  readonly cookieBanner: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -33,6 +34,7 @@ export abstract class AbstractPage {
     this.deleteButton = page.locator('button', { hasText: 'Delete' });
     this.saveButton = page.getByRole('button').filter({ hasText: 'Save' });
     this.cancelButton = page.getByRole('button').filter({ hasText: 'Cancel' });
+    this.cookieBanner = page.locator('#truste-consent-button');
   }
 
   async showElementActions(selectorName: string) {
@@ -76,5 +78,14 @@ export abstract class AbstractPage {
     await this.page.locator(AbstractPage.menuLocator, { hasText: productList }).click();
     // Check that page with list of tested product instances is opened
     await expect(this.page.locator('h1', { hasText: productList })).toHaveCount(1);
+  }
+
+  async closeCookieBanner() {
+    try {
+      await this.cookieBanner.click();
+      await expect(await this.cookieBanner).toBeHidden();
+    } catch (err) {
+      // ignore
+    }
   }
 }
