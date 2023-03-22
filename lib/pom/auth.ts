@@ -44,6 +44,9 @@ export class ConsoleDotAuthPage extends AbstractPage {
     // check we landed on the right page
     await this.checkUiIsVisible();
     await expect(this.welcomePage).toBeTruthy();
+
+    // close cookie banner if still present
+    await this.closeCookieBanner();
   }
 
   async logout() {

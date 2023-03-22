@@ -55,6 +55,7 @@ export class ServiceAccountPage extends AbstractPage {
     await expect(this.serviceAccountMenuLink).toHaveCount(1, { timeout: 2000 });
     await this.serviceAccountMenuLink.click();
     await expect(this.serviceAccountHeading).toHaveCount(1);
+    await expect(this.createServiceAccountButton).toHaveCount(1);
   }
 
   async createServiceAccount(name: string) {
