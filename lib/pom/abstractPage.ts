@@ -82,7 +82,7 @@ export abstract class AbstractPage {
 
   async closeCookieBanner() {
     try {
-      await this.cookieBanner.click();
+      await this.cookieBanner.click({ timeout: 10000 });
       await expect(await this.cookieBanner).toBeHidden();
     } catch (err) {
       // ignore

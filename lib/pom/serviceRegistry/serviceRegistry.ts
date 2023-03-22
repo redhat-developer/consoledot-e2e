@@ -22,7 +22,7 @@ export class ServiceRegistryPage extends AbstractPage {
     this.nameInputForm = page.getByLabel('Name *');
     this.submitButton = page.locator('button[type="submit"]');
     this.serviceRegistryTable = page.locator('[aria-label="Service Registry instance list"]');
-    this.deleteCheckbox = page.locator('input[type="checkbox"]');
+    this.deleteCheckbox = page.locator('input[type="checkbox"]#mas--confirm__button');
     this.deleteNameInput = page.locator('input[name="mas-name-input"]');
   }
 
@@ -81,7 +81,7 @@ export class ServiceRegistryPage extends AbstractPage {
       // Fill name of instance
       await this.deleteNameInput.fill(name);
       // Tick checkbox for deletion
-      await this.deleteCheckbox.click();
+      await this.deleteCheckbox.check();
     }
     // Click on delete button
     await this.deleteButton.click();
