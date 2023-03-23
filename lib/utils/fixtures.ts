@@ -37,6 +37,12 @@ export const test = base.extend({
     }
     await expect(page.getByText('Gain increased visibility into your hybrid cloud')).toBeTruthy();
     await autPage.closeCookieBanner();
+
+    // use beta environment
+    if (config.useBeta) {
+      await autPage.switchBetaOn();
+    }
+
     await use(page);
 
     if (testInfo.status == 'failed' || testInfo.status == 'timedOut') {

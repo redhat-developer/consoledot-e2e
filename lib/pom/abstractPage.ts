@@ -1,5 +1,6 @@
 import { closePopUp } from '@lib/utils/popup';
 import { Locator, Page, expect } from '@playwright/test';
+import { config } from '@lib/config';
 
 export abstract class AbstractPage {
   readonly page: Page;
@@ -19,6 +20,14 @@ export abstract class AbstractPage {
   readonly saveButton: Locator;
   readonly cancelButton: Locator;
   readonly cookieBanner: Locator;
+  readonly consoleDotSettingsButton: Locator;
+  // Stage beta switch
+  readonly betaOnLabel: Locator;
+  readonly betaOffLabel: Locator;
+  // Prod beta switch
+  readonly betaOnMenuItem: Locator;
+  readonly betaOffMenuItem: Locator;
+  readonly betaWidget: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -35,6 +44,15 @@ export abstract class AbstractPage {
     this.saveButton = page.getByRole('button').filter({ hasText: 'Save' });
     this.cancelButton = page.getByRole('button').filter({ hasText: 'Cancel' });
     this.cookieBanner = page.locator('#truste-consent-button');
+    this.consoleDotSettingsButton = page.getByRole('button', { name: 'Settings menu' });
+    if (!config.prodEnv) {
+      this.betaOnLabel = page.getByText('Beta on');
+      this.betaOffLabel = page.getByText('Beta off');
+    } else {
+      this.betaOnMenuItem = page.getByRole('menuitem', { name: 'Use the beta release' });
+      this.betaOffMenuItem = page.getByRole('menuitem', { name: 'Stop using the beta release' });
+      this.betaWidget = page.getByText('beta', { exact: true });
+    }
   }
 
   async showElementActions(selectorName: string) {
@@ -83,9 +101,49 @@ export abstract class AbstractPage {
   async closeCookieBanner() {
     try {
       await this.cookieBanner.click({ timeout: 10000 });
-      await expect(await this.cookieBanner).toBeHidden();
+      await expect(this.cookieBanner).toBeHidden();
     } catch (err) {
       // ignore
+    }
+  }
+
+  async switchBetaOn() {
+    if (config.prodEnv) {
+      try {
+        await this.consoleDotSettingsButton.click();
+        await expect(this.betaOnMenuItem).toBeVisible();
+        await this.betaOnMenuItem.click();
+        await expect(this.betaWidget).toBeVisible();
+      } catch (err) {
+        throw new Error('Unable to turn on beta mode');
+      }
+    } else {
+      try {
+        await this.betaOffLabel.click({ timeout: 10000 });
+        await expect(this.betaOnLabel).toBeVisible();
+      } catch (err) {
+        throw new Error('Unable to turn on beta mode');
+      }
+    }
+  }
+
+  async switchBetaOff() {
+    if (config.prodEnv) {
+      try {
+        await this.consoleDotSettingsButton.click();
+        await expect(this.betaOffMenuItem).toBeVisible();
+        await this.betaOffMenuItem.click();
+        await expect(this.betaWidget).toBeHidden();
+      } catch (err) {
+        throw new Error('Unable to turn off beta mode');
+      }
+    } else {
+      try {
+        await this.betaOnLabel.click({ timeout: 10000 });
+        await expect(this.betaOffLabel).toBeVisible();
+      } catch (err) {
+        throw new Error('Unable to turn off beta mode');
+      }
     }
   }
 }
