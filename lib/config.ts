@@ -7,12 +7,6 @@ class Config {
   readonly password_2: string;
   readonly adminUsername: string;
   readonly adminPassword: string;
-  // Billing credentials
-  readonly stratosphere1username: string;
-  readonly stratosphere2username: string;
-  readonly stratosphere3username: string;
-  readonly stratosphere4username: string;
-  readonly stratospherePassword: string;
 
   readonly startingPage: string;
   readonly sessionID: string;
@@ -36,10 +30,6 @@ class Config {
   readonly adminAuthFile = 'playwright/.auth/admin.json';
   readonly user1AuthFile = 'playwright/.auth/user1.json';
   readonly user2AuthFile = 'playwright/.auth/user2.json';
-  readonly stratosphere1AuthFile = 'playwright/.auth/stratosphere1.json';
-  readonly stratosphere2AuthFile = 'playwright/.auth/stratosphere2.json';
-  readonly stratosphere3AuthFile = 'playwright/.auth/stratosphere3.json';
-  readonly stratosphere4AuthFile = 'playwright/.auth/stratosphere4.json';
 
   constructor() {
     // Load credentials
@@ -49,11 +39,6 @@ class Config {
     this.password_2 = process.env.TEST_2_PASSWORD;
     this.adminUsername = process.env.TEST_ADMIN_USERNAME;
     this.adminPassword = process.env.TEST_ADMIN_PASSWORD;
-    this.stratosphere1username = process.env.STRATOSPHERE_SCENARIO_1_USER;
-    this.stratosphere2username = process.env.STRATOSPHERE_SCENARIO_2_USER;
-    this.stratosphere3username = process.env.STRATOSPHERE_SCENARIO_3_USER;
-    this.stratosphere4username = process.env.STRATOSPHERE_SCENARIO_4_USER;
-    this.stratospherePassword = process.env.STRATOSPHERE_SCENARIO_PASSWORD;
 
     // Setup starting page
     this.startingPage = process.env.STARTING_PAGE || this.startingPageDefault;
