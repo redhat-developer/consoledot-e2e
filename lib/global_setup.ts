@@ -19,26 +19,6 @@ export default async function globalSetup() {
       name: testConfig.username_2,
       password: testConfig.password_2,
       path: testConfig.user2AuthFile
-    },
-    {
-      name: testConfig.stratosphere1username,
-      password: testConfig.stratospherePassword,
-      path: testConfig.stratosphere1AuthFile
-    },
-    {
-      name: testConfig.stratosphere2username,
-      password: testConfig.stratospherePassword,
-      path: testConfig.stratosphere2AuthFile
-    },
-    {
-      name: testConfig.stratosphere3username,
-      password: testConfig.stratospherePassword,
-      path: testConfig.stratosphere3AuthFile
-    },
-    {
-      name: testConfig.stratosphere4username,
-      password: testConfig.stratospherePassword,
-      path: testConfig.stratosphere4AuthFile
     }
   ];
 

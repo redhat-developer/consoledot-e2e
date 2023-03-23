@@ -1,6 +1,5 @@
 import { expect, Locator, Page } from '@playwright/test';
 import { config } from '@lib/config';
-import { BillingOptions } from '@lib/enums/billing';
 import { CloudProviders } from '@lib/enums/cloudproviders';
 import { resourceStore } from '@lib/resource_store';
 import { AbstractPage } from '@lib/pom/abstractPage';
@@ -45,12 +44,7 @@ export class KafkaInstanceListPage extends AbstractPage {
     await expect(this.createKafkaInstanceButton).toHaveCount(1);
   }
 
-  async createKafkaInstance(
-    name: string,
-    check = true,
-    billingOption = BillingOptions.PREPAID,
-    provider = CloudProviders.AWS
-  ) {
+  async createKafkaInstance(name: string, check = true, provider = CloudProviders.AWS) {
     await this.createKafkaInstanceButton.click();
     await expect(this.createKafkaInstanceHeading).toHaveCount(1);
     await this.page.waitForSelector(AbstractPage.progressBarLocatorString, { state: 'detached' });
@@ -67,13 +61,6 @@ export class KafkaInstanceListPage extends AbstractPage {
     // Choose Cloud provider if different from AWS
     try {
       await this.page.locator('div:text-is("' + provider + '")').click({ timeout: 1000 });
-    } catch (err) {
-      // Billing option is not available so do nothing
-    }
-
-    // Set billing options
-    try {
-      await this.page.locator('div:text-is("' + billingOption + '")').click({ timeout: 1000 });
     } catch (err) {
       // Billing option is not available so do nothing
     }
