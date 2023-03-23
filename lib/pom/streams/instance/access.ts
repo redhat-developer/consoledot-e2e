@@ -54,6 +54,11 @@ export class AccessPage extends KafkaInstancePage {
     await this.page.locator('button', { hasText: topicName }).click();
 
     await this.saveButton.click();
+
+    // Verify permissions were granted
+    await expect(await this.findAccessRow(saId, 'Create', topicName)).toHaveCount(1);
+    await expect(await this.findAccessRow(saId, 'Write', topicName)).toHaveCount(1);
+    await expect(await this.findAccessRow(saId, 'Describe', topicName)).toHaveCount(1);
   }
 
   // TODO - we shouldn't use just prefix for topic/group but also complete name
@@ -76,6 +81,11 @@ export class AccessPage extends KafkaInstancePage {
     await this.consumerGroupConsumePermissionRow.getByPlaceholder(placeholder).fill(consumerGroup);
     await this.page.locator('button', { hasText: consumerGroup }).click();
     await this.saveButton.click();
+
+    // Verify permissions were granted
+    await expect(await this.findAccessRow(saId, 'Read', consumerGroup)).toHaveCount(1);
+    await expect(await this.findAccessRow(saId, 'Describe', topicName)).toHaveCount(1);
+    await expect(await this.findAccessRow(saId, 'Read', topicName)).toHaveCount(1);
   }
 
   async grantManageAccess(saId: string) {
