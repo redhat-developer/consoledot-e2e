@@ -5,12 +5,13 @@ import { ServiceAccountPage } from '@lib/pom/serviceAccounts/sa';
 import { AbstractPage } from '@lib/pom/abstractPage';
 
 const testServiceAccountPrefix = 'test-service-account-';
-const testServiceAccountName = `${testServiceAccountPrefix}${config.sessionID}`;
+let testServiceAccountName;
 
 // Use admin user context
 test.use({ storageState: config.adminAuthFile });
 
 test.beforeEach(async ({ page }) => {
+  testServiceAccountName = `${testServiceAccountPrefix}${Date.now()}`;
   const serviceAccountPage = new ServiceAccountPage(page);
   await serviceAccountPage.gotoThroughMenu();
 

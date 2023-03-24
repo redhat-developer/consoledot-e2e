@@ -15,18 +15,20 @@ import { FilterGroup, Limit } from '@lib/enums/messages';
 
 const testInstanceName = config.instanceName;
 const testTopicName = `test-topic-name-${config.sessionID}`;
-const testServiceAccountName = `test-messaging-sa-${config.sessionID}`;
+const testServiceAccountPrefix = `test-messaging-sa-${config.sessionID}-`;
 const testMessageKey = 'key';
 const consumerGroupId = `test-cg-${config.sessionID}`;
 const expectedMessageCount = 100;
 const reconnectCount = 5;
 const reconnectDelayMs = 500;
+let testServiceAccountName;
 let credentials;
 let bootstrap: string;
 
 test.use({ storageState: config.adminAuthFile });
 
 test.beforeEach(async ({ page }) => {
+  testServiceAccountName = `${testServiceAccountPrefix}${Date.now()}`;
   const serviceAccountPage = new ServiceAccountPage(page);
   const kafkaInstancesPage = new KafkaInstanceListPage(page);
   const kafkaInstancePage = new KafkaInstancePage(page, testInstanceName);
