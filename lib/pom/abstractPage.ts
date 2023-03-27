@@ -32,8 +32,8 @@ export abstract class AbstractPage {
     this.nextButton = page.locator('button', { hasText: 'Next' });
     this.finishButton = page.locator('button', { hasText: 'Finish' });
     this.deleteButton = page.locator('button', { hasText: 'Delete' });
-    this.saveButton = page.getByRole('button').filter({ hasText: 'Save' });
-    this.cancelButton = page.getByRole('button').filter({ hasText: 'Cancel' });
+    this.saveButton = page.locator('button:text-is("Save")');
+    this.cancelButton = page.locator('button:text-is("Cancel")');
     this.cookieBanner = page.locator('#truste-consent-button');
   }
 
