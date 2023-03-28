@@ -21,6 +21,8 @@ Local requirements:
 Before running the tests you would need to provide a valid username and password to be used in the form of environment variables.
 
 ```bash
+export ENV_TYPE=... # stage or production - depends on environment 
+export USE_BETA=... # true/false to enable test run on Beta 
 export TEST_USERNAME=...
 export TEST_PASSWORD=...
 export TEST_ADMIN_USERNAME=...
@@ -33,6 +35,8 @@ export STARTING_PAGE=...
 or drop a `.env` file in the root folder with a similar content:
 
 ```
+USE_BETA=... # true/false to enable test run on Beta 
+ENV_TYPE=... # stage or production - depends on environment
 TEST_USERNAME=...
 TEST_PASSWORD=...
 TEST_ADMIN_USERNAME=...
@@ -70,7 +74,7 @@ ENABLE_ERR_LOGGING=1 npx playwright test
 
 ### Setup
 
-This repository uses GitHub Actions as infrastructure to run the tests agains publicly accessible services.
+This repository uses GitHub Actions as infrastructure to run the tests against publicly accessible services.
 The CI only runs on the `main` branch to avoid sharing secrets on branches and forks.
 
 ### Security

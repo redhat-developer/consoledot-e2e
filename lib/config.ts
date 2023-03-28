@@ -1,6 +1,8 @@
 import { v1 as uuid } from 'uuid';
 
 class Config {
+  readonly prodEnv: boolean;
+  readonly useBeta: boolean;
   readonly username: string;
   readonly password: string;
   readonly username_2: string;
@@ -32,6 +34,10 @@ class Config {
   readonly user2AuthFile = 'playwright/.auth/user2.json';
 
   constructor() {
+    // Env type - stage/production
+    this.prodEnv = process.env.ENV_TYPE === 'production';
+    // Use Beta environment
+    this.useBeta = process.env.USE_BETA === 'true';
     // Load credentials
     this.username = process.env.TEST_USERNAME;
     this.password = process.env.TEST_PASSWORD;
