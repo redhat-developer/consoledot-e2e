@@ -42,6 +42,7 @@ export class KafkaInstanceListPage extends AbstractPage {
     // Navigates to list of Kafka instances
     await this.navigateToProductList(this.productName, this.productList);
     await expect(this.createKafkaInstanceButton).toHaveCount(1);
+    await expect(this.loadingContent.first()).toBeHidden();
   }
 
   async createKafkaInstance(name: string, check = true, provider = CloudProviders.AWS) {

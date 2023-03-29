@@ -44,6 +44,7 @@ export class TopicListPage extends KafkaInstancePage {
     // data-testid=pageKafka-tabTopics
     await this.kafkaTabNavTopics.click();
     await expect(this.createTopicButton).toHaveCount(1);
+    await expect(this.loadingContent.first()).toBeHidden();
   }
 
   async createKafkaTopic(name: string, defaultProperties: boolean) {
