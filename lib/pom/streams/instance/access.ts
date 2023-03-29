@@ -14,6 +14,9 @@ export class AccessPage extends KafkaInstancePage {
   readonly createPrefixTopicConfirmButton: Locator;
   readonly topicConsumePermissionRow: Locator;
   readonly consumerGroupConsumePermissionRow: Locator;
+  readonly permissionRowCheckBox: Locator;
+  readonly toolbarKebabMenu: Locator;
+  readonly deleteSelectedPermissions: Locator;
 
   constructor(page: Page, instanceName: string) {
     super(page, instanceName);
@@ -28,12 +31,26 @@ export class AccessPage extends KafkaInstancePage {
     this.createPrefixTopicConfirmButton = page.locator('button', { hasText: /Create.+/ });
     this.topicConsumePermissionRow = page.locator('tr', { hasText: 'Topic' });
     this.consumerGroupConsumePermissionRow = page.locator('tr', { hasText: 'Consumer group' });
+    this.permissionRowCheckBox = page.locator('input[type="checkbox"]');
+    // TODO - Change toolbarKebabMenu locator once IDs are in place
+    this.toolbarKebabMenu = page
+      .locator('main')
+      .locator('[data-ouia-component-type="PF4/Toolbar"]')
+      .locator('button[aria-label="Actions"]');
+    this.deleteSelectedPermissions = page.locator('button:text-is("Delete selected permissions")');
   }
 
   async gotoThroughMenu() {
     await expect(this.kafkaTabNavAccess).toHaveCount(1);
     await this.kafkaTabNavAccess.click();
     await expect(this.manageAccessButton).toHaveCount(1);
+    await expect(this.loadingContent.first()).toBeHidden();
+  }
+
+  async gotoFromAnywhere() {
+    await super.gotoUrl();
+    await super.gotoThroughMenu();
+    await this.gotoThroughMenu();
   }
 
   // TODO - we shouldn't use just prefix for topic/group but also complete name
@@ -113,16 +130,27 @@ export class AccessPage extends KafkaInstancePage {
   }
 
   async revokeAccess(account: string, permission: string, resource: string, awaitDeletion: boolean) {
-    const row = await this.findAccessRow(account, permission, resource);
-    if ((await row.count()) == 1) {
+    const rows = await this.findAccessRow(account, permission, resource);
+    if ((await rows.count()) == 1) {
       // GetByRole sometimes works, sometimes it does not.
       // await row.getByRole('button', { name: 'Actions' }).click();
-      await row.locator(AbstractPage.actionsLocatorString).click();
+      await rows.locator(AbstractPage.actionsLocatorString).click();
       await this.deleteButton.click();
 
       // await for the permission to be revoked
       if (awaitDeletion) {
-        await expect(row).toHaveCount(0);
+        await expect(rows).toHaveCount(0);
+      }
+    } else if ((await rows.count()) > 1) {
+      for (const row of await rows.all()) {
+        await row.locator(this.permissionRowCheckBox).check();
+      }
+      await this.toolbarKebabMenu.click();
+      await this.deleteSelectedPermissions.click();
+
+      // await for the permission to be revoked
+      if (awaitDeletion) {
+        await expect(rows).toHaveCount(0);
       }
     }
   }
