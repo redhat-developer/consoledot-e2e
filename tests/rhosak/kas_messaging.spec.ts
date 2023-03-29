@@ -82,6 +82,9 @@ test.beforeEach(async ({ page }) => {
 test.afterEach(async ({ page }) => {
   const serviceAccountPage = new ServiceAccountPage(page);
   await serviceAccountPage.deleteAllServiceAccounts();
+  const accessPage = new AccessPage(page, testInstanceName);
+  await accessPage.gotoFromAnywhere();
+  await accessPage.revokeAccess(credentials.clientID, '', '', true);
 });
 
 test.afterAll(async ({ page }) => {

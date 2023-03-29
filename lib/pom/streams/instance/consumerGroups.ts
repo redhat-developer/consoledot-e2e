@@ -14,6 +14,7 @@ export class ConsumerGroupsPage extends KafkaInstancePage {
   async gotoThroughMenu() {
     await expect(this.kafkaTabNavConsumerGroups).toHaveCount(1);
     await this.kafkaTabNavConsumerGroups.click();
+    await expect(this.loadingContent.first()).toBeHidden();
   }
 
   async waitForEmptyConsumerGroupsTable() {

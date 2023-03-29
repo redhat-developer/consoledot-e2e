@@ -28,6 +28,7 @@ export abstract class AbstractPage {
   readonly betaOnMenuItem: Locator;
   readonly betaOffMenuItem: Locator;
   readonly betaWidget: Locator;
+  readonly loadingContent: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -45,6 +46,7 @@ export abstract class AbstractPage {
     this.cancelButton = page.locator('button:text-is("Cancel")');
     this.cookieBanner = page.locator('#truste-consent-button');
     this.consoleDotSettingsButton = page.getByRole('button', { name: 'Settings menu' });
+    this.loadingContent = page.locator('table').getByText('Loading content');
     if (!config.prodEnv) {
       this.betaOnLabel = page.getByText('Beta on');
       this.betaOffLabel = page.getByText('Beta off');
