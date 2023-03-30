@@ -55,6 +55,27 @@ export class ServiceAccountPage extends AbstractPage {
     await expect(this.serviceAccountMenuLink).toHaveCount(1, { timeout: 2000 });
     await this.serviceAccountMenuLink.click();
     await expect(this.serviceAccountHeading).toHaveCount(1);
+
+    // Wait for initial load
+    await this.page.waitForSelector(AbstractPage.progressBarLocatorString, {
+      state: 'detached',
+      timeout: config.serviceAccountCreationTimeout
+    });
+
+    // Wait for reload caused by a bug https://issues.redhat.com/browse/MGDX-405
+    try {
+      await this.page.waitForSelector(AbstractPage.progressBarLocatorString, {
+        state: 'attached',
+        timeout: 10000
+      });
+      // Secondary refresh started, wait for detach
+      await this.page.waitForSelector(AbstractPage.progressBarLocatorString, {
+        state: 'detached',
+        timeout: 10000
+      });
+    } catch (e) {
+      // ignore
+    }
     await expect(this.createServiceAccountButton).toHaveCount(1);
   }
 

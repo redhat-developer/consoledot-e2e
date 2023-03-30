@@ -2,7 +2,6 @@ import { expect } from '@playwright/test';
 import { test } from '@lib/utils/fixtures';
 import { config } from '@lib/config';
 import { ServiceAccountPage } from '@lib/pom/serviceAccounts/sa';
-import { AbstractPage } from '@lib/pom/abstractPage';
 
 const testServiceAccountPrefix = 'test-service-account-';
 let testServiceAccountName;
@@ -14,11 +13,6 @@ test.beforeEach(async ({ page }) => {
   testServiceAccountName = `${testServiceAccountPrefix}${Date.now()}`;
   const serviceAccountPage = new ServiceAccountPage(page);
   await serviceAccountPage.gotoThroughMenu();
-
-  await page.waitForSelector(AbstractPage.progressBarLocatorString, {
-    state: 'detached',
-    timeout: config.serviceAccountCreationTimeout
-  });
 });
 
 test.afterEach(async ({ page }) => {
