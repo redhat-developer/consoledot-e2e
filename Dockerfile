@@ -1,6 +1,6 @@
 # https://github.com/nodejs/docker-node/issues/1734#issuecomment-1274343563
 # this ships with node 16.14
-FROM mcr.microsoft.com/playwright:v1.30.0-focal
+FROM mcr.microsoft.com/playwright:v1.32.1-focal
 # FROM mcr.microsoft.com/playwright:v1.27.0-focal
 
 RUN curl -sL https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64 -o /usr/local/bin/jq && chmod a+x /usr/local/bin/jq
