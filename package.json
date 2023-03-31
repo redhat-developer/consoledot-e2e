@@ -6,6 +6,8 @@
   "scripts": {
     "prettier-format": "prettier --config .prettierrc 'tests/**/*.ts' 'lib/**/*.ts' --write",
     "prettier-check": "prettier --config .prettierrc 'tests/**/*.ts' 'lib/**/*.ts' --check",
+    "eslint-check": "npx eslint . --max-warnings=0",
+    "check": "npm run prettier-check && npm run eslint-check",
     "test": "npx playwright test",
     "test-chrome": "npx playwright test --project chromium",
     "test-firefox": "npx playwright test --project firefox"
