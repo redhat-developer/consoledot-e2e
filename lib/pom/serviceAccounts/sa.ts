@@ -7,7 +7,6 @@ import { AbstractPage } from '@lib/pom/abstractPage';
 export class ServiceAccountPage extends AbstractPage {
   readonly urlPath: string = '/application-services/service-accounts';
   readonly serviceAccountHeading: Locator;
-  readonly appDataServiceMenuLink: Locator;
   readonly serviceAccountMenuLink: Locator;
   readonly createServiceAccountButton: Locator;
   readonly serviceAccountDescription: Locator;
@@ -22,7 +21,6 @@ export class ServiceAccountPage extends AbstractPage {
   constructor(page: Page) {
     super(page);
     this.serviceAccountHeading = page.locator('h1', { hasText: 'Service Accounts' });
-    this.appDataServiceMenuLink = page.getByRole('link', { name: 'Application and Data Services' });
     this.serviceAccountMenuLink = page.locator('li >> a:text("Service Accounts")');
     this.createServiceAccountButton = page.locator('button', { hasText: 'Create service account' });
     this.serviceAccountDescription = page.getByLabel('Short description *');

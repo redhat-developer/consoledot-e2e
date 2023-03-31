@@ -12,7 +12,7 @@ export abstract class AbstractPage {
   readonly nextButton: Locator;
   readonly finishButton: Locator;
   readonly deleteButton: Locator;
-  readonly appDataServicesLink: Locator;
+  readonly appDataServiceMenuLink: Locator;
   readonly appDataServicesText: Locator;
   static readonly menuLocator: string = '[data-testid=router-link]';
   static readonly actionsLocatorString: string = '[aria-label="Actions"]';
@@ -37,7 +37,7 @@ export abstract class AbstractPage {
     this.deleteNameInput = page.locator('input[data-ouia-component-id="delete-confirmation"]');
     this.actionsDeleteButton = page.locator('button', { hasText: 'Delete' });
     this.closeButton = page.locator('button', { hasText: 'Close' });
-    this.appDataServicesLink = page.locator('a', { hasText: 'Application and Data Services' });
+    this.appDataServiceMenuLink = page.getByRole('link', { name: 'Application and Data Services', exact: true });
     this.appDataServicesText = page.getByText('Application and Data Services');
     this.nextButton = page.locator('button', { hasText: 'Next' });
     this.finishButton = page.locator('button', { hasText: 'Finish' });
@@ -72,9 +72,9 @@ export abstract class AbstractPage {
   async navigateToApplicationAndDataServices() {
     await this.checkUiIsVisible();
     // If category of tested product is not present in navigation
-    if (await this.appDataServicesLink.isVisible()) {
+    if (await this.appDataServiceMenuLink.isVisible()) {
       // Open link to Application and Data Services overview page
-      await this.appDataServicesLink.click();
+      await this.appDataServiceMenuLink.click();
     }
   }
 
