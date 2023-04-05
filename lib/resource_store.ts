@@ -1,17 +1,22 @@
 //Singleton class for global storing created instances, serviceaccounts etc...
 export class ResourceStore {
   private kafkaList: string[];
+  private kafkaTopicList: string[];
   private serviceAccountList: string[];
   private serviceRegistryList: string[];
 
   constructor() {
     this.kafkaList = [];
+    this.kafkaTopicList = [];
     this.serviceAccountList = [];
     this.serviceRegistryList = [];
   }
 
   get getKafkaList(): string[] {
     return this.kafkaList;
+  }
+  get getKafkaTopicList(): string[] {
+    return this.kafkaTopicList;
   }
 
   get getSeviceAccountList(): string[] {
@@ -26,6 +31,10 @@ export class ResourceStore {
     this.kafkaList.push(kafka);
   }
 
+  addKafkaTopic(topic: string) {
+    this.kafkaTopicList.push(topic);
+  }
+
   addServiceAccount(sa: string) {
     this.serviceAccountList.push(sa);
   }
@@ -37,6 +46,12 @@ export class ResourceStore {
   removeKafka(kafka: string) {
     this.kafkaList = this.kafkaList.filter(function (element) {
       return element != kafka;
+    });
+  }
+
+  removeKafkaTopic(topic: string) {
+    this.kafkaTopicList = this.kafkaTopicList.filter(function (element) {
+      return element != topic;
     });
   }
 
@@ -54,6 +69,10 @@ export class ResourceStore {
 
   clearKafkaList() {
     this.kafkaList = [];
+  }
+
+  clearKafkaTopicList() {
+    this.kafkaTopicList = [];
   }
 
   clearServiceAccountList() {

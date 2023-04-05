@@ -43,6 +43,11 @@ test.afterEach(async ({ page }) => {
 
   await kafkaInstancesPage.gotoThroughMenu();
   await kafkaInstancePage.gotoThroughMenu();
+
+  const topicPage = new TopicListPage(page, testInstanceName);
+  await topicPage.deleteAllKafkaTopics();
+
+  await kafkaInstancesPage.gotoThroughMenu();
 });
 
 test.afterAll(async ({ page }) => {

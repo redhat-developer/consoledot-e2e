@@ -1,5 +1,6 @@
 import { expect, Locator, Page } from '@playwright/test';
 import { KafkaInstancePage } from '@lib/pom/streams/kafkaInstance';
+import { resourceStore } from '@lib/resource_store';
 
 export class TopicListPage extends KafkaInstancePage {
   readonly createTopicButton: Locator;
@@ -88,6 +89,7 @@ export class TopicListPage extends KafkaInstancePage {
       await this.createTopicButton.click();
     }
     await expect(this.page.getByText(name)).toHaveCount(1);
+    resourceStore.addKafkaTopic(name);
   }
 
   async deleteKafkaTopic(name: string) {
@@ -99,5 +101,20 @@ export class TopicListPage extends KafkaInstancePage {
     // data-testid=modalDeleteTopic-buttonDelete
     await this.deleteButton.click();
     await expect(this.page.getByText(name)).toHaveCount(0);
+
+    resourceStore.removeKafkaTopic(name);
+  }
+
+  async deleteAllKafkaTopics() {
+    const kafkaTopicList = resourceStore.getKafkaTopicList;
+    await this.gotoThroughMenu();
+    for (const topicName of kafkaTopicList) {
+      try {
+        await this.deleteKafkaTopic(topicName);
+      } catch (error) {
+        //Ignore exception
+      }
+    }
+    resourceStore.clearKafkaTopicList();
   }
 }
