@@ -48,7 +48,7 @@ export class TopicListPage extends KafkaInstancePage {
     await expect(this.loadingContent.first()).toBeHidden();
   }
 
-  async createKafkaTopic(name: string, defaultProperties: boolean) {
+  async createKafkaTopic(name: string, defaultProperties: boolean, partition?: number) {
     await this.createTopicButton.click();
     await expect(this.createTopicHeading).toHaveCount(1);
     await this.topicNameField.fill(name);
@@ -63,11 +63,16 @@ export class TopicListPage extends KafkaInstancePage {
       await this.showAllOptions.first().click();
 
       await expect(this.numPartitionsInput).toHaveValue('1', { timeout: 3000 });
-      // Increasing twice and decreasing once the num of partitions to test + & -
-      for (let i = 0; i < 2; i++) {
-        await this.numPartitionsButton.nth(1).click();
+      if (partition) {
+        await this.numPartitionsInput.fill(String(partition));
+        await expect(this.numPartitionsInput).toHaveValue(String(partition), { timeout: 3000 });
+      } else {
+        // Increasing twice and decreasing once the num of partitions to test + & -
+        for (let i = 0; i < 2; i++) {
+          await this.numPartitionsButton.nth(1).click();
+        }
+        await this.numPartitionsButton.nth(0).click();
       }
-      await this.numPartitionsButton.nth(0).click();
 
       await expect(this.retentionOptionField).toHaveCount(1);
       await this.daysButton.click();
