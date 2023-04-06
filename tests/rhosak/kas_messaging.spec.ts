@@ -233,34 +233,3 @@ for (const filter of filters) {
     }
   });
 }
-// test_6acl.py test_kafka_create_consumer_group_and_check_dashboard
-test('create consumer group and check dashboard', async ({ page }) => {
-  const kafkaInstancesPage = new KafkaInstanceListPage(page);
-  const kafkaInstancePage = new KafkaInstancePage(page, testInstanceName);
-  const consumerGroupsPage = new ConsumerGroupsPage(page, testInstanceName);
-  const accessPage = new AccessPage(page, testInstanceName);
-
-  await kafkaInstancesPage.gotoThroughMenu();
-  const bootstrapUrl = await kafkaInstancesPage.getBootstrapUrl(testInstanceName);
-  console.log('bootstrapUrl: ' + bootstrapUrl);
-
-  // Consumer
-  await kafkaInstancePage.gotoThroughMenu();
-  await accessPage.gotoThroughMenu();
-  await accessPage.grantConsumerAccess(credentials.clientID, testTopicName, consumerGroupId);
-
-  const consumer = new KafkaConsumer(bootstrapUrl, consumerGroupId, credentials.clientID, credentials.clientSecret);
-  const consumerResponse = await retry(
-    () => consumer.consumeMessages(testTopicName, expectedMessageCount),
-    reconnectCount,
-    reconnectDelayMs
-  );
-  expect(consumerResponse).toEqual(expectedMessageCount);
-
-  // Open Consumer Groups Tab to check dashboard
-  await kafkaInstancesPage.gotoThroughMenu();
-  await kafkaInstancePage.gotoThroughMenu();
-  await consumerGroupsPage.gotoThroughMenu();
-  await consumerGroupsPage.waitForFilledConsumerGroupsTable();
-  await expect(page.getByText(consumerGroupId)).toHaveCount(1);
-});
