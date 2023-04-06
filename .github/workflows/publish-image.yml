@@ -16,7 +16,7 @@ jobs:
         uses: docker/login-action@v2
         with:
           registry: quay.io
-          username: aperuffo
+          username: ${{ secrets.QUAY_USERNAME}}
           password: ${{ secrets.QUAY_TOKEN }}
       
       - name: Build and push Container image
@@ -24,4 +24,4 @@ jobs:
         with:
           context: .
           push: true
-          tags: quay.io/aperuffo/consoledot-e2e:latest
+          tags: quay.io/mk-ci-cd/consoledot-e2e:latest
