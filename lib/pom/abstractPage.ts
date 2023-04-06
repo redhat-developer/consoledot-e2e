@@ -29,6 +29,8 @@ export abstract class AbstractPage {
   readonly betaOffMenuItem: Locator;
   readonly betaWidget: Locator;
   readonly loadingContent: Locator;
+  readonly warningAlert: Locator;
+  readonly dangerAlert: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -55,6 +57,8 @@ export abstract class AbstractPage {
       this.betaOffMenuItem = page.getByRole('menuitem', { name: 'Stop using the beta release' });
       this.betaWidget = page.getByText('beta', { exact: true });
     }
+    this.warningAlert = page.locator('[aria-label="Warning Alert"]');
+    this.dangerAlert = page.locator('[aria-label="Danger Alert"]');
   }
 
   async showElementActions(selectorName: string) {

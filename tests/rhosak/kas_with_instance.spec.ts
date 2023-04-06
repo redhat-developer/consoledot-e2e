@@ -13,7 +13,8 @@ import { TopicPage } from '@lib/pom/streams/instance/topic';
 import { sleep } from '@lib/utils/sleep';
 
 const testInstanceName = config.instanceName;
-const testTopicName = `test-topic-${config.sessionID}`;
+const testTopicNamePrefix = `test-topic-`;
+const testTopicName = `${testTopicNamePrefix}${config.sessionID}`;
 
 // Use admin user context
 test.use({ storageState: config.adminAuthFile });
@@ -43,6 +44,11 @@ test.afterEach(async ({ page }) => {
 
   await kafkaInstancesPage.gotoThroughMenu();
   await kafkaInstancePage.gotoThroughMenu();
+
+  const topicPage = new TopicListPage(page, testInstanceName);
+  await topicPage.deleteAllKafkaTopics();
+
+  await kafkaInstancesPage.gotoThroughMenu();
 });
 
 test.afterAll(async ({ page }) => {
@@ -306,9 +312,7 @@ test('create Topic with properties different than default', async ({ page }) => 
   expect(cp).not.toMatch(/delete/);
 
   // Topic CleanUp
-  await topicPage.deleteTopicLink.click();
-  await topicListPage.deleteNameInput.fill(testTopicName);
-  await topicListPage.deleteButton.click();
+  await propertiesPage.deleteKafkaTopic();
 });
 
 // test_4kafka.py test_edit_topic_properties_after_creation
@@ -363,8 +367,11 @@ test('edit topic properties after creation', async ({ page }) => {
 
   await propertiesPage.saveButton.click();
 
-  // await expect(page.getByText('Increase the number of partitions?')).toHaveCount(1);
-  // await page.getByRole('button', { name: 'Yes' }).click();
+  if (!config.prodEnv) {
+    await expect(page.getByText('Increase the number of partitions?')).toHaveCount(1);
+    await page.getByRole('button', { name: 'Yes' }).click();
+  }
+
   await page.waitForSelector(AbstractPage.progressBarLocatorString, {
     state: 'detached'
   });
@@ -388,7 +395,48 @@ test('edit topic properties after creation', async ({ page }) => {
   expect(cp).not.toMatch(/Delete/);
 
   // Topic CleanUp
-  await topicPage.deleteTopicLink.click();
-  await topicListPage.deleteNameInput.fill(testTopicName);
-  await topicListPage.deleteButton.click();
+  await propertiesPage.deleteKafkaTopic();
+});
+
+test('test kafka dashboard with multiple topics and partitions', async ({ page }) => {
+  const kafkaInstancesPage = new KafkaInstanceListPage(page);
+  const kafkaInstancePage = new KafkaInstancePage(page, testInstanceName);
+  const topicListPage = new TopicListPage(page, testInstanceName);
+
+  await kafkaInstancesPage.gotoThroughMenu();
+  await kafkaInstancePage.gotoThroughMenu();
+  await kafkaInstancePage.setPartitionLimit();
+
+  // Create 3 topics and reach topic partitions limit-1
+  await topicListPage.gotoThroughMenu();
+  await topicListPage.createKafkaTopic(
+    testTopicNamePrefix + Date.now(),
+    false,
+    kafkaInstancePage.maxTopicPartitionsNumber - 3
+  );
+  await topicListPage.createKafkaTopic(testTopicNamePrefix + Date.now(), true);
+  await topicListPage.createKafkaTopic(testTopicNamePrefix + Date.now(), true);
+
+  await kafkaInstancePage.kafkaTabNavDashboard.click();
+  // Metrics are not live, wait for update
+  await kafkaInstancePage.dashboardTopicCountRefreshed(3, 20, 2000);
+
+  await expect(
+    page.locator(`[aria-valuetext="${kafkaInstancePage.maxTopicPartitionsNumber - 1} Topic partitions"]`)
+  ).toBeVisible({ timeout: 500 });
+  await expect(kafkaInstancePage.nearTopicPartitionsLimit).toBeVisible({ timeout: 500 });
+
+  // Create another topic to reach partition limit
+  await topicListPage.gotoThroughMenu();
+  await topicListPage.createKafkaTopic(testTopicNamePrefix + Date.now(), true);
+  await kafkaInstancePage.kafkaTabNavDashboard.click();
+
+  // Metrics are not live, wait for update
+  await kafkaInstancePage.dashboardTopicCountRefreshed(4, 20, 2000);
+
+  await expect(
+    page.locator(`[aria-valuetext="${kafkaInstancePage.maxTopicPartitionsNumber} Topic partitions"]`)
+  ).toBeVisible({ timeout: 500 });
+  await expect(kafkaInstancePage.reachedTopicPartitionsLimit).toBeVisible({ timeout: 500 });
+  await expect(kafkaInstancePage.nearTopicPartitionsLimit).toBeHidden({ timeout: 500 });
 });

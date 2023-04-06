@@ -5,14 +5,12 @@ export class TopicPage extends TopicListPage {
   readonly topicName: string;
   readonly topicLink: Locator;
   readonly topicHeading: Locator;
-  readonly deleteTopicLink: Locator;
 
   constructor(page: Page, instanceName: string, topicName: string) {
     super(page, instanceName);
     this.topicName = topicName;
     this.topicLink = page.locator('a', { hasText: this.topicName });
     this.topicHeading = page.locator('h1', { hasText: this.topicName });
-    this.deleteTopicLink = page.locator('a', { hasText: 'Delete topic' });
   }
 
   async gotoThroughMenu() {

@@ -2,6 +2,7 @@ import { expect, Locator, Page } from '@playwright/test';
 import { KafkaInstanceListPage } from '@lib/pom/streams/kafkaInstanceList';
 import { AbstractPage } from '@lib/pom/abstractPage';
 import { sleep } from '@lib/utils/sleep';
+import { retry } from '@lib/utils/common';
 
 export class KafkaInstancePage extends KafkaInstanceListPage {
   readonly instanceName: string;
@@ -15,6 +16,10 @@ export class KafkaInstancePage extends KafkaInstanceListPage {
   readonly kafkaTabNavConsumerGroups: Locator;
   readonly kafkaTabNavAccess: Locator;
   readonly kafkaTabNavSettings: Locator;
+  readonly nearTopicPartitionsLimit: Locator;
+  readonly reachedTopicPartitionsLimit: Locator;
+  readonly maxTopicPartitions: Locator;
+  maxTopicPartitionsNumber: number;
 
   constructor(page: Page, instanceName: string) {
     super(page);
@@ -30,6 +35,13 @@ export class KafkaInstancePage extends KafkaInstanceListPage {
     this.kafkaTabNavConsumerGroups = page.locator('li[data-ouia-component-id="tab-Consumers"]');
     this.kafkaTabNavAccess = page.locator('li[data-ouia-component-id="tab-Permissions"]');
     this.kafkaTabNavSettings = page.locator('li[data-ouia-component-id="tab-Settings"]');
+
+    // Dashboard
+    this.maxTopicPartitions = page.getByText(/^Limit \d+ partitions$/);
+    this.nearTopicPartitionsLimit = this.warningAlert.getByText(
+      'This Kafka instance is close to reaching the partition limit'
+    );
+    this.reachedTopicPartitionsLimit = this.dangerAlert.getByText('This Kafka instance reached the partition limit');
   }
 
   async gotoThroughMenu() {
@@ -49,6 +61,11 @@ export class KafkaInstancePage extends KafkaInstanceListPage {
   async showDetails() {
     await this.showInstanceActions();
     await this.detailsButton.click();
+  }
+
+  async setPartitionLimit() {
+    const text = await this.maxTopicPartitions.innerText();
+    this.maxTopicPartitionsNumber = parseInt(text.match(/\d+/gm)[0]);
   }
 
   async deleteInstance(name: string) {
@@ -75,5 +92,25 @@ export class KafkaInstancePage extends KafkaInstanceListPage {
 
   async closeModalWithInfo() {
     await this.closeDrawerButton.click();
+  }
+
+  async waitForLoaded() {
+    await expect(this.kafkaInstanceHeading).toHaveCount(1);
+    await this.page.waitForSelector(AbstractPage.progressBarLocatorString, {
+      state: 'detached'
+    });
+  }
+
+  async dashboardTopicCountRefreshed(expectedTopics: number, retries: number, retryInterval: number) {
+    await retry(
+      async () => {
+        await this.kafkaTabNavTopics.click();
+        await this.kafkaTabNavDashboard.click();
+        await this.waitForLoaded();
+        await expect(this.page.locator(`[aria-valuetext="${expectedTopics} Topics"]`)).toBeVisible({ timeout: 500 });
+      },
+      retries,
+      retryInterval
+    );
   }
 }
