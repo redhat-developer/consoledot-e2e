@@ -312,9 +312,7 @@ test('create Topic with properties different than default', async ({ page }) => 
   expect(cp).not.toMatch(/delete/);
 
   // Topic CleanUp
-  await topicPage.deleteTopicLink.click();
-  await topicListPage.deleteNameInput.fill(testTopicName);
-  await topicListPage.deleteButton.click();
+  await propertiesPage.deleteKafkaTopic();
 });
 
 // test_4kafka.py test_edit_topic_properties_after_creation
@@ -397,9 +395,7 @@ test('edit topic properties after creation', async ({ page }) => {
   expect(cp).not.toMatch(/Delete/);
 
   // Topic CleanUp
-  await topicPage.deleteTopicLink.click();
-  await topicListPage.deleteNameInput.fill(testTopicName);
-  await topicListPage.deleteButton.click();
+  await propertiesPage.deleteKafkaTopic();
 });
 
 test('test kafka dashboard with multiple topics and partitions', async ({ page }) => {
