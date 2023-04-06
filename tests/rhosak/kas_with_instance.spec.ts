@@ -369,8 +369,11 @@ test('edit topic properties after creation', async ({ page }) => {
 
   await propertiesPage.saveButton.click();
 
-  // await expect(page.getByText('Increase the number of partitions?')).toHaveCount(1);
-  // await page.getByRole('button', { name: 'Yes' }).click();
+  if (!config.prodEnv) {
+    await expect(page.getByText('Increase the number of partitions?')).toHaveCount(1);
+    await page.getByRole('button', { name: 'Yes' }).click();
+  }
+
   await page.waitForSelector(AbstractPage.progressBarLocatorString, {
     state: 'detached'
   });
