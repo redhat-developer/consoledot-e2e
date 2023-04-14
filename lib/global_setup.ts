@@ -29,6 +29,10 @@ export default async function globalSetup() {
         ignoreHTTPSErrors: config.use.ignoreHTTPSErrors
       });
       const page = await context.newPage();
+      await page.addInitScript(() => {
+        window.localStorage.setItem('chrome:analytics:disable', String(true));
+        window.localStorage.setItem('chrome:segment:disable', String(true));
+      });
       const consoleDotAuthPage = new ConsoleDotAuthPage(page);
       await consoleDotAuthPage.login(user.name, user.password);
       await page.context().storageState({ path: user.path as string });
