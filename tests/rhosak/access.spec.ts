@@ -23,18 +23,7 @@ test.describe('kafka instance manage access tests', () => {
     await consoleDotAuthPage.login();
     await kafkaInstancesPage.gotoThroughMenu();
 
-    if ((await kafkaInstancesPage.noKafkaInstancesText.count()) == 1) {
-      await kafkaInstancesPage.createKafkaInstance(testInstanceName);
-      await kafkaInstancesPage.waitForKafkaReady(testInstanceName);
-    } else {
-      // Test instance present, nothing to do!
-      try {
-        await expect(page.getByText(testInstanceName)).toHaveCount(1, { timeout: 2000 });
-      } catch (e) {
-        await kafkaInstancesPage.createKafkaInstance(testInstanceName);
-        await kafkaInstancesPage.waitForKafkaReady(testInstanceName);
-      }
-    }
+    await kafkaInstancesPage.setupTestKafkaInstance(page, testInstanceName);
   });
 
   test.afterAll(async ({ page }) => {

@@ -151,4 +151,67 @@ export class KafkaInstanceListPage extends AbstractPage {
     }
     resourceStore.clearKafkaList();
   }
+
+  async setupTestKafkaInstance(page, testInstanceName: string) {
+    await this.gotoThroughMenu();
+    if ((await this.noKafkaInstancesText.count()) == 1) {
+      await this.createKafkaInstance(testInstanceName);
+      await this.waitForKafkaReady(testInstanceName);
+    } else {
+      // Test instance present, nothing to do!
+      try {
+        await expect(page.getByText(testInstanceName)).toHaveCount(1, { timeout: 2000 });
+        await this.waitForKafkaReady(testInstanceName);
+      } catch (e) {
+        await this.createKafkaInstance(testInstanceName);
+        await this.waitForKafkaReady(testInstanceName);
+      }
+    }
+  }
+
+  async resetFilter(page) {
+    if ((await page.getByText('Clear all filters').count()) > 1) {
+      await page.getByText('Clear all filters').nth(1).click();
+    }
+  }
+
+  async filterByStatus(page, status) {
+    await this.resetFilter(page);
+    await page.getByTestId('large-viewport-toolbar').locator('[aria-label="Options menu"]').click();
+
+    await page.locator('button[role="option"]:has-text("Status")').click();
+    await page.getByTestId('large-viewport-toolbar').getByText('Filter by status').click();
+
+    await page.getByLabel(status).check(true);
+
+    await page.getByTestId('large-viewport-toolbar').getByText('Filter by status').click();
+  }
+
+  async filterByName(page, name, skipClick = false) {
+    await this.resetFilter(page);
+    await page.getByTestId('large-viewport-toolbar').locator('[aria-label="Options menu"]').click();
+
+    await page.locator('button[role="option"]:has-text("Name")').click();
+
+    await page.getByTestId('large-viewport-toolbar').getByPlaceholder('Filter by name').click();
+    await page.getByTestId('large-viewport-toolbar').getByPlaceholder('Filter by name').fill(name);
+
+    if (!skipClick) {
+      await page.getByRole('button', { name: 'Search' }).click();
+    }
+  }
+
+  async filterByOwner(page, name, skipClick = false) {
+    await this.resetFilter(page);
+    await page.getByTestId('large-viewport-toolbar').locator('[aria-label="Options menu"]').click();
+
+    await page.locator('button[role="option"]:has-text("Owner")').click();
+
+    await page.getByTestId('large-viewport-toolbar').getByPlaceholder('Filter by owner').click();
+    await page.getByTestId('large-viewport-toolbar').getByPlaceholder('Filter by owner').fill(name);
+
+    if (!skipClick) {
+      await page.getByRole('button', { name: 'Search' }).click();
+    }
+  }
 }

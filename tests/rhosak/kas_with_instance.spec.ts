@@ -21,21 +21,7 @@ test.use({ storageState: config.adminAuthFile });
 
 test.beforeEach(async ({ page }) => {
   const kafkaInstancesPage = new KafkaInstanceListPage(page);
-
-  await kafkaInstancesPage.gotoThroughMenu();
-
-  if ((await kafkaInstancesPage.noKafkaInstancesText.count()) == 1) {
-    await kafkaInstancesPage.createKafkaInstance(testInstanceName);
-    await kafkaInstancesPage.waitForKafkaReady(testInstanceName);
-  } else {
-    // Test instance present, nothing to do!
-    try {
-      await expect(page.getByText(testInstanceName)).toHaveCount(1, { timeout: 2000 });
-    } catch (e) {
-      await kafkaInstancesPage.createKafkaInstance(testInstanceName);
-      await kafkaInstancesPage.waitForKafkaReady(testInstanceName);
-    }
-  }
+  await kafkaInstancesPage.setupTestKafkaInstance(page, testInstanceName);
 });
 
 test.afterEach(async ({ page }) => {
@@ -94,70 +80,35 @@ test('test fail to create a second Kafka instance', async ({ page }) => {
   await page.locator('#modalCreateKafka > button').click();
 });
 
-const filterByName = async function (page, name, skipClick = false) {
-  if ((await page.getByRole('button', { name: 'Clear all filters' }).count()) > 0) {
-    await page.getByRole('button', { name: 'Clear all filters' }).click();
-  }
-  await page.getByTestId('large-viewport-toolbar').locator('[aria-label="Options menu"]').click();
-
-  await page.locator('button[role="option"]:has-text("Name")').click();
-
-  await page.getByTestId('large-viewport-toolbar').getByPlaceholder('Filter by name').click();
-  await page.getByTestId('large-viewport-toolbar').getByPlaceholder('Filter by name').fill(name);
-
-  if (!skipClick) {
-    await page.getByRole('button', { name: 'Search' }).click();
-  }
-};
-
 // test_3kas.py test_kas_kafka_filter_by_name
 test('test instances can be filtered by name', async ({ page }) => {
   const kafkaInstancesPage = new KafkaInstanceListPage(page);
   await kafkaInstancesPage.gotoThroughMenu();
 
-  await filterByName(page, 'test');
+  await kafkaInstancesPage.filterByName(page, 'test');
   await expect(page.getByText(testInstanceName)).toBeTruthy();
 
-  await filterByName(page, 'wrong');
+  await kafkaInstancesPage.filterByName(page, 'wrong');
   await expect(page.getByText('No results found')).toHaveCount(1);
 
-  await filterByName(page, 'INVALID-SYNTAX#$', true);
+  await kafkaInstancesPage.filterByName(page, 'INVALID-SYNTAX#$', true);
   await expect(
     page.getByText('Valid characters include lowercase letters from a to z, numbers from 0 to 9, and')
   ).toHaveCount(1);
 });
-
-const filterByOwner = async function (page, name, skipClick = false) {
-  const kafkaInstancesPage = new KafkaInstanceListPage(page);
-  await kafkaInstancesPage.gotoThroughMenu();
-
-  if ((await page.getByRole('button', { name: 'Clear all filters' }).count()) > 0) {
-    await page.getByRole('button', { name: 'Clear all filters' }).click();
-  }
-  await page.getByTestId('large-viewport-toolbar').locator('[aria-label="Options menu"]').click();
-
-  await page.locator('button[role="option"]:has-text("Owner")').click();
-
-  await page.getByTestId('large-viewport-toolbar').getByPlaceholder('Filter by owner').click();
-  await page.getByTestId('large-viewport-toolbar').getByPlaceholder('Filter by owner').fill(name);
-
-  if (!skipClick) {
-    await page.getByRole('button', { name: 'Search' }).click();
-  }
-};
 
 // test_3kas.py test_kas_kafka_filter_by_owner
 test('test instances can be filtered by owner', async ({ page }) => {
   const kafkaInstancesPage = new KafkaInstanceListPage(page);
   await kafkaInstancesPage.gotoThroughMenu();
 
-  await filterByOwner(page, config.adminUsername.substring(0, 5));
+  await kafkaInstancesPage.filterByOwner(page, config.adminUsername.substring(0, 5));
   await expect(page.getByText(testInstanceName)).toBeTruthy();
 
-  await filterByOwner(page, 'wrong');
+  await kafkaInstancesPage.filterByOwner(page, 'wrong');
   await expect(page.getByText('No results found')).toHaveCount(1);
 
-  await filterByOwner(page, 'INVALID-SYNTAX#$', true);
+  await kafkaInstancesPage.filterByOwner(page, 'INVALID-SYNTAX#$', true);
   await expect(
     page.getByText('Valid characters include lowercase letters from a to z, numbers from 0 to 9, and')
   ).toHaveCount(1);

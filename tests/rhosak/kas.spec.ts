@@ -70,24 +70,6 @@ test('test Kafka creation units slider', async ({ page }) => {
   await expect(slider.locator('.pf-c-slider__step-label').last()).toHaveText(config.maxKafkaStreamingUnits.toString());
 });
 
-const resetFilter = async function (page) {
-  if ((await page.getByText('Clear all filters').count()) > 1) {
-    await page.getByText('Clear all filters').nth(1).click();
-  }
-};
-
-const filterByStatus = async function (page, status) {
-  await resetFilter(page);
-  await page.getByTestId('large-viewport-toolbar').locator('[aria-label="Options menu"]').click();
-
-  await page.locator('button[role="option"]:has-text("Status")').click();
-  await page.getByTestId('large-viewport-toolbar').getByText('Filter by status').click();
-
-  await page.getByLabel(status).check(true);
-
-  await page.getByTestId('large-viewport-toolbar').getByText('Filter by status').click();
-};
-
 // test_3kas.py test_kas_kafka_filter_by_status
 test('test Kafka list filtered by status', async ({ page }) => {
   const kafkaInstancesPage = new KafkaInstanceListPage(page);
@@ -96,17 +78,17 @@ test('test Kafka list filtered by status', async ({ page }) => {
   await kafkaInstancesPage.createKafkaInstance(testInstanceName);
   await expect(page.getByText(testInstanceName)).toBeVisible();
 
-  await filterByStatus(page, 'Suspended');
+  await kafkaInstancesPage.filterByStatus(page, 'Suspended');
   await expect(page.getByText('No results found')).toHaveCount(1);
 
-  await filterByStatus(page, 'Creating');
+  await kafkaInstancesPage.filterByStatus(page, 'Creating');
   await expect(page.getByText(testInstanceName)).toBeTruthy();
 
   // Reset the filter
-  await resetFilter(page);
+  await kafkaInstancesPage.resetFilter(page);
   await kafkaInstancesPage.waitForKafkaReady(testInstanceName);
 
-  await filterByStatus(page, 'Ready');
+  await kafkaInstancesPage.filterByStatus(page, 'Ready');
   await expect(page.getByText(testInstanceName)).toBeTruthy();
 
   await kafkaInstancesPage.deleteKafkaInstance(testInstanceName, false);
