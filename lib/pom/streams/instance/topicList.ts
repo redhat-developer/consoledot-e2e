@@ -122,4 +122,16 @@ export class TopicListPage extends KafkaInstancePage {
     }
     resourceStore.clearKafkaTopicList();
   }
+
+  async kafkaTopicExists(name: string) {
+    return (await this.page.locator('a', { hasText: name }).count()) === 1;
+  }
+
+  async setupTestKafkaTopic(testTopicName) {
+    await this.gotoThroughMenu();
+    // Do not create topic if it already exists
+    if (!(await this.kafkaTopicExists(testTopicName))) {
+      await this.createKafkaTopic(testTopicName, true);
+    }
+  }
 }

@@ -6,6 +6,7 @@ export class MessagesPage extends TopicListPage {
   readonly topicName: string;
   readonly messageMenuButton: Locator;
   readonly messageTable: Locator;
+  readonly messageTableBody: Locator;
   readonly checkForNewDataButton: Locator;
   readonly searchButton: Locator;
   readonly filterGroup: Locator;
@@ -19,6 +20,7 @@ export class MessagesPage extends TopicListPage {
     this.topicName = topicName;
     this.messageMenuButton = page.locator('li[data-ouia-component-id="tab-Topics"]');
     this.messageTable = page.locator('table[aria-label="Messages table"]');
+    this.messageTableBody = this.messageTable.locator('tbody');
     this.checkForNewDataButton = page.locator('button', { hasText: 'Check for new data' });
     this.searchButton = page.locator('button[aria-label="Search"]');
     this.filterGroup = page.locator('[data-testid="filter-group"]');

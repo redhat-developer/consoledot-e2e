@@ -35,38 +35,16 @@ test.beforeEach(async ({ page }) => {
   const topicPage = new TopicListPage(page, testInstanceName);
   const accessPage = new AccessPage(page, testInstanceName);
 
-  await kafkaInstancesPage.gotoThroughMenu();
-
-  if ((await kafkaInstancesPage.noKafkaInstancesText.count()) == 1) {
-    await kafkaInstancesPage.createKafkaInstance(testInstanceName);
-    await kafkaInstancesPage.waitForKafkaReady(testInstanceName);
-  } else {
-    // Test instance present, nothing to do!
-    try {
-      await expect(page.getByText(testInstanceName)).toHaveCount(1, { timeout: 2000 });
-    } catch (e) {
-      await kafkaInstancesPage.createKafkaInstance(testInstanceName);
-      await kafkaInstancesPage.waitForKafkaReady(testInstanceName);
-    }
-  }
-
-  await kafkaInstancePage.gotoThroughMenu();
-  await topicPage.gotoThroughMenu();
-  // Do not create topic if it already exists
-  // TODO - implement this in POM somehow
-  await expect(page.getByText('Create topic')).toHaveCount(1);
-  await expect(page.getByText('Loading content')).toHaveCount(0);
-  if ((await page.locator('a', { hasText: testTopicName }).count()) === 0) {
-    await topicPage.createKafkaTopic(testTopicName, true);
-  }
-
-  await serviceAccountPage.gotoThroughMenu();
-  credentials = await serviceAccountPage.createServiceAccount(testServiceAccountName);
-  await kafkaInstancesPage.gotoThroughMenu();
+  await kafkaInstancesPage.setupTestKafkaInstance(page, testInstanceName);
   bootstrap = await kafkaInstancesPage.getBootstrapUrl(testInstanceName);
 
   await kafkaInstancePage.gotoThroughMenu();
-  await accessPage.gotoThroughMenu();
+  await topicPage.setupTestKafkaTopic(testTopicName);
+
+  await serviceAccountPage.gotoThroughMenu();
+  credentials = await serviceAccountPage.createServiceAccount(testServiceAccountName);
+
+  await accessPage.gotoFromAnywhere();
   await accessPage.grantProducerAccess(credentials.clientID, testTopicName);
 
   // Producer 100 messages
@@ -101,9 +79,7 @@ test('Consume messages from topic', async ({ page }) => {
   const consumerGroupsPage = new ConsumerGroupsPage(page, testInstanceName);
   const accessPage = new AccessPage(page, testInstanceName);
 
-  await kafkaInstancesPage.gotoThroughMenu();
-  await kafkaInstancePage.gotoThroughMenu();
-  await accessPage.gotoThroughMenu();
+  await accessPage.gotoFromAnywhere();
   await accessPage.grantConsumerAccess(credentials.clientID, testTopicName, consumerGroupId);
 
   // Consume 100 messages
@@ -139,9 +115,9 @@ test('Browse messages', async ({ page }) => {
 
   await messagesPage.refreshMessages();
 
-  await expect(page.locator('table[aria-label="Messages table"]')).toContainText('value-' + testMessageKey);
-  await expect(page.locator('table[aria-label="Messages table"]')).toContainText('key-' + testMessageKey);
-  await page.locator('table[aria-label="Messages table"] >> tr').nth(1).click();
+  await expect(messagesPage.messageTable).toContainText('value-' + testMessageKey);
+  await expect(messagesPage.messageTable).toContainText('key-' + testMessageKey);
+  await messagesPage.messageTable.locator('tr').nth(1).click();
   const messageDetail = await page.locator('data-testid=message-details');
   await expect(messageDetail.locator('dt:has-text("Offset")')).toHaveCount(1);
   await expect(messageDetail.locator('dd:has-text("key-")')).toHaveCount(1);
