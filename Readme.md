@@ -1,5 +1,4 @@
 # E2E tests for console.redhat.com
-[![Playwright Tests](https://github.com/redhat-developer/consoledot-e2e/actions/workflows/playwright.yml/badge.svg?branch=main)](https://github.com/redhat-developer/consoledot-e2e/actions/workflows/playwright.yml)
 
 E2E tests for RedHat Console.
 
