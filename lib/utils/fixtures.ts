@@ -1,9 +1,20 @@
 import { config } from '@lib/config';
-import { test as base, expect } from '@playwright/test';
+import {test as base, expect, Page} from '@playwright/test';
 import { ConsoleDotAuthPage } from '@lib/pom/auth';
+import {ServiceRegistryPage} from "@lib/pom/serviceRegistry/serviceRegistry";
+import {AbstractPage} from "@lib/pom/abstractPage";
+import {ServiceAccountPage} from "@lib/pom/serviceAccounts/sa";
+
+
+// Declare the types of your fixtures.
+type PomFixtures = {
+  page: Page;
+  serviceRegistryPage: ServiceRegistryPage;
+  serviceAccountPage: ServiceAccountPage;
+};
 
 // Extend Playwright page to start always at config.startingPage
-export const test = base.extend({
+export const test = base.extend<PomFixtures>({
   page: async ({ page }, use, testInfo) => {
     const autPage = new ConsoleDotAuthPage(page);
 
@@ -50,5 +61,45 @@ export const test = base.extend({
         console.error(logEntry);
       }
     }
-  }
+  },
+
+  // Fixture to create a new page and initialize the ServiceRegistryPage
+  serviceRegistryPage: async ({ page }, use) => {
+    const serviceRegistryPage = new ServiceRegistryPage(page);
+    // Go to list of Service Registry instances
+    await serviceRegistryPage.gotoThroughMenu();
+    // Wait for dismiss of loading spinner
+    await serviceRegistryPage.waitForSelector(AbstractPage.progressBarLocatorString, {
+      state: 'detached',
+      timeout: config.serviceRegistryInstanceCreationTimeout,
+    });
+    // Wait for presence of button for Service Registry instance creation
+    await serviceRegistryPage.waitForSelector('button:has-text("Create Service Registry instance")');
+    // Delete all existing Service Registry instances
+    for (const el of await serviceRegistryPage.locator(`tr >> a`).elementHandles()) {
+      // Get name of existing instance
+      const name = await el.textContent();
+      // Delete instance
+      await serviceRegistryPage.deleteServiceRegistryInstance(name);
+    }
+    // Use fixture in test
+    await use(serviceRegistryPage);
+    // Teardown - Delete all Service Registry instances created during tests
+    await serviceRegistryPage.deleteAllServiceRegistries();
+  },
+
+  serviceAccountPage: async ({ page }, use) => {
+    const serviceAccountPage = new ServiceAccountPage(page);
+    // Go to list of Service accounts instances
+    await serviceAccountPage.gotoThroughMenu();
+
+    // Use fixture in test
+    await use(serviceAccountPage);
+
+    // Teardown - Delete all Service accounts created during tests
+    await serviceAccountPage.deleteAllServiceAccounts();
+  },
+
+
 });
+
