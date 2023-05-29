@@ -179,4 +179,3 @@ export const test = base.extend<PomFixtures>({
     await use(kafkaAccessPage);
   },
 });
-
