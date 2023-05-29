@@ -4,13 +4,22 @@ import { ConsoleDotAuthPage } from '@lib/pom/auth';
 import {ServiceRegistryPage} from "@lib/pom/serviceRegistry/serviceRegistry";
 import {AbstractPage} from "@lib/pom/abstractPage";
 import {ServiceAccountPage} from "@lib/pom/serviceAccounts/sa";
+import {KafkaInstanceListPage} from "@lib/pom/streams/kafkaInstanceList";
+import {KafkaInstancePage} from "@lib/pom/streams/kafkaInstance";
+import {AccessPage} from "@lib/pom/streams/instance/access";
 
+const testInstanceName = config.instanceName;
 
 // Declare the types of your fixtures.
 type PomFixtures = {
   page: Page;
   serviceRegistryPage: ServiceRegistryPage;
   serviceAccountPage: ServiceAccountPage;
+  kafkaInstancePage: KafkaInstancePage;
+  kafkaInstanceListPage: KafkaInstanceListPage;
+  kafkaAccessPage: AccessPage;
+  consoleDotAuthPage: ConsoleDotAuthPage
+
 };
 
 // Extend Playwright page to start always at config.startingPage
@@ -88,6 +97,7 @@ export const test = base.extend<PomFixtures>({
     await serviceRegistryPage.deleteAllServiceRegistries();
   },
 
+  // Fixture to create a new page and initialize the ServiceAccountPage
   serviceAccountPage: async ({ page }, use) => {
     const serviceAccountPage = new ServiceAccountPage(page);
     // Go to list of Service accounts instances
@@ -100,6 +110,65 @@ export const test = base.extend<PomFixtures>({
     await serviceAccountPage.deleteAllServiceAccounts();
   },
 
+  // Fixture to create a new page and initialize the kafkaInstanceListPage which returns list of Kafka instances
+  kafkaInstanceListPage: async ({ page }, use) => {
+    const kafkaInstancesListPage = new KafkaInstanceListPage(page);
+    await kafkaInstancesListPage.gotoThroughMenu();
 
+    // Use fixture in test
+    await use(kafkaInstancesListPage);
+  },
+
+  // Fixture to create a new page and initialize the consoleDotAuthPage
+  consoleDotAuthPage: async ({ page }, use) => {
+    const consoleDotAuthPage = new ConsoleDotAuthPage(page);
+    await consoleDotAuthPage.goto();
+
+    // Use fixture in test
+    await use(consoleDotAuthPage);
+  },
+
+  // Fixture to create a new page and initialize the kafkaInstancePage and create new kafka instance if not present
+  kafkaInstancePage: async ({ kafkaInstanceListPage,page }, use) => {
+    const kafkaInstancePage = new KafkaInstancePage(page, testInstanceName);
+    await kafkaInstanceListPage.gotoThroughMenu();
+
+    if ((await kafkaInstanceListPage.noKafkaInstancesText.count()) == 1) {
+      await kafkaInstanceListPage.createKafkaInstance(testInstanceName);
+      await kafkaInstanceListPage.waitForKafkaReady(testInstanceName);
+    } else {
+      // Test instance present, nothing to do!
+      try {
+        await expect(page.getByText(testInstanceName)).toHaveCount(1, { timeout: 2000 });
+      } catch (e) {
+        await kafkaInstanceListPage.createKafkaInstance(testInstanceName);
+        await kafkaInstanceListPage.waitForKafkaReady(testInstanceName);
+      }
+    }
+
+    // Use fixture in test
+    await use(kafkaInstancePage);
+
+    // Teardown - Delete all kafka instances created during tests
+    await kafkaInstanceListPage.gotoThroughMenu();
+
+    try {
+      await kafkaInstanceListPage.deleteKafkaInstance(testInstanceName);
+    } catch (error) {
+      //Ignore exception
+    }
+  },
+
+  // Fixture to create a new page and initialize the AccessPage
+  kafkaAccessPage: async ({ kafkaInstancePage, kafkaInstanceListPage  }, use) => {
+    const kafkaAccessPage = new AccessPage(page, testInstanceName);
+    await kafkaInstanceListPage.waitForKafkaReady(testInstanceName);
+    await kafkaInstanceListPage.gotoThroughMenu();
+    await kafkaInstancePage.gotoThroughMenu();
+    await kafkaAccessPage.gotoThroughMenu();
+
+    // Use fixture in test
+    await use(kafkaAccessPage);
+  },
 });
 
