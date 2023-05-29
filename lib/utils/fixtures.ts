@@ -78,14 +78,14 @@ export const test = base.extend<PomFixtures>({
     // Go to list of Service Registry instances
     await serviceRegistryPage.gotoThroughMenu();
     // Wait for dismiss of loading spinner
-    await serviceRegistryPage.waitForSelector(AbstractPage.progressBarLocatorString, {
+    await page.waitForSelector(AbstractPage.progressBarLocatorString, {
       state: 'detached',
       timeout: config.serviceRegistryInstanceCreationTimeout,
     });
     // Wait for presence of button for Service Registry instance creation
-    await serviceRegistryPage.waitForSelector('button:has-text("Create Service Registry instance")');
+    await page.waitForSelector('button:has-text("Create Service Registry instance")');
     // Delete all existing Service Registry instances
-    for (const el of await serviceRegistryPage.locator(`tr >> a`).elementHandles()) {
+    for (const el of await page.locator(`tr >> a`).elementHandles()) {
       // Get name of existing instance
       const name = await el.textContent();
       // Delete instance
@@ -115,8 +115,16 @@ export const test = base.extend<PomFixtures>({
     const kafkaInstancesListPage = new KafkaInstanceListPage(page);
     await kafkaInstancesListPage.gotoThroughMenu();
 
+    await page.waitForSelector(AbstractPage.progressBarLocatorString, {
+      state: 'detached',
+      timeout: config.kafkaInstanceCreationTimeout
+    });
+
     // Use fixture in test
     await use(kafkaInstancesListPage);
+
+    // Teardown - Delete all Kafka instances
+    await kafkaInstancesListPage.deleteAllKafkas();
   },
 
   // Fixture to create a new page and initialize the consoleDotAuthPage
