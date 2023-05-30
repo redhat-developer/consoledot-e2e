@@ -7,6 +7,8 @@ import {ServiceAccountPage} from "@lib/pom/serviceAccounts/sa";
 import {KafkaInstanceListPage} from "@lib/pom/streams/kafkaInstanceList";
 import {KafkaInstancePage} from "@lib/pom/streams/kafkaInstance";
 import {AccessPage} from "@lib/pom/streams/instance/access";
+import {ConsumerGroupsPage} from "@lib/pom/streams/instance/consumerGroups";
+import {TopicListPage} from "@lib/pom/streams/instance/topicList";
 
 const testInstanceName = config.instanceName;
 
@@ -18,8 +20,9 @@ type PomFixtures = {
   kafkaInstancePage: KafkaInstancePage;
   kafkaInstanceListPage: KafkaInstanceListPage;
   kafkaAccessPage: AccessPage;
-  consoleDotAuthPage: ConsoleDotAuthPage
-
+  consoleDotAuthPage: ConsoleDotAuthPage;
+  consumerGroupsPage: ConsumerGroupsPage;
+  kafkaTopicPage: TopicListPage;
 };
 
 // Extend Playwright page to start always at config.startingPage
@@ -171,11 +174,31 @@ export const test = base.extend<PomFixtures>({
   kafkaAccessPage: async ({ kafkaInstancePage, kafkaInstanceListPage  }, use) => {
     const kafkaAccessPage = new AccessPage(page, testInstanceName);
     await kafkaInstanceListPage.waitForKafkaReady(testInstanceName);
-    await kafkaInstanceListPage.gotoThroughMenu();
-    await kafkaInstancePage.gotoThroughMenu();
+    await kafkaInstancePage;
     await kafkaAccessPage.gotoThroughMenu();
 
     // Use fixture in test
     await use(kafkaAccessPage);
+  },
+
+  // Fixture to create a new page and initialize the Kafkas's Consumer group page
+  consumerGroupsPage: async ({ kafkaInstancePage}, use) => {
+    const consumerGroupsPage = new ConsumerGroupsPage(page, testInstanceName);
+    await kafkaInstancePage;
+
+    await consumerGroupsPage.gotoThroughMenu();
+
+    // Use fixture in test
+    await use(consumerGroupsPage);
+  },
+
+  // Fixture to create a new page and initialize the consoleDotAuthPage
+  kafkaTopicPage: async ({ kafkaInstancePage }, use) => {
+    const topicPage = new TopicListPage(page, testInstanceName);
+    await kafkaInstancePage;
+    await topicPage.gotoThroughMenu();
+
+    // Use fixture in test
+    await use(topicPage);
   },
 });
